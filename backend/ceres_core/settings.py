@@ -37,6 +37,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
+    # Bibliotecas de Terceiros
+    'rest_framework',
+    'rest_framework_simplejwt',
+    
+    # Nossos Apps
+    'accounts',
+    'diagnostico',
 ]
 
 MIDDLEWARE = [
@@ -74,8 +82,12 @@ WSGI_APPLICATION = 'ceres_core.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'ceres_db',
+        'USER': 'ceres_user',
+        'PASSWORD': 'ceres_password',
+        'HOST': 'localhost', # Ou o IP do WSL/Docker dependendo de como estiver rodando
+        'PORT': '5433',
     }
 }
 
@@ -115,3 +127,24 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    )
+}
+
+# Configurações básicas do JWT (Tempo de expiração)
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+# Define o nosso modelo de usuário customizado (que vamos criar na próxima task)
+AUTH_USER_MODEL = 'accounts.CustomUser'
