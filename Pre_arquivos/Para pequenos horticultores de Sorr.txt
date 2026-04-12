@@ -1,0 +1,4 @@
+Para pequenos horticultores de Sorriso-MT e região, produtores de tomate que trabalham diretamente no campo e possuem pouco tempo ou dificuldade para digitar textos técnicos no celular,
+o Ceres Diagnóstico é uma ferramenta web de triagem agronômica guiada por IA que permite identificar rapidamente pragas e doenças do tomateiro através de um fluxo visual de seleção de sintomas, sem necessidade de digitação.
+Diferente de grupos de WhatsApp, pesquisas no Google ou chatbots agrícolas genéricos,
+nosso produto transforma recomendações oficiais da Embrapa em diagnósticos rápidos e confiáveis, acessíveis diretamente na lavoura, ajudando o produtor a tomar decisões técnicas mais seguras e reduzir perdas na produção
