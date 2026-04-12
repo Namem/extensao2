@@ -1,3 +1,4 @@
+@"
 # Ambientes Virtuais Python
 venv/
 env/
@@ -6,7 +7,7 @@ env/
 # Cache do Python
 __pycache__/
 *.py[cod]
-*$py.class
+*`$py.class
 
 # Django
 *.log
@@ -29,3 +30,4 @@ staticfiles/
 # Arquivos de Sistema Operacional
 .DS_Store
 Thumbs.db
+"@ | Out-File -FilePath .gitignore -Encoding utf8
