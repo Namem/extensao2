@@ -1,0 +1,202 @@
+{
+  "diagnosticos": [
+    {
+      "id": "D1",
+      "nome": "Requeima (Phytophthora infestans)",
+      "descricao": "Manchas grandes, escuras com aspecto encharcado nas folhas e brotações jovens; na face inferior pode haver mofo esbranquiçado, evoluindo para queima generalizada da planta.",
+      "recomendacao_manejo": "Controle preventivo com fungicidas sistêmicos e protetores para oomicetos (metalaxil, cimoxanil); evitar molhamento foliar com irrigação por gotejamento; usar mudas sadias e rotação de culturas."
+    },
+    {
+      "id": "D2",
+      "nome": "Septoriose (Septoria lycopersici)",
+      "descricao": "Manchas pequenas, circulares e numerosas nas folhas mais velhas, com bordas escuras, centro claro e halo amarelado.",
+      "recomendacao_manejo": "Rotação de culturas, destruição de restos culturais, redução de umidade foliar e fungicidas como tiofanato-metílico ou difenoconazol."
+    },
+    {
+      "id": "D3",
+      "nome": "Pinta-Preta (Alternaria solani)",
+      "descricao": "Manchas escuras nas folhas mais velhas com anéis concêntricos característicos (alvo); nos frutos, lesões deprimidas próximas ao pedúnculo.",
+      "recomendacao_manejo": "Rotação de culturas, adubação equilibrada (evitar excesso de N), pulverizações preventivas com clorotalonil, mancozeb ou estrobirulinas."
+    },
+    {
+      "id": "D4",
+      "nome": "Traça-do-Tomateiro (Tuta absoluta)",
+      "descricao": "Minas largas e irregulares ('balões') nas folhas com excrementos escuros; perfurações em brotações, hastes e frutos próximos ao pedúnculo.",
+      "recomendacao_manejo": "Monitoramento com armadilhas de feromônio; controle biológico (Trichogramma); eliminação de restos culturais; inseticidas seletivos rotacionados."
+    },
+    {
+      "id": "D5",
+      "nome": "Mosca-Branca (Bemisia tabaci biótipo B)",
+      "descricao": "Insetos brancos na face inferior das folhas; honeydew com fumagina; prateamento foliar e manchas internas nos frutos.",
+      "recomendacao_manejo": "Telas em viveiros; sincronização de plantio; inseticidas sistêmicos e reguladores de crescimento; vazio sanitário regional."
+    },
+    {
+      "id": "D6",
+      "nome": "Tripes/Vira-Cabeça (Frankliniella schulzei + Tospovírus)",
+      "descricao": "Pontos prateados nas folhas/flores; folhas bronzeadas, ponteiro apical curvado para baixo; manchas cloróticas nos frutos.",
+      "recomendacao_manejo": "Cultivares resistentes; proteção rigorosa de viveiros; roguing de plantas sintomáticas; barreiras vegetais (crotalária)."
+    },
+    {
+      "id": "D7",
+      "nome": "Ácaro-do-Bronzeamento",
+      "descricao": "Bronzeamento do caule e folhas começando pela base; deformação foliar evoluindo para necrose.",
+      "recomendacao_manejo": "Irrigação por aspersão para aumentar umidade; acaricidas seletivos no MIP; monitoramento constante."
+    },
+    {
+      "id": "D8",
+      "nome": "Murcha-Bacteriana (Ralstonia solanacearum)",
+      "descricao": "Murcha repentina das folhas jovens mantendo coloração verde; escurecimento vascular no caule (teste do copo: exsudato leitoso).",
+      "recomendacao_manejo": "Não plantar em solos contaminados; mudas de substrato isento; evitar escoamento de água entre áreas; solarização do solo."
+    },
+    {
+      "id": "D9",
+      "nome": "Mancha-Bacteriana (Xanthomonas spp.)",
+      "descricao": "Manchas angulares marrom com halo amarelado nas folhas; lesões crostosas, salientes e rugosas nos frutos.",
+      "recomendacao_manejo": "Sementes/mudas certificadas; pulverizações preventivas com cobre; poda em dias secos com ferramentas desinfetadas."
+    },
+    {
+      "id": "D10",
+      "nome": "Broca-Pequena-do-Fruto (Neoleucinodes elegantalis)",
+      "descricao": "Orifícios de saída circulares e limpos nos frutos; galerias internas na polpa e sementes com escurecimento.",
+      "recomendacao_manejo": "Monitoramento desde florescimento; coleta/destruição de frutos brotados; ensacamento de cachos (Tomatec); inseticidas preventivos."
+    }
+  ],
+  "perguntas": [
+    {
+      "id": "P1",
+      "texto": "Onde está o sintoma principal mais evidente?",
+      "opcoes": [
+        {
+          "texto": "Folhas (manchas, minas ou insetos)",
+          "proxima_pergunta_id": "P2",
+          "diagnostico_final_id": null
+        },
+        {
+          "texto": "Frutos (furos, manchas ou podridão)",
+          "proxima_pergunta_id": "P8",
+          "diagnostico_final_id": null
+        },
+        {
+          "texto": "Planta toda (murcha ou secamento geral)",
+          "proxima_pergunta_id": "P9",
+          "diagnostico_final_id": null
+        }
+      ]
+    },
+    {
+      "id": "P2",
+      "texto": "Nas folhas, há sinais de insetos/ácaros ou manchas de doença?",
+      "opcoes": [
+        {
+          "texto": "Insetos visíveis, minas, perfurações ou prateamento",
+          "proxima_pergunta_id": "P3",
+          "diagnostico_final_id": null
+        },
+        {
+          "texto": "Manchas necróticas ou áreas encharcadas",
+          "proxima_pergunta_id": "P6",
+          "diagnostico_final_id": null
+        }
+      ]
+    },
+    {
+      "id": "P3",
+      "texto": "Qual padrão de dano por inseto/ácaro se observa?",
+      "opcoes": [
+        {
+          "texto": "Minas transparentes largas como 'balões' com excrementos",
+          "proxima_pergunta_id": null,
+          "diagnostico_final_id": "D4"
+        },
+        {
+          "texto": "Insetos brancos que voam + fumagina nas folhas",
+          "proxima_pergunta_id": null,
+          "diagnostico_final_id": "D5"
+        },
+        {
+          "texto": "Áreas prateadas + ponteiro apical curvado/bronzeado",
+          "proxima_pergunta_id": null,
+          "diagnostico_final_id": "D6"
+        },
+        {
+          "texto": "Bronzeamento na base evoluindo para necrose",
+          "proxima_pergunta_id": null,
+          "diagnostico_final_id": "D7"
+        }
+      ]
+    },
+    {
+      "id": "P6",
+      "texto": "Características das manchas foliares?",
+      "opcoes": [
+        {
+          "texto": "Grandes, encharcadas verde-oliva com mofo branco na face inferior",
+          "proxima_pergunta_id": null,
+          "diagnostico_final_id": "D1"
+        },
+        {
+          "texto": "Pequenas, circulares com centro claro e halo amarelado",
+          "proxima_pergunta_id": null,
+          "diagnostico_final_id": "D2"
+        },
+        {
+          "texto": "Escuras com anéis concêntricos (alvo) nas folhas velhas",
+          "proxima_pergunta_id": null,
+          "diagnostico_final_id": "D3"
+        },
+        {
+          "texto": "Angulares escuras com halo amarelado",
+          "proxima_pergunta_id": null,
+          "diagnostico_final_id": "D9"
+        }
+      ]
+    },
+    {
+      "id": "P8",
+      "texto": "Aspecto do dano nos frutos?",
+      "opcoes": [
+        {
+          "texto": "Orifício de saída circular limpo na polpa",
+          "proxima_pergunta_id": null,
+          "diagnostico_final_id": "D10"
+        },
+        {
+          "texto": "Furo irregular próximo ao pedúnculo com excrementos",
+          "proxima_pergunta_id": null,
+          "diagnostico_final_id": "D4"
+        },
+        {
+          "texto": "Lesão crostosa, saliente e rugosa",
+          "proxima_pergunta_id": null,
+          "diagnostico_final_id": "D9"
+        },
+        {
+          "texto": "Podridão firme marrom-escura e ondulada",
+          "proxima_pergunta_id": null,
+          "diagnostico_final_id": "D1"
+        },
+        {
+          "texto": "Lesão deprimida escura próxima ao pedúnculo",
+          "proxima_pergunta_id": null,
+          "diagnostico_final_id": "D3"
+        }
+      ]
+    },
+    {
+      "id": "P9",
+      "texto": "Características da murcha/secamento geral?",
+      "opcoes": [
+        {
+          "texto": "Murcha repentina das folhas jovens mantendo verde; escurecimento vascular",
+          "proxima_pergunta_id": null,
+          "diagnostico_final_id": "D8"
+        },
+        {
+          "texto": "Bronzeamento apical + ponteiro curvado para baixo",
+          "proxima_pergunta_id": null,
+          "diagnostico_final_id": "D6"
+        }
+      ]
+    }
+  ]
+}
