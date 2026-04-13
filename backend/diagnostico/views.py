@@ -1,54 +1,40 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import AllowAny 
 from django.shortcuts import get_object_or_404
 from .models import Pergunta, Opcao
 from .serializers import PerguntaSerializer, DiagnosticoSerializer
 
 class IniciarDiagnosticoView(APIView):
-    """ Retorna a primeira pergunta da triagem (a raiz da árvore) """
+    permission_classes = [AllowAny] # Aberto para o produtor no campo
     
     def get(self, request):
-        # A raiz lógica é a pergunta que NÃO é destino de nenhuma opção.
         raiz = Pergunta.objects.filter(opcoes_que_trazem_aqui__isnull=True).first()
-        
         if not raiz:
-            return Response(
-                {"erro": "Nenhuma árvore de decisão cadastrada no sistema."}, 
-                status=status.HTTP_404_NOT_FOUND
-            )
-        
+            return Response({"erro": "Arvore vazia."}, status=404)
         serializer = PerguntaSerializer(raiz)
         return Response({"tipo": "pergunta", "dados": serializer.data})
 
-
 class ResponderDiagnosticoView(APIView):
-    """ Processa a resposta do usuário e retorna o próximo passo """
-    
+    permission_classes = [AllowAny]
+
+    # Certifique-se de que está escrito 'post' (tudo minúsculo)
     def post(self, request):
+        print("DEBUG: O POST chegou com sucesso!") # Isso vai aparecer no seu terminal
+        
         opcao_id = request.data.get('opcao_id')
-        
         if not opcao_id:
-            return Response(
-                {"erro": "O campo 'opcao_id' é obrigatório."}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
+            return Response({"erro": "Envie o opcao_id no body."}, status=400)
+            
         opcao = get_object_or_404(Opcao, id=opcao_id)
         
-        # A Mágica do Motor de Inferência:
         if opcao.diagnostico_final:
-            # Se a opção aponta para uma folha, devolvemos a doença e o manejo
             serializer = DiagnosticoSerializer(opcao.diagnostico_final)
             return Response({"tipo": "diagnostico", "dados": serializer.data})
-            
-        elif opcao.proxima_pergunta:
-            # Se aponta para outro nó, devolvemos a próxima pergunta
+        
+        if opcao.proxima_pergunta:
             serializer = PerguntaSerializer(opcao.proxima_pergunta)
             return Response({"tipo": "pergunta", "dados": serializer.data})
-            
-        else:
-            return Response(
-                {"erro": "Esta opção não leva a lugar nenhum (banco de dados inconsistente)."}, 
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+
+        return Response({"erro": "Fim de linha."}, status=500)

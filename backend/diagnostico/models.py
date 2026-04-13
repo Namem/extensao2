@@ -60,5 +60,5 @@ class Opcao(models.Model):
     )
 
     def __str__(self):
-        destino = f"Pergunta: {self.proxima_pergunta.texto}" if self.proxima_pergunta else f"Diagnóstico: {self.diagnostico_final.nome}"
+        destino = f"Pergunta: {self.proxima_pergunta.texto}" if self.proxima_pergunta else f"Diagnóstico: {self.diagnostico_final}"
         return f"[{self.pergunta_origem.texto}] -> ({self.texto}) -> {destino}"
