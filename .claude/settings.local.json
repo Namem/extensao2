@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell.exe -Command \"Get-Command pdftoppm,gs,ghostscript,magick,convert -ErrorAction SilentlyContinue | Select-Object Name, Source\")",
+      "Bash(powershell.exe -Command \"& python -c 'import aspose.slides; print\\(\\\\\"aspose ok\\\\\"\\)'\")",
+      "Bash(powershell.exe -Command \"& pip show pdf2image 2>&1 | head -2\")",
+      "Bash(powershell.exe -Command \"& python create_sprint_review.py\")",
+      "Bash(powershell.exe -Command \"& python 'C:\\\\Users\\\\Rachid\\\\Desktop\\\\NR\\\\Semestre 2026_1\\\\extensao\\\\ceres-diagnostico\\\\Pre_arquivos\\\\export_slides.py'\")",
+      "Bash(powershell.exe -Command \"& python export_slides.py\")",
+      "Bash(powershell.exe -Command ':*)"
+    ]
+  }
+}
