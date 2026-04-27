@@ -1,0 +1,840 @@
+
+<style>
+*{box-sizing:border-box}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0)}
+.tabs{display:flex;gap:0;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:1.25rem;padding-top:0.5rem;flex-wrap:wrap}
+.tab{font-size:12px;padding:7px 12px;cursor:pointer;color:var(--color-text-secondary);border-bottom:2px solid transparent;margin-bottom:-0.5px;background:transparent;border-top:none;border-left:none;border-right:none;white-space:nowrap}
+.tab.active{color:var(--color-text-primary);border-bottom-color:var(--color-text-primary);font-weight:500}
+.panel{display:none}.panel.active{display:block}
+.section-lbl{font-size:10px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.07em;margin:1.2rem 0 0.5rem}
+.prompt-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);margin-bottom:10px;overflow:hidden}
+.prompt-card.updated{border-color:#97C459}
+.updated-tag{font-size:10px;padding:1px 8px;border-radius:99px;background:#EAF3DE;color:#27500A;font-weight:500;margin-left:6px}
+.prompt-head{display:flex;align-items:flex-start;gap:10px;padding:10px 12px 8px}
+.prompt-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;font-weight:500}
+.pi-setup{background:#EAF3DE;color:#27500A}
+.pi-diag{background:#EEEDFE;color:#3C3489}
+.pi-fw{background:#FAEEDA;color:#633806}
+.pi-ai{background:#E1F5EE;color:#085041}
+.pi-int{background:#E6F1FB;color:#0C447C}
+.pi-hw{background:#FAECE7;color:#712B13}
+.pi-exp{background:#F1EFE8;color:#444441}
+.pi-sprint{background:#EEEDFE;color:#3C3489}
+.prompt-meta{flex:1}
+.prompt-title{font-size:13px;font-weight:500;color:var(--color-text-primary);margin:0 0 2px}
+.prompt-when{font-size:11px;color:var(--color-text-tertiary)}
+.prompt-body{border-top:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);padding:10px 12px}
+.prompt-text{font-size:11.5px;color:var(--color-text-primary);font-family:monospace;line-height:1.65;white-space:pre-wrap;word-break:break-word;margin:0}
+.copy-btn{display:block;width:100%;margin-top:8px;padding:5px 10px;font-size:11px;background:transparent;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);color:var(--color-text-secondary);cursor:pointer;text-align:center}
+.copy-btn:hover{background:var(--color-background-primary)}
+.copy-btn.copied{color:var(--color-text-success);border-color:var(--color-border-success)}
+.note-box{background:var(--color-background-secondary);border-left:3px solid var(--color-border-info);padding:10px 12px;margin-bottom:12px;border-radius:0 var(--border-radius-md) var(--border-radius-md) 0}
+.note-box p{font-size:12px;color:var(--color-text-secondary);margin:0;line-height:1.6}
+.warn-box{background:#FAEEDA;border-left:3px solid #BA7517;padding:10px 12px;margin-bottom:12px;border-radius:0 var(--border-radius-md) var(--border-radius-md) 0}
+.warn-box p{font-size:12px;color:#633806;margin:0;line-height:1.6}
+</style>
+
+<h2 class="sr-only">Guia atualizado de prompts Claude Code — Ceres Diagnóstico v2</h2>
+
+<div class="tabs">
+  <button class="tab active" onclick="show('setup',this)">Configuração</button>
+  <button class="tab" onclick="show('diag',this)">Diagnóstico</button>
+  <button class="tab" onclick="show('s1',this)">Sprint 1</button>
+  <button class="tab" onclick="show('s2',this)">Sprint 2</button>
+  <button class="tab" onclick="show('s3',this)">Sprint 3</button>
+  <button class="tab" onclick="show('s4',this)">Sprint 4</button>
+  <button class="tab" onclick="show('art',this)">Artigo</button>
+</div>
+
+<!-- CONFIGURACAO -->
+<div id="setup" class="panel active">
+  <div class="warn-box"><p>Windows: o Claude Code usa caminhos com barras normais internamente. Use <code>/mnt/c/Users/Rachid/...</code> se estiver em WSL, ou o caminho Windows direto se usar PowerShell.</p></div>
+
+  <div class="section-lbl">passo 1 — criar CLAUDE.md atualizado na raiz</div>
+  <div class="prompt-card updated">
+    <div class="prompt-head">
+      <div class="prompt-icon pi-setup">C</div>
+      <div class="prompt-meta">
+        <p class="prompt-title">CLAUDE.md — versão atualizada <span class="updated-tag">atualizado</span></p>
+        <p class="prompt-when">Cole no terminal dentro de ceres-diagnostico/ e execute</p>
+      </div>
+    </div>
+    <div class="prompt-body">
+      <pre class="prompt-text">cat > CLAUDE.md << 'EOF'
+# Ceres Diagnóstico — Contexto para Claude Code
+
+## Projeto
+TCC de Engenharia da Computação — IFMT (Sorriso-MT).
+Sistema embarcado de detecção precoce de doenças no
+tomateiro: ESP32-S3 TinyML + Django REST + Flutter.
+Autor: Namem Rachid Jaudy Neto
+
+## Pasta de artefatos pré-existentes
+Pre_arquivos/ (dentro da raiz do projeto) contém:
+- SprintReview_1_CeresDiagnostico.pptx (Sprint 0)
+- Backlog Projeto Ceres Diagnóstico V2.xlsx (backlog)
+- guia_sprint_review.pdf
+Antes de criar ou atualizar qualquer documentação,
+SEMPRE leia o backlog existente nessa pasta.
+
+## Stack
+Backend : Django REST + PostgreSQL 15 (Docker :5433)
+          + SimpleJWT + paho-mqtt (a adicionar)
+App     : Flutter + Dart + Drift (cache SQLite)
+Hardware: ESP32-S3 N16R8 + OV5640 5MP (a comprar)
+          ESP32 genérico (disponível agora)
+IoT     : MQTT Mosquitto + broker local
+AI      : TFLite Micro + Edge Impulse
+          Modelo: MobileNetV2 INT8 quantizado
+
+## Dataset oficial do projeto
+PRIMARY  : PlantVillage (Hughes & Salathé 2015)
+           ~18.160 imagens de folha de tomate
+           10 classes + saudável — CC BY 4.0
+           Kaggle: abdallahalidev/plantvillage-dataset
+EXTRA    : New Plant Diseases Dataset (Kaggle)
+           ~22.900 imgs já augmentadas — CC BY 4.0
+VALIDAÇÃO: PlantDoc (~500 imgs campo real)
+NÃO USAR : Roboflow "Tomato Fruit Disease Detection"
+           (Object Detection de fruto, 5 classes —
+           incompatível com a tarefa do Ceres)
+
+## As 10 doenças do Ceres (base Embrapa)
+D1  Requeima          (Phytophthora infestans)
+D2  Septoriose        (Septoria lycopersici)
+D3  Pinta-Preta       (Alternaria solani)
+D4  Traça-do-Tomateiro(Tuta absoluta)
+D5  Mosca-Branca      (Bemisia tabaci)
+D6  Tripes/Vira-Cabeça(Frankliniella + Tospovírus)
+D7  Ácaro-do-Bronzeamento
+D8  Murcha-Bacteriana (Ralstonia solanacearum)
+D9  Mancha-Bacteriana (Xanthomonas spp.)
+D10 Broca-Pequena     (Neoleucinodes elegantalis)
+
+## Estado atual das sprints
+Sprint 0: CONCLUÍDA — API Django + Motor IA + JWT
+Sprint 1: EM ANDAMENTO — MQTT + dataset + treino
+Sprint 2: PENDENTE — deploy TFLite no ESP32-S3
+Sprint 3: PENDENTE — integração MQTT-Ceres completa
+Sprint 4: PENDENTE — Flutter + experimentos
+Sprint 5: PENDENTE — artigo + defesa
+
+## Regras de código
+- Python  : PEP8, docstrings em português
+- Dart    : dart format, comentários em português
+- C++     : PlatformIO, um arquivo por módulo
+- Commits : Conventional Commits (feat/fix/chore/docs)
+- Nunca commitar secrets — usar .env
+
+## Estrutura de pastas
+backend/       → Django REST API
+app_ceres/     → Flutter
+firmware/      → ESP32 (criar na Sprint 2)
+datasets/      → scripts de treino e dados
+docs/          → relatórios, artigo, benchmarks
+Pre_arquivos/  → artefatos pré-existentes (não editar)
+EOF</pre>
+      <button class="copy-btn" onclick="cp(this)">Copiar</button>
+    </div>
+  </div>
+
+  <div class="section-lbl">passo 2 — abrir o claude code</div>
+  <div class="prompt-card">
+    <div class="prompt-head">
+      <div class="prompt-icon pi-setup">$</div>
+      <div class="prompt-meta">
+        <p class="prompt-title">Comando de abertura (PowerShell ou WSL)</p>
+        <p class="prompt-when">Terminal na raiz do projeto</p>
+      </div>
+    </div>
+    <div class="prompt-body">
+      <pre class="prompt-text">cd "C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico"
+claude</pre>
+      <button class="copy-btn" onclick="cp(this)">Copiar</button>
+    </div>
+  </div>
+</div>
+
+<!-- DIAGNOSTICO -->
+<div id="diag" class="panel">
+  <div class="note-box"><p>Estes prompts mapeiam o estado real do projeto antes de qualquer modificação. Execute sempre ao iniciar uma sessão nova.</p></div>
+
+  <div class="section-lbl">prompt 1 — leitura geral do projeto</div>
+  <div class="prompt-card">
+    <div class="prompt-head">
+      <div class="prompt-icon pi-diag">1</div>
+      <div class="prompt-meta">
+        <p class="prompt-title">Varredura completa do estado atual</p>
+        <p class="prompt-when">Primeiro prompt de toda sessão nova</p>
+      </div>
+    </div>
+    <div class="prompt-body">
+      <pre class="prompt-text">Leia o CLAUDE.md e depois faça uma varredura completa
+do projeto. Quero saber:
+
+1. Estrutura de arquivos atual (árvore completa)
+2. Models Django existentes e seus campos
+3. Endpoints REST funcionando (liste as URLs)
+4. Rode: python manage.py test — mostre o resultado
+5. Conteúdo do pubspec.yaml do Flutter
+6. Se o docker-compose.yml está correto
+7. Arquivos com TODOs ou incompletos
+
+No final: resumo executivo — o que está pronto e
+o que está faltando para a Sprint 1.</pre>
+      <button class="copy-btn" onclick="cp(this)">Copiar</button>
+    </div>
+  </div>
+
+  <div class="section-lbl">prompt 2 — ler o backlog existente</div>
+  <div class="prompt-card updated">
+    <div class="prompt-head">
+      <div class="prompt-icon pi-diag">2</div>
+      <div class="prompt-meta">
+        <p class="prompt-title">Importar backlog da pasta Pre_arquivos <span class="updated-tag">atualizado</span></p>
+        <p class="prompt-when">Execute antes de criar qualquer documentação nova</p>
+      </div>
+    </div>
+    <div class="prompt-body">
+      <pre class="prompt-text">Na pasta Pre_arquivos/ existe o arquivo
+"Backlog Projeto Ceres Diagnóstico V2.xlsx".
+
+Leia esse arquivo e extraia:
+1. Todas as sprints listadas e seus status
+2. Todas as tarefas com seus status (feito/pendente)
+3. Quais tarefas da Sprint 0 foram concluídas
+4. O que estava planejado para as próximas sprints
+
+Com base nisso, crie o arquivo docs/BACKLOG.md
+atualizado que:
+- Mantém tudo que já estava concluído (Sprint 0)
+- Incorpora as novas sprints do projeto expandido
+  (ESP32-S3 + TinyML + MQTT + dataset PlantVillage)
+- Usa checkboxes markdown [ ] para tarefas pendentes
+  e [x] para concluídas
+- Inclui critério de aceite para cada sprint
+
+O backlog deve refletir o escopo completo do TCC
+conforme o CLAUDE.md.</pre>
+      <button class="copy-btn" onclick="cp(this)">Copiar</button>
+    </div>
+  </div>
+
+  <div class="section-lbl">prompt 3 — validar ambiente</div>
+  <div class="prompt-card">
+    <div class="prompt-head">
+      <div class="prompt-icon pi-diag">3</div>
+      <div class="prompt-meta">
+        <p class="prompt-title">Verificar se o ambiente sobe corretamente</p>
+        <p class="prompt-when">Antes de qualquer desenvolvimento</p>
+      </div>
+    </div>
+    <div class="prompt-body">
+      <pre class="prompt-text">Verifique se o ambiente de desenvolvimento está
+funcional:
+
+1. docker-compose up -d (PostgreSQL na porta 5433)
+2. python manage.py migrate
+3. python manage.py test — todos devem passar
+4. Verificar se .env existe com as variáveis:
+   SECRET_KEY, DB_NAME, DB_USER, DB_PASSWORD,
+   DB_HOST, DB_PORT
+5. Listar rotas: python manage.py show_urls
+   (ou verificar urls.py manualmente)
+
+Se encontrar problemas, corrija-os e descreva
+o que foi alterado. Não prossiga até o ambiente
+estar 100% funcional.</pre>
+      <button class="copy-btn" onclick="cp(this)">Copiar</button>
+    </div>
+  </div>
+</div>
+
+<!-- SPRINT 1 -->
+<div id="s1" class="panel">
+  <div class="note-box"><p>Sprint 1 usa o ESP32 que você já tem. Três frentes em paralelo: firmware MQTT, consumer Django, e dataset PlantVillage no Edge Impulse.</p></div>
+
+  <div class="section-lbl">1a — firmware MQTT no ESP32 atual</div>
+  <div class="prompt-card">
+    <div class="prompt-head">
+      <div class="prompt-icon pi-fw">F</div>
+      <div class="prompt-meta">
+        <p class="prompt-title">Firmware ESP32 — DHT22 + solo + MQTT</p>
+        <p class="prompt-when">Primeira tarefa técnica da Sprint 1</p>
+      </div>
+    </div>
+    <div class="prompt-body">
+      <pre class="prompt-text">Crie a pasta firmware/esp32_mqtt_sensor/ com projeto
+PlatformIO:
+
+platformio.ini:
+  platform = espressif32
+  board = esp32dev
+  framework = arduino
+  monitor_speed = 115200
+  lib_deps =
+    knolleary/PubSubClient@^2.8
+    adafruit/DHT sensor library@^1.4.6
+    bblanchon/ArduinoJson@^7.0.0
+
+src/main.cpp deve:
+  - Conectar WiFi (credenciais via include/config.h)
+  - Conectar Mosquitto broker local (192.168.x.x:1883)
+  - Ler DHT22 no GPIO4 a cada 30s
+  - Ler sensor umidade solo no GPIO34 (ADC 12 bits,
+    mapear 0-4095 para 0-100%)
+  - Publicar JSON em ceres/sensor/001:
+    {"device_id":"ceres_001","temperatura":28.4,
+     "umidade_ar":82,"umidade_solo":65,
+     "timestamp":"2025-09-14T10:32:11Z"}
+  - Reconexão automática WiFi e MQTT
+  - LED_BUILTIN pisca ao publicar
+
+include/config.h: placeholders WIFI_SSID, WIFI_PASS,
+  MQTT_HOST, MQTT_PORT, DEVICE_ID
+
+README.md: como instalar, gravar e testar com
+  mosquitto_sub -t ceres/sensor/+</pre>
+      <button class="copy-btn" onclick="cp(this)">Copiar</button>
+    </div>
+  </div>
+
+  <div class="section-lbl">1b — consumer MQTT no django</div>
+  <div class="prompt-card">
+    <div class="prompt-head">
+      <div class="prompt-icon pi-int">M</div>
+      <div class="prompt-meta">
+        <p class="prompt-title">Backend Django — paho-mqtt + DiagnosticoEvento</p>
+        <p class="prompt-when">Paralelo ao firmware</p>
+      </div>
+    </div>
+    <div class="prompt-body">
+      <pre class="prompt-text">No backend Django, adicione o consumer MQTT:
+
+1. requirements.txt: adicionar paho-mqtt>=2.0.0
+
+2. diagnostico/models.py: novo model DiagnosticoEvento
+   campos: device_id (CharField), classe_detectada
+   (CharField nullable), confianca (FloatField
+   nullable), temperatura (FloatField), umidade_ar
+   (IntegerField), umidade_solo (IntegerField),
+   timestamp (DateTimeField), diagnostico (FK para
+   Diagnostico nullable), criado_em (auto_now_add)
+   Meta: ordering = ['-criado_em']
+
+3. python manage.py makemigrations diagnostico
+
+4. diagnostico/management/commands/mqtt_listener.py:
+   - Conecta ao broker com retry exponencial
+   - Subscreve em ceres/sensor/#
+   - Ao receber: valida JSON, persiste
+     DiagnosticoEvento, loga no console
+   - Handle de SIGTERM para shutdown limpo
+
+5. diagnostico/views.py: novo endpoint
+   GET /api/diagnostico/historico/
+   retorna últimos 20 eventos paginados (page_size=10)
+   serializer com todos os campos
+
+6. 2 novos testes em diagnostico/tests.py:
+   - test_evento_criado_com_dados_validos
+   - test_historico_retorna_lista_paginada
+
+Execute python manage.py test no final.</pre>
+      <button class="copy-btn" onclick="cp(this)">Copiar</button>
+    </div>
+  </div>
+
+  <div class="section-lbl">1c — dataset plantvillage <span class="updated-tag">atualizado</span></div>
+  <div class="prompt-card updated">
+    <div class="prompt-head">
+      <div class="prompt-icon pi-ai">AI</div>
+      <div class="prompt-meta">
+        <p class="prompt-title">Script de preparação do PlantVillage para Edge Impulse <span class="updated-tag">atualizado</span></p>
+        <p class="prompt-when">Executar após baixar o PlantVillage do Kaggle</p>
+      </div>
+    </div>
+    <div class="prompt-body">
+      <pre class="prompt-text">Crie datasets/scripts/prepare_plantvillage.py:
+
+DATASET CORRETO: PlantVillage de Hughes & Salathé 2015
+Link Kaggle: kaggle.com/datasets/abdallahalidev/
+             plantvillage-dataset
+NÃO usar: Roboflow "Tomato Fruit Disease Detection"
+  (é Object Detection de fruto — incompatível)
+
+O script recebe --input (pasta do PlantVillage baixado)
+e --output (datasets/plantvillage_ceres/) e deve:
+
+1. Filtrar APENAS estas 10 pastas de tomate:
+   Tomato___Bacterial_spot
+   Tomato___Early_blight
+   Tomato___Late_blight
+   Tomato___Leaf_Mold
+   Tomato___Septoria_leaf_spot
+   Tomato___Spider_mites Two-spotted_spider_mite
+   Tomato___Target_Spot
+   Tomato___Tomato_Yellow_Leaf_Curl_Virus
+   Tomato___Tomato_mosaic_virus
+   Tomato___healthy
+
+2. Mapear para os IDs do Ceres (D1-D10 + saudavel)
+   e criar estrutura datasets/plantvillage_ceres/
+   com subpastas train/ val/ test/ (70/15/15)
+   usando stratified split
+
+3. Augmentation offline nas imagens de treino:
+   flip horizontal, rotação ±15°, brilho ±20%,
+   ruído gaussiano leve — dobrar volume de treino
+
+4. Gerar datasets/dataset_stats.md com:
+   - contagem por classe (antes e após augmentation)
+   - distribuição train/val/test
+   - aviso se alguma classe tiver < 200 imagens
+
+5. Gerar datasets/edge_impulse_upload_guide.md com
+   instruções passo a passo de como fazer upload
+   no Edge Impulse (via CLI ou interface web)
+
+Libs: pathlib, shutil, Pillow, scikit-learn, numpy</pre>
+      <button class="copy-btn" onclick="cp(this)">Copiar</button>
+    </div>
+  </div>
+
+  <div class="section-lbl">1d — validação da sprint 1</div>
+  <div class="prompt-card">
+    <div class="prompt-head">
+      <div class="prompt-icon pi-sprint">V</div>
+      <div class="prompt-meta">
+        <p class="prompt-title">Checklist de conclusão e atualização do backlog</p>
+        <p class="prompt-when">Antes de fechar a sprint</p>
+      </div>
+    </div>
+    <div class="prompt-body">
+      <pre class="prompt-text">Faça a verificação completa da Sprint 1:
+
+FIRMWARE:
+[ ] firmware/ compila sem erro no PlatformIO
+[ ] publica JSON válido (test: mosquitto_sub -t
+    ceres/sensor/+ no terminal)
+[ ] reconexão WiFi funciona após desconectar
+
+BACKEND:
+[ ] python manage.py test — todos passam
+[ ] DiagnosticoEvento salvo no banco após mensagem
+    MQTT (verifique com Django shell)
+[ ] GET /api/diagnostico/historico/ retorna JSON
+    paginado com os eventos
+
+DATASET:
+[ ] datasets/plantvillage_ceres/ criado com
+    estrutura train/val/test
+[ ] dataset_stats.md gerado com contagens por classe
+[ ] Mínimo 500 imagens por classe em treino
+
+DOCUMENTAÇÃO:
+[ ] docs/BACKLOG.md: Sprint 1 marcada como concluída
+[ ] Pre_arquivos/ não foi modificada
+
+Para cada item que falhar, proponha a correção
+antes de marcar a sprint como concluída.</pre>
+      <button class="copy-btn" onclick="cp(this)">Copiar</button>
+    </div>
+  </div>
+</div>
+
+<!-- SPRINT 2 -->
+<div id="s2" class="panel">
+  <div class="note-box"><p>Sprint 2 começa quando o ESP32-S3 N16R8 + OV5640 chegar. O modelo deve já estar treinado no Edge Impulse (Sprint 1).</p></div>
+
+  <div class="section-lbl">2a — configurar esp32-s3-cam</div>
+  <div class="prompt-card">
+    <div class="prompt-head">
+      <div class="prompt-icon pi-hw">H</div>
+      <div class="prompt-meta">
+        <p class="prompt-title">Projeto PlatformIO para ESP32-S3 N16R8</p>
+        <p class="prompt-when">Primeiro dia com a placa em mãos</p>
+      </div>
+    </div>
+    <div class="prompt-body">
+      <pre class="prompt-text">Crie firmware/esp32s3_ceres/ com PlatformIO:
+
+platformio.ini:
+  platform = espressif32
+  board = esp32-s3-devkitc-1
+  framework = arduino
+  board_build.flash_size = 16MB
+  board_build.partitions = default_16MB.csv
+  board_upload.flash_size = 16MB
+  build_flags =
+    -DBOARD_HAS_PSRAM
+    -DCORE_DEBUG_LEVEL=3
+  monitor_speed = 115200
+
+src/camera_test.cpp: sketch que inicializa a câmera
+OV5640 nos pinos corretos para o N16R8, captura um
+frame JPEG, imprime tamanho e resolução no serial,
+e pisca LED se bem-sucedido.
+
+include/camera_pins.h: pinout correto para ESP32-S3-
+CAM N16R8 com OV5640. Pesquise no GitHub espressif/
+arduino-esp32 os pinos para CAMERA_MODEL_ESP32S3_EYE
+ou variante equivalente para N16R8.
+
+README.md:
+- Como gravar via USB-C (sem FTDI — nativo)
+- Configurações do Arduino IDE: Flash 16MB,
+  PSRAM OPI, Partition 16M Flash 3MB APP
+- Como testar no monitor serial</pre>
+      <button class="copy-btn" onclick="cp(this)">Copiar</button>
+    </div>
+  </div>
+
+  <div class="section-lbl">2b — deploy tflite micro</div>
+  <div class="prompt-card">
+    <div class="prompt-head">
+      <div class="prompt-icon pi-ai">AI</div>
+      <div class="prompt-meta">
+        <p class="prompt-title">Integrar modelo Edge Impulse ao firmware</p>
+        <p class="prompt-when">Após exportar do Edge Impulse como Arduino Library</p>
+      </div>
+    </div>
+    <div class="prompt-body">
+      <pre class="prompt-text">O modelo foi exportado do Edge Impulse como Arduino
+Library (.zip). Integre ao firmware:
+
+1. Descompacte em firmware/esp32s3_ceres/lib/ei_ceres/
+2. Adicione lib_deps no platformio.ini apontando para
+   esta pasta local
+
+3. Crie src/inference.h e src/inference.cpp:
+   struct InferenceResult {
+     uint8_t classe_id;
+     const char* nome_classe;
+     float confianca;
+     uint32_t latencia_ms;
+   };
+   InferenceResult run_inference(camera_fb_t* frame);
+
+4. run_inference() deve:
+   - Redimensionar frame para resolução do modelo
+     (96x96 ou 160x160 conforme exportado)
+   - Normalizar pixels para [-1, 1]
+   - Alocar tensor arena na PSRAM (MALLOC_CAP_SPIRAM)
+   - Medir tempo com esp_timer_get_time()
+   - Retornar classe com maior probabilidade
+
+5. main.cpp: captura frame, chama run_inference(),
+   imprime no serial:
+   INFERENCIA: [classe] conf=[0.87] lat=[145ms]
+   RAM_livre=[6234KB]
+
+Mínimo esperado: latência < 300ms, RAM livre > 4MB</pre>
+      <button class="copy-btn" onclick="cp(this)">Copiar</button>
+    </div>
+  </div>
+
+  <div class="section-lbl">2c — benchmark para o artigo</div>
+  <div class="prompt-card">
+    <div class="prompt-head">
+      <div class="prompt-icon pi-exp">B</div>
+      <div class="prompt-meta">
+        <p class="prompt-title">Coletar métricas de benchmark — dados para Seção 5</p>
+        <p class="prompt-when">Após inferência funcionando na placa</p>
+      </div>
+    </div>
+    <div class="prompt-body">
+      <pre class="prompt-text">Crie datasets/scripts/benchmark_esp32s3.py:
+
+Parâmetros: --port (serial), --images (pasta com
+imagens de teste), --n (default 50 imagens)
+
+Para cada imagem:
+1. Envia via serial para o ESP32-S3
+2. Lê resposta: classe_predita, confiança, latência
+3. Compara com label verdadeiro (nome da pasta)
+
+Ao final, gera docs/benchmark_results.md com:
+- Latência: média, min, max, p95 (ms)
+- RAM livre média durante inferência (KB)
+- Tamanho do modelo em ROM (KB) — do log de flash
+- Acurácia geral (%) e por classe
+- Matriz de confusão em texto
+- Comparativo edge vs Python local:
+  Python: rodar mesmo modelo com tflite-runtime
+  no PC e medir latência — simula cloud
+
+Salvar dados brutos em docs/benchmark_raw.csv
+Estes dados vão direto para o artigo científico.</pre>
+      <button class="copy-btn" onclick="cp(this)">Copiar</button>
+    </div>
+  </div>
+</div>
+
+<!-- SPRINT 3 -->
+<div id="s3" class="panel">
+  <div class="note-box"><p>Sprint 3 fecha o loop completo: câmera detecta anomalia → MQTT → Django → Flutter exibe diagnóstico.</p></div>
+
+  <div class="section-lbl">3a — firmware integrado final</div>
+  <div class="prompt-card">
+    <div class="prompt-head">
+      <div class="prompt-icon pi-fw">F</div>
+      <div class="prompt-meta">
+        <p class="prompt-title">Firmware completo: câmera + sensores + MQTT + TFLite</p>
+        <p class="prompt-when">Início da Sprint 3</p>
+      </div>
+    </div>
+    <div class="prompt-body">
+      <pre class="prompt-text">Integre todos os módulos em firmware/esp32s3_ceres/:
+
+Ciclo principal (a cada 30s):
+1. Capturar frame OV5640 (resolução QVGA ou VGA)
+2. Rodar run_inference()
+3. Se confiança >= THRESHOLD (default 0.70):
+   a. Ler DHT22 (GPIO4)
+   b. Ler sensor solo (GPIO34)
+   c. Montar JSON completo (device_id, classe,
+      confiança, temp, umidade_ar, umidade_solo,
+      timestamp ISO8601)
+   d. Publicar em ceres/sensor/{DEVICE_ID}
+   e. LED vermelho pisca 3x
+4. Senão: imprimir "Sem anomalia" + LED verde 1x
+
+include/config.h — todas as configurações:
+  WIFI_SSID, WIFI_PASS, MQTT_HOST, MQTT_PORT,
+  DEVICE_ID, INFERENCE_THRESHOLD, SENSOR_INTERVAL_MS
+
+Adicionar:
+- Reconexão automática WiFi (retry a cada 5s)
+- Reconexão automática MQTT (retry a cada 10s)
+- Armazenar último evento válido na NVS
+- Watchdog timer de 60s (esp_task_wdt)
+- Versão do firmware no boot: "Ceres v1.0 - ESP32S3"</pre>
+      <button class="copy-btn" onclick="cp(this)">Copiar</button>
+    </div>
+  </div>
+
+  <div class="section-lbl">3b — teste end-to-end cronometrado</div>
+  <div class="prompt-card">
+    <div class="prompt-head">
+      <div class="prompt-icon pi-int">E2E</div>
+      <div class="prompt-meta">
+        <p class="prompt-title">Medir tempo do loop completo sensor → app</p>
+        <p class="prompt-when">Firmware + backend + Flutter funcionando</p>
+      </div>
+    </div>
+    <div class="prompt-body">
+      <pre class="prompt-text">Execute e meça o teste end-to-end completo:
+
+1. Terminal 1: mosquitto -v (broker local)
+2. Terminal 2: python manage.py mqtt_listener
+3. Terminal 3: python manage.py runserver
+4. Monitor serial do ESP32-S3
+
+Para 5 eventos gerados pelo ESP32, registre:
+  T0: timestamp no log serial (frame capturado)
+  T1: inferência concluída (log serial)
+  T2: publicação MQTT confirmada (log mosquitto)
+  T3: Django recebeu e persistiu (log Django)
+  T4: GET /api/diagnostico/historico/ retorna evento
+
+Documente em docs/e2e_test_results.md:
+  - Tabela com T0..T4 para cada evento
+  - Tempo total médio T4-T0
+  - Meta: < 5 segundos total
+  - Identificar gargalo se acima da meta
+
+Se alguma etapa falhar, diagnostique a causa raiz
+e corrija antes de prosseguir para Sprint 4.</pre>
+      <button class="copy-btn" onclick="cp(this)">Copiar</button>
+    </div>
+  </div>
+</div>
+
+<!-- SPRINT 4 -->
+<div id="s4" class="panel">
+
+  <div class="section-lbl">4a — telas flutter</div>
+  <div class="prompt-card">
+    <div class="prompt-head">
+      <div class="prompt-icon pi-int">FL</div>
+      <div class="prompt-meta">
+        <p class="prompt-title">Implementar telas de resultado, histórico e status</p>
+        <p class="prompt-when">Início da Sprint 4</p>
+      </div>
+    </div>
+    <div class="prompt-body">
+      <pre class="prompt-text">No Flutter (app_ceres/), implemente:
+
+1. DiagnosticoResultadoScreen:
+   - Nome da doença (destaque visual)
+   - Barra de confiança do modelo TinyML (0-100%)
+   - Dados do sensor: temperatura, umidade ar e solo
+   - Descrição dos sintomas
+   - Recomendação Embrapa
+   - Botão "Novo diagnóstico"
+
+2. HistoricoScreen:
+   - ListView.builder consumindo
+     GET /api/diagnostico/historico/
+   - Paginação infinita (load more ao rolar)
+   - Pull-to-refresh
+   - Item: data/hora, classe, confiança, ícone
+
+3. SensorStatusScreen:
+   - Polling GET /api/diagnostico/historico/?limit=1
+     a cada 10s para status do sensor
+   - Exibe: online/offline, última leitura,
+     último evento detectado
+
+Crie os models Dart: DiagnosticoEventoModel,
+DiagnosticoService. Use o padrão já existente
+no projeto. Execute flutter analyze no final.</pre>
+      <button class="copy-btn" onclick="cp(this)">Copiar</button>
+    </div>
+  </div>
+
+  <div class="section-lbl">4b — experimento edge vs cloud</div>
+  <div class="prompt-card updated">
+    <div class="prompt-head">
+      <div class="prompt-icon pi-exp">EXP</div>
+      <div class="prompt-meta">
+        <p class="prompt-title">Protocolo comparativo para Seção 5 do artigo <span class="updated-tag">atualizado</span></p>
+        <p class="prompt-when">Paralelo ao Flutter</p>
+      </div>
+    </div>
+    <div class="prompt-body">
+      <pre class="prompt-text">Crie datasets/scripts/experiment_edge_vs_cloud.py:
+
+Usando 100 imagens do PlantVillage (test split):
+
+CENÁRIO EDGE (ESP32-S3):
+  - Envia imagem via serial, mede latência até
+    receber InferenceResult
+
+CENÁRIO CLOUD SIMULADO (Python local):
+  - Carrega o mesmo .tflite com tflite-runtime
+  - Mede latência de inferência + "overhead de rede"
+    simulado (adicionar 200ms como latência típica 4G)
+
+Para cada cenário, calcule:
+  - Latência: média, desvio padrão, p95 (ms)
+  - Acurácia geral (%)
+  - Disponibilidade offline: EDGE=sempre, CLOUD=não
+  - Consumo estimado de dados (EDGE=0, CLOUD=tamanho
+    da imagem × N requisições)
+
+Gere docs/experiment_a_results.md com:
+  - Tabela comparativa formatada
+  - Gráfico ASCII de distribuição de latência
+  - Conclusão: em que contexto cada abordagem
+    é superior (campo sem internet vs cidade)
+
+Referência a citar no artigo: Springer 2025
+"Automated tomato leaf disease detection and alert
+system using IoT and TinyML" — mesma arquitetura,
+valida nossa abordagem.</pre>
+      <button class="copy-btn" onclick="cp(this)">Copiar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ARTIGO -->
+<div id="art" class="panel">
+  <div class="note-box"><p>Prompts para usar após defesa, ao condensar o TCC em artigo acadêmico para SBSI, WSCAD, ERRC ou similar.</p></div>
+
+  <div class="section-lbl">redigir artigo com dados reais</div>
+  <div class="prompt-card updated">
+    <div class="prompt-head">
+      <div class="prompt-icon pi-sprint">A</div>
+      <div class="prompt-meta">
+        <p class="prompt-title">Gerar rascunho das seções 4 e 5 com dados do projeto <span class="updated-tag">atualizado</span></p>
+        <p class="prompt-when">Após benchmark e experimentos concluídos</p>
+      </div>
+    </div>
+    <div class="prompt-body">
+      <pre class="prompt-text">Leia os seguintes arquivos do projeto:
+- docs/benchmark_results.md
+- docs/experiment_a_results.md
+- docs/e2e_test_results.md
+- docs/dataset_stats.md
+- Pre_arquivos/ (para contexto do escopo original)
+
+Com base nesses dados reais, escreva em português
+acadêmico (estilo IEEE/SBC):
+
+SEÇÃO 4 — Metodologia Experimental (max 600 palavras):
+Dataset: PlantVillage (Hughes & Salathé 2015), 18.160
+imagens de folha de tomate, 10 classes, CC BY 4.0,
+split 70/15/15 com augmentation. Pipeline Edge Impulse:
+MobileNetV2 transfer learning, quantização INT8.
+Protocolo de medição de latência e RAM no ESP32-S3.
+
+SEÇÃO 5 — Resultados e Discussão (max 800 palavras):
+Tabela de benchmark, matriz de confusão, comparativo
+edge vs cloud, análise de degradação com PlantDoc.
+Comparar com: Springer 2025 (mesmo ESP32-S3+MQTT+
+PlantVillage — nossa arquitetura tem diferencial do
+sistema especialista Ceres integrado).
+
+Salve em docs/artigo_secoes_4_5.md
+Destaque o diferencial: nenhum paper combina sistema
+especialista (árvore de decisão Embrapa) + TinyML
+edge em loop único para tomateiro brasileiro.</pre>
+      <button class="copy-btn" onclick="cp(this)">Copiar</button>
+    </div>
+  </div>
+
+  <div class="section-lbl">commit e tag final</div>
+  <div class="prompt-card">
+    <div class="prompt-head">
+      <div class="prompt-icon pi-diag">G</div>
+      <div class="prompt-meta">
+        <p class="prompt-title">Tag de versão final do TCC no Git</p>
+        <p class="prompt-when">Após defesa aprovada</p>
+      </div>
+    </div>
+    <div class="prompt-body">
+      <pre class="prompt-text">Finalize o repositório após a defesa:
+
+1. Verificar arquivos não commitados
+2. python manage.py test — todos devem passar
+3. flutter analyze — sem warnings críticos
+4. Atualizar docs/BACKLOG.md — Sprint 5 concluída
+5. Commit: docs: versão final TCC Ceres Diagnóstico
+           IFMT 2025/2026 — Namem Rachid Jaudy Neto
+6. Tag: git tag -a v1.0-tcc -m "TCC defendido e
+        aprovado IFMT Eng. Computação 2026"
+7. git push origin main --tags
+
+Listar tamanho total do repositório (du -sh .)
+e número total de commits (git rev-list --count HEAD)
+para incluir no relatório final.</pre>
+      <button class="copy-btn" onclick="cp(this)">Copiar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(id,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+}
+function cp(btn){
+  const text=btn.previousElementSibling.textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.textContent='Copiado!';
+    btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='Copiar';btn.classList.remove('copied')},2000);
+  }).catch(()=>{
+    const ta=document.createElement('textarea');
+    ta.value=text;document.body.appendChild(ta);
+    ta.select();document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent='Copiado!';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='Copiar';btn.classList.remove('copied')},2000);
+  });
+}
+</script>

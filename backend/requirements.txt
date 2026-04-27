@@ -5,3 +5,5 @@ djangorestframework_simplejwt==5.5.1
 psycopg2-binary==2.9.11
 PyJWT==2.12.1
 sqlparse==0.5.5
+python-dotenv==1.0.1
+paho-mqtt==2.1.0

@@ -1,13 +1,22 @@
-@"
-# Ambientes Virtuais Python
+# =============================================================================
+# Ceres Diagnóstico — .gitignore
+# =============================================================================
+
+# =============================================================================
+# PYTHON / DJANGO
+# =============================================================================
+# Ambientes virtuais
 venv/
 env/
 .venv/
+ENV/
 
 # Cache do Python
 __pycache__/
 *.py[cod]
-*`$py.class
+*.pyo
+*$py.class
+*.pyc
 
 # Django
 *.log
@@ -16,18 +25,179 @@ db.sqlite3
 db.sqlite3-journal
 media/
 staticfiles/
+celerybeat-schedule
+celerybeat.pid
 
-# Variáveis de Ambiente e Segredos
+# Distribuição / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+.eggs/
+wheels/
+
+# pytest / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.cover
+
+# mypy / type checkers
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# =============================================================================
+# SECRETS E VARIÁVEIS DE AMBIENTE
+# =============================================================================
 .env
 .env.local
-.env.*
+.env.*.local
+.env.production
+.env.staging
+*.env
 
-# Configurações de IDEs
+# Manter apenas o exemplo público
+!.env.example
+
+# =============================================================================
+# DATASETS — arquivos grandes demais para o git
+# =============================================================================
+# Dataset bruto baixado do Kaggle (~1.5 GB) — em qualquer nível
+**/datasets/raw/
+datasets/raw/
+
+# Dataset processado após o script prepare_plantvillage.py (~3 GB com augmentation)
+**/datasets/plantvillage_ceres/
+datasets/plantvillage_ceres/
+
+# Dados brutos do benchmark (usar benchmark_results.md no lugar)
+docs/benchmark_raw.csv
+
+# Modelos treinados (binários grandes)
+*.tflite
+*.h5
+*.pb
+*.onnx
+*.pt
+*.pth
+
+# =============================================================================
+# FIRMWARE ESP32 — PlatformIO
+# =============================================================================
+# Build do PlatformIO
+.pio/
+.pio_libdeps/
+
+# Cache do PlatformIO
+firmware/**/.pio/
+
+# =============================================================================
+# FLUTTER / DART
+# =============================================================================
+# Build
+app_ceres/build/
+**/build/
+
+# Ferramentas do Dart
+app_ceres/.dart_tool/
+**/.dart_tool/
+
+# Plugins Flutter
+app_ceres/.flutter-plugins
+app_ceres/.flutter-plugins-dependencies
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+
+# Pub cache
+app_ceres/.pub-cache/
+**/.pub-cache/
+app_ceres/.pub/
+**/.pub/
+
+# Gerado pelo build_runner (Drift)
+app_ceres/**/*.g.dart
+
+# Android
+app_ceres/android/.gradle/
+app_ceres/android/local.properties
+app_ceres/android/key.properties
+app_ceres/android/app/google-services.json
+**/android/.gradle/
+
+# iOS
+app_ceres/ios/Pods/
+app_ceres/ios/.symlinks/
+app_ceres/ios/Flutter/.last_build_id
+**/ios/Pods/
+
+# =============================================================================
+# IDEs E EDITORES
+# =============================================================================
 .vscode/
 .idea/
 *.swp
+*.swo
+*~
+.project
+.classpath
+*.iml
+*.iws
+*.ipr
+.settings/
 
-# Arquivos de Sistema Operacional
+# =============================================================================
+# SISTEMA OPERACIONAL
+# =============================================================================
+# macOS
 .DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
 Thumbs.db
-"@ | Out-File -FilePath .gitignore -Encoding utf8
+Thumbs.db:encdata
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+*~
+
+# =============================================================================
+# DOCKER
+# =============================================================================
+# Volumes locais do Docker (dados do PostgreSQL)
+postgres_data/
+
+# =============================================================================
+# CLAUDE CODE — configurações locais do agente (não commitar)
+# =============================================================================
+.claude/settings.local.json
+.claude/launch.json
+
+# =============================================================================
+# OUTROS
+# =============================================================================
+# Arquivos temporários
+*.tmp
+*.temp
+*.bak
+*.backup
+*.orig
+
+# Jupyter Notebooks checkpoints
+.ipynb_checkpoints/
+
+# Logs
+logs/
+*.log
+
+# Arquivos de certificado
+*.pem
+*.key
+*.crt
+*.p12
