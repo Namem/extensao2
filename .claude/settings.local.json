@@ -7,7 +7,30 @@
       "Bash(powershell.exe -Command \"& python create_sprint_review.py\")",
       "Bash(powershell.exe -Command \"& python 'C:\\\\Users\\\\Rachid\\\\Desktop\\\\NR\\\\Semestre 2026_1\\\\extensao\\\\ceres-diagnostico\\\\Pre_arquivos\\\\export_slides.py'\")",
       "Bash(powershell.exe -Command \"& python export_slides.py\")",
-      "Bash(powershell.exe -Command ':*)"
+      "Bash(powershell.exe -Command ':*)",
+      "Bash(python -c ' *)",
+      "Bash(python docs/gerar_backlog_xlsx.py)",
+      "Bash(venv/Scripts/pip install *)",
+      "Bash(venv/bin/pip install *)",
+      "Bash(python -c \"import dotenv\")",
+      "Bash(python -m pip install python-dotenv==1.0.1 -q)",
+      "Bash(docker compose *)",
+      "Bash(python manage.py migrate)",
+      "Bash(cmd.exe /c \"C:\\\\Users\\\\Rachid\\\\Desktop\\\\NR\\\\Semestre 2026_1\\\\extensao\\\\ceres-diagnostico\\\\backend\\\\venv\\\\Scripts\\\\python.exe -m django --version\")",
+      "PowerShell(& \"C:\\\\Users\\\\Rachid\\\\Desktop\\\\NR\\\\Semestre 2026_1\\\\extensao\\\\ceres-diagnostico\\\\backend\\\\venv\\\\Scripts\\\\python.exe\" -m django --version)",
+      "Bash(python -m venv venv)",
+      "Bash(venv/Scripts/python.exe manage.py migrate)",
+      "Bash(venv/Scripts/python.exe manage.py test)",
+      "Bash(venv/Scripts/python.exe manage.py show_urls)",
+      "Bash(venv/Scripts/python.exe -c ' *)",
+      "Bash(venv/Scripts/python.exe manage.py makemigrations diagnostico)",
+      "Read(//c/Program Files/**)",
+      "Read(//c/Program Files \\(x86\\)/**)",
+      "Bash(venv/Scripts/python.exe manage.py shell -c ' *)",
+      "Bash(kaggle datasets *)",
+      "PowerShell(python -m kaggle datasets download abdallahalidev/plantvillage-dataset --dry-run 2>&1)",
+      "Bash(git restore *)",
+      "Bash(git add *)"
     ]
   }
 }
