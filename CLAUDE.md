@@ -25,6 +25,10 @@ AI      : TFLite Micro + Edge Impulse
           Modelo: MobileNetV2 INT8 quantizado
 
 ## Dataset oficial do projeto
+Sempre usar os melhores datasets disponíveis — novos podem ser
+adicionados conforme necessidade, desde que documentados em
+docs/FUNDAMENTACAO_TECNICA.md com justificativa e licença.
+
 PRIMARY  : PlantVillage (Hughes & Salathé 2015)
            ~18.160 imagens de folha de tomate
            10 classes + saudável — CC BY 4.0
@@ -63,6 +67,14 @@ Sprint 5: PENDENTE — artigo + defesa
 - Commits : Conventional Commits (feat/fix/chore/docs)
 - Nunca commitar secrets — usar .env
 
+## Regra de fundamentação técnica
+SEMPRE que uma tecnologia, método, biblioteca ou arquitetura
+for adicionada OU removida do projeto, atualizar:
+  docs/FUNDAMENTACAO_TECNICA.md
+com justificativa técnica, comparativo com alternativas e
+referência acadêmica (Google Scholar, PMC, Springer, IEEE).
+Isso é obrigatório para a defesa do TCC.
+
 ## Estrutura de pastas
 backend/       → Django REST API
 app_ceres/     → Flutter
@@ -70,3 +82,9 @@ firmware/      → ESP32 (criar na Sprint 2)
 datasets/      → scripts de treino e dados
 docs/          → relatórios, artigo, benchmarks
 Pre_arquivos/  → artefatos pré-existentes (não editar)
+
+## Documentos vivos (atualizar ao final de cada implementação)
+docs/TCC_CERES.md            → rascunho do TCC, seções [PENDENTE] a preencher
+docs/RELATORIO_TECNICO.md    → log cronológico de tudo implementado
+docs/FUNDAMENTACAO_TECNICA.md → justificativa técnica + refs acadêmicas
+SEMPRE atualizar os três ao final de cada sprint ou bloco significativo.

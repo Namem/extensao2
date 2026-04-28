@@ -72,6 +72,8 @@ datasets/raw/
 # Dataset processado após o script prepare_plantvillage.py (~3 GB com augmentation)
 **/datasets/plantvillage_ceres/
 datasets/plantvillage_ceres/
+**/datasets/processed/
+datasets/processed/
 
 # Dados brutos do benchmark (usar benchmark_results.md no lugar)
 docs/benchmark_raw.csv
