@@ -1,7 +1,7 @@
 # Backlog do Produto — Ceres Diagnóstico
 **TCC Engenharia da Computação — IFMT Cuiabá**
 **Autor:** Namem Rachid Jaudy Neto
-**Última atualização:** 2026-04-23
+**Última atualização:** 2026-04-29
 
 > Backlog exclusivo do produto (software + firmware + hardware).
 > Para escrita do TCC e artigo científico, veja [BACKLOG_ESCRITA.md](BACKLOG_ESCRITA.md).
@@ -17,7 +17,7 @@
 - [x] Endpoints `GET /api/diagnostico/iniciar/` e `POST /api/diagnostico/responder/`
 - [x] Autenticação JWT configurada (SimpleJWT)
 - [x] 3 testes automatizados passando
-- [x] Docker Compose com PostgreSQL 15 na porta 5433
+- [x] PostgreSQL 18.3.3 instalado direto na porta 5433 (sem Docker)
 - [x] Multi-tenant (`Tenant`, `CustomUser`) estruturado
 - [x] `.env` criado e `settings.py` lendo variáveis de ambiente
 
@@ -25,9 +25,9 @@
 
 ## Sprint 1 — MQTT + Dataset + Treino 🔄 EM ANDAMENTO
 
-**Critério de aceite:** ESP32 publicando JSON via MQTT, Django persistindo eventos com endpoint paginado, dataset PlantVillage preparado e upload iniciado no Edge Impulse.
+**Critério de aceite:** ESP32 publicando JSON via MQTT, Django persistindo eventos com endpoint paginado, dataset PlantVillage preparado e modelos treinados.
 
-### Firmware (ESP32 genérico disponível)
+### Firmware (ESP32 genérico disponível) — PENDENTE
 - [ ] Criar `firmware/esp32_mqtt_sensor/` com PlatformIO (`esp32dev`)
 - [ ] Conectar WiFi e broker Mosquitto local (192.168.x.x:1883)
 - [ ] Ler DHT22 no GPIO4 e sensor de umidade do solo no GPIO34 (ADC 12 bits)
@@ -35,19 +35,25 @@
 - [ ] Reconexão automática WiFi e MQTT
 - [ ] Testar com `mosquitto_sub -t ceres/sensor/+`
 
-### Backend Django
+### Backend Django — PENDENTE
 - [ ] Adicionar `paho-mqtt>=2.0.0` ao `requirements.txt`
 - [ ] Model `DiagnosticoEvento` + migration (device_id, classe_detectada, confianca, temperatura, umidade_ar, umidade_solo, timestamp, FK Diagnostico)
 - [ ] Command `mqtt_listener` com retry exponencial e shutdown limpo (SIGTERM)
 - [ ] Endpoint `GET /api/diagnostico/historico/` paginado (page_size=10)
 - [ ] Testes: `test_evento_criado_com_dados_validos` e `test_historico_retorna_lista_paginada`
 
-### Dataset & IA
-- [ ] Baixar PlantVillage do Kaggle (`abdallahalidev/plantvillage-dataset`)
-- [ ] Criar `datasets/scripts/prepare_plantvillage.py` (filtro 10 classes tomate, split 70/15/15, augmentation)
-- [ ] Gerar `datasets/dataset_stats.md` com contagem por classe (alerta se < 200 imgs)
-- [ ] Gerar `datasets/edge_impulse_upload_guide.md` com instruções de upload
-- [ ] Treinar MobileNetV2 INT8 no Edge Impulse
+### Dataset & IA ✅ CONCLUÍDO (2026-04-29)
+- [x] Baixar PlantVillage do Kaggle (`abdallahalidev/plantvillage-dataset`) — 18.160 imgs
+- [x] `datasets/scripts/prepare_plantvillage.py` — split 70/15/15, 6 augmentations offline → 88.949 imgs treino
+- [x] `datasets/dataset_stats.md` gerado com contagem por classe
+- [x] `datasets/edge_impulse_upload_guide.md` gerado
+- [x] **Experimento A (Edge Impulse):** MobileNetV2 96×96 0.35, 40 cycles — FP32 92,5% / INT8 62,0% val acc
+- [x] **Experimento B (TF local WSL2):** MobileNetV2 96×96 0.35, 2 fases — **INT8 98,13% test acc, 639 KB** ← modelo escolhido
+- [x] `datasets/scripts/train_local.py` — script de treinamento completo
+- [x] `datasets/scripts/export_tflite.py` — exportação FP32 + INT8 com calibração
+- [x] `datasets/modelo/ceres_mobilenetv2_int8.tflite` — modelo pronto para Sprint 2
+- [x] `datasets/modelo/ei_ceres_fp32.tflite` + `ei_ceres_int8.tflite` — Exp A arquivado
+- [x] Análise comparativa documentada (quantization loss EI: -30pp sem calibração)
 
 ---
 
@@ -118,6 +124,6 @@
 | Sprint | Tema | Status | Tarefas |
 |--------|------|--------|---------|
 | Sprint 0 | Motor de Diagnóstico | ✅ Concluída | 8/8 |
-| Sprint 1 | MQTT + Dataset + Treino | 🔄 Em andamento | 0/16 |
+| Sprint 1 | MQTT + Dataset + Treino | 🔄 Em andamento | 11/22 (IA concluída, MQTT pendente) |
 | Sprint 2 | ESP32-S3 + TFLite + Integração | ⏳ Pendente | 0/16 |
 | Sprint 3 | Flutter + Resiliência + Experimentos | ⏳ Pendente | 0/17 |
