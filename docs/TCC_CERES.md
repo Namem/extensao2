@@ -446,22 +446,49 @@ Download e processamento do PlantVillage:
 
 ## 5. RESULTADOS E DISCUSSÃO
 
-### 5.1 Acurácia do Modelo
+### 5.1 Experimento de Treinamento — Edge Impulse vs TensorFlow Local
 
-`[PENDENTE: preencher após treinamento no Edge Impulse]`
+O projeto realizou dois experimentos de treinamento para comparação:
+
+**Design experimental:**
+
+| Parametro | Experimento A (Edge Impulse) | Experimento B (TF Local) |
+|-----------|------------------------------|--------------------------|
+| Plataforma | Edge Impulse Studio (nuvem) | TensorFlow 2.18 + WSL2 |
+| Hardware treino | GPU Edge Impulse | RTX 3060 Ti (8GB VRAM) |
+| Dataset | 18.160 imgs originais | 88.949 imgs com aug offline |
+| Augmentation | Online (Edge Impulse) | Offline (prepare_plantvillage.py) |
+| Arquitetura | MobileNetV2 96x96 0.35 | MobileNetV2 96x96 0.35 |
+| Quantizacao | INT8 automatica (EI) | INT8 pos-treinamento (TFLite) |
+| Epochs | 50 (max 60min) | 50 |
+
+**Resultados:**
+
+`[PENDENTE: preencher apos conclusao dos dois treinamentos]`
+
+| Metrica | Exp A (Edge Impulse) | Exp B (TF Local) |
+|---------|---------------------|------------------|
+| Acuracia val set | - | - |
+| Acuracia test set | - | - |
+| Tamanho modelo (.tflite) | - | - |
+| Latencia ESP32-S3 | - | - |
+
+### 5.2 Acurácia do Modelo
+
+`[PENDENTE: preencher após treinamentos]`
 
 Métricas esperadas (baseline literatura):
 - Acurácia top-1 no val set: > 85%
 - Acurácia top-1 no test set PlantVillage: > 85%
-- Acurácia no PlantDoc (campo real): > 70% (gap laboratório-campo esperado)
+- Acurácia no PlantDoc (campo real): > 70%
 
-### 5.2 Latência de Inferência
+### 5.3 Latência de Inferência
 
 `[PENDENTE: preencher após Sprint 2 — medição com esp_timer_get_time()]`
 
 Meta: < 300ms no ESP32-S3 @ 240MHz com modelo INT8.
 
-### 5.3 Experimento Edge vs Cloud
+### 5.4 Experimento Edge vs Cloud
 
 `[PENDENTE: preencher após Sprint 3 — script experiment_edge_vs_cloud.py]`
 

@@ -120,12 +120,56 @@ kaggle datasets download abdallahalidev/plantvillage-dataset \
 **Observação:** Classe D06b Mosaico tem apenas 373 imagens originais
 (menor do dataset). Monitorar acurácia dessa classe no Edge Impulse.
 
-#### PENDENTE — Upload Edge Impulse
+#### 2026-04-28 — Definição da Estratégia de Treinamento (2 Experimentos)
 
-- [ ] Criar conta/projeto no Edge Impulse
-- [ ] Upload de `processed/train/` e `processed/val/`
-- [ ] Configurar Impulse: MobileNetV2 96x96 RGB INT8
-- [ ] Treinar e registrar acurácia aqui
+Análise do hardware disponível (CPU-Z + nvidia-smi):
+- CPU: AMD Ryzen 7 5700X3D (8 cores / 16 threads)
+- RAM: 48 GB DDR4
+- GPU: NVIDIA RTX 3060 Ti (8GB VRAM, CUDA 13.2)
+
+Decisão: realizar **dois experimentos de treinamento** para comparação no artigo:
+
+| | Experimento A | Experimento B |
+|--|---------------|---------------|
+| Plataforma | Edge Impulse (nuvem) | TensorFlow local (WSL2) |
+| Dataset | 18.160 imgs originais | 88.949 imgs com augmentation |
+| Augmentation | Online (Edge Impulse) | Offline (prepare_plantvillage.py) |
+| GPU | Servidores Edge Impulse | RTX 3060 Ti local |
+| Limite de tempo | 60 min/job | Sem limite |
+| Saída | Arduino Library (.zip) | .tflite INT8 |
+
+Justificativa: comparação entre plataforma gerenciada vs treinamento próprio
+gera dados experimentais originais para o artigo (seção 5 do TCC).
+
+#### 2026-04-28 — Upload Experimento A — Edge Impulse
+
+- Projeto criado: `ceres-diagnostico` (plano Developer gratuito, privado)
+- Script: `backend/datasets/scripts/upload_edge_impulse.py`
+- API Key: armazenada em `backend/.env` (EDGE_IMPULSE_API_KEY)
+- Upload: processed/train (88.949 imgs) e processed/val (2.719 imgs)
+- Status: EM ANDAMENTO (upload via API REST, 4 workers paralelos)
+- Destino EI: train -> "training" | val -> "testing"
+- test/ NAO enviado — reservado para benchmark final
+
+Observacao: plano gratuito tem 60min/job. Se 88k imgs exceder,
+criar projeto separado com apenas as 18k originais para comparacao.
+
+- [ ] Confirmar upload completo no Edge Impulse Studio > Data acquisition
+- [ ] Configurar Impulse: Image 96x96 RGB > MobileNetV2 0.35 > INT8
+- [ ] Treinar (max 60 min) e registrar acuracia val aqui
+- [ ] Exportar como Arduino Library para Sprint 2
+
+#### 2026-04-28 — Setup Experimento B — TensorFlow WSL2
+
+Ambiente: WSL2 Ubuntu 24.04, Python 3.12.3
+GPU acessivel via WSL2 (nvidia-smi confirma RTX 3060 Ti + CUDA 13.2)
+Instalando: python3-venv, tensorflow[and-cuda], pillow, tqdm
+
+- [ ] Confirmar `import tensorflow as tf; tf.config.list_physical_devices('GPU')`
+- [ ] Criar script `datasets/scripts/train_local.py`
+- [ ] Treinar MobileNetV2 96x96 INT8 com 88.949 imgs
+- [ ] Exportar para TFLite INT8
+- [ ] Registrar acuracia e comparar com Experimento A
 
 ### Frente A — Firmware ESP32 (PENDENTE)
 
@@ -165,6 +209,9 @@ kaggle datasets download abdallahalidev/plantvillage-dataset \
 | 2026-04-28 | Nomes de pastas PlantVillage com `___` | Dataset usa triple underscore | Corrigir mapeamento no script |
 | 2026-04-28 | PowerShell bloqueando activate.ps1 | ExecutionPolicy restrita | Set-ExecutionPolicy RemoteSigned -Scope CurrentUser |
 | 2026-04-28 | Testes Django: sem permissão CREATEDB | Usuário ceres_user sem privilégio | ALTER USER ceres_user CREATEDB |
+| 2026-04-28 | edge-impulse-cli falha ao instalar | node-gyp exige Visual Studio C++ | Usar --ignore-scripts; migrar para API REST Python |
+| 2026-04-28 | TensorFlow não suporta Python 3.13 | Suporte oficial até 3.12 | Usar Python 3.12 do WSL2 Ubuntu |
+| 2026-04-28 | python3.12-venv não encontrado no apt | Pacote ausente no Ubuntu WSL | sudo apt update + python3-venv |
 
 ---
 

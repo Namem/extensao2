@@ -199,14 +199,36 @@ with data being captured and processed on the device" (MDPI Sensors, 2025).
 - **Custo**: ~R$ 60–80 (vs. Raspberry Pi 4: ~R$ 400+)
 - **Suporte TFLite Micro**: biblioteca oficial do TensorFlow para microcontroladores
 
-### Por que Edge Impulse para treinar?
+### Estratégia de treinamento — dois experimentos comparativos
 
-Edge Impulse é a plataforma líder para desenvolvimento de modelos TinyML,
-com exportação direta para Arduino Library (compatível com PlatformIO),
-quantização INT8 integrada, e suporte oficial ao ESP32-S3.
-Alternativa (TF/Keras direto) exigiria conversão manual para TFLite e
-calibração de quantização — processo mais complexo e propenso a erros para
-equipes pequenas.
+O projeto adota dois experimentos paralelos de treinamento, cujos resultados
+serão comparados no artigo:
+
+**Experimento A — Edge Impulse (plataforma gerenciada):**
+- Plataforma líder para TinyML com exportação direta para Arduino Library
+- Quantização INT8 integrada e suporte oficial ao ESP32-S3
+- Dataset: 18.160 imagens originais + augmentation online da plataforma
+- Limitação: 60 min/job no plano gratuito
+
+**Experimento B — TensorFlow 2.18 local (WSL2 + RTX 3060 Ti):**
+- Hardware disponível: RTX 3060 Ti (8GB VRAM), CUDA 13.2, 48GB RAM
+- TensorFlow via WSL2 Ubuntu (Python 3.12) com `tensorflow[and-cuda]`
+- Dataset: 88.949 imagens com augmentation offline (prepare_plantvillage.py)
+- Sem limite de tempo, controle total do pipeline
+- Exportação manual para TFLite INT8 via `TFLiteConverter`
+
+**Por que comparar os dois?**
+A comparação gera dados originais para o artigo: qual pipeline
+(gerenciado vs manual) produz melhor modelo para TinyML em termos de
+acurácia, tamanho e latência no ESP32-S3?
+
+| Criterio | Edge Impulse | TF Local |
+|----------|-------------|----------|
+| Facilidade | Alta | Media |
+| Controle do pipeline | Baixo | Total |
+| Dataset utilizado | 18k imgs | 88k imgs |
+| Reproducibilidade | Media | Alta (seed fixo) |
+| Custo | Gratuito (limitado) | Gratuito (sem limite) |
 
 ### Referências
 - [Tiny Machine Learning and On-Device Inference — PMC](https://pmc.ncbi.nlm.nih.gov/articles/PMC12115890/)
