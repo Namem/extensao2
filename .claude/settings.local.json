@@ -30,7 +30,27 @@
       "Bash(kaggle datasets *)",
       "PowerShell(python -m kaggle datasets download abdallahalidev/plantvillage-dataset --dry-run 2>&1)",
       "Bash(git restore *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git clone *)",
+      "Bash(git init *)",
+      "Bash(git remote *)",
+      "Bash(git fetch *)",
+      "Bash(git checkout *)",
+      "Bash(mkdir -p /tmp/claude-backup)",
+      "Bash(mv .claude/launch.json .claude/settings.local.json /tmp/claude-backup/)",
+      "Bash(kaggle --version)",
+      "Read(//c/Users/Namem/.kaggle/**)",
+      "Bash(pip install *)",
+      "Bash(docker --version)",
+      "Bash(python -c \"from PIL import Image; print\\('Pillow OK'\\)\")",
+      "Bash(where docker *)",
+      "Bash(python -c \"import kaggle; print\\('kaggle lib OK'\\)\")",
+      "Bash(backend/venv/Scripts/pip install *)",
+      "PowerShell(Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force)",
+      "Bash(pg_isready -h localhost -p 5433)",
+      "PowerShell(Get-Service | Where-Object { $_.DisplayName -match \"docker|postgres|sql\" } | Select-Object Name, Status, DisplayName)",
+      "WebSearch",
+      "PowerShell(wsl -d Ubuntu -- bash -c \"source ~/venv_ceres/bin/activate 2>/dev/null || \\(python3 -m venv ~/venv_ceres && source ~/venv_ceres/bin/activate\\) && pip install --upgrade pip && pip install tensorflow[and-cuda] pillow tqdm 2>&1 | tail -5\")"
     ]
   }
 }
