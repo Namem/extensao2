@@ -1,0 +1,36 @@
+============================================================
+RELATORIO EXPERIMENTO B — TensorFlow Local
+Data: 2026-04-28 23:12
+Hardware: RTX 3060 Ti (WSL2), TF 2.21.0
+============================================================
+
+Acuracia no test set : 98.13%
+Loss no test set     : 0.0769
+Tamanho FP32         : 1626.0 KB
+Tamanho INT8         : 639.2 KB
+
+Acuracia por classe:
+----------------------------------------
+  D01_requeima                         97.56%
+  D02_septoriose                       98.50%
+  D03_pinta_preta                      90.00%
+  D03b_mancha_alvo                     95.28%
+  D05_mofo_foliar                      97.22%
+  D06_vira_cabeca                      99.50%
+  D06b_mosaico                        100.00%
+  D07_acaro_bronzeamento               98.41%
+  D09_mancha_bacteriana                99.06%
+  saudavel                            100.00%
+
+Matriz de Confusao (linhas=real, colunas=predito):
+            D01_re  D02_se  D03_pi  D03b_m  D05_mo  D06_vi  D06b_m  D07_ac  D09_ma  saudav
+D01_requei     280       2       3       1       0       0       0       0       0       1
+D02_septor       1     263       2       1       0       0       0       0       0       0
+D03_pinta_       2       8     135       2       0       0       1       1       1       0
+D03b_manch       0       2       1     202       0       0       1       5       0       1
+D05_mofo_f       1       1       0       0     140       0       0       1       1       0
+D06_vira_c       1       0       0       0       0     801       0       0       3       0
+D06b_mosai       0       0       0       0       0       0      57       0       0       0
+D07_acaro_       0       0       0       1       0       1       1     248       1       0
+D09_mancha       2       1       0       0       0       0       0       0     317       0
+  saudavel       0       0       0       0       0       0       0       0       0     240

@@ -36,8 +36,11 @@ de nuvem para inferência. Os resultados são transmitidos via protocolo MQTT
 para um backend Django REST, acessível por aplicativo Flutter para Android/iOS.
 
 O modelo foi treinado com o dataset PlantVillage (Hughes & Salathé, 2015),
-contendo 18.160 imagens de folhas de tomate em 10 classes de doenças.
-`[PENDENTE: acurácia final, latência medida, resultados do experimento edge vs cloud]`
+contendo 18.160 imagens de folhas de tomate em 10 classes de doenças,
+expandido para 88.949 imagens via augmentation offline. O Experimento B
+(TensorFlow local com RTX 3060 Ti) atingiu **98,13% de acurácia no test set**
+com modelo INT8 de 639 KB — compacto para execução no ESP32-S3.
+`[PENDENTE: acurácia Experimento A (Edge Impulse), latência ESP32-S3, comparativo final]`
 
 **Palavras-chave:** TinyML, ESP32-S3, detecção de doenças em plantas,
 MobileNetV2, MQTT, Django REST, Flutter, agricultura de precisão.
@@ -223,7 +226,11 @@ para execução em dispositivos móveis, com redução de parâmetros de 138M
 (Sandler et al., 2018) introduziu os blocos *inverted residual* com
 *linear bottleneck*, melhorando a eficiência computacional.
 
-`[PENDENTE: adicionar resultados próprios após treinamento]`
+O Experimento B (TF local, WSL2, RTX 3060 Ti) atingiu **98,13% de acurácia
+no test set** com MobileNetV2 96×96 alpha=0.35, duas fases de treinamento
+(backbone congelado + fine-tuning das últimas 30 camadas) e augmentation
+offline com 88.949 imagens. O modelo INT8 quantizado ocupa **639 KB**,
+adequado para a memória flash do ESP32-S3 N16R8 (16 MB).
 
 ### 2.3 TinyML e Inferência na Borda
 
@@ -464,14 +471,18 @@ O projeto realizou dois experimentos de treinamento para comparação:
 
 **Resultados:**
 
-`[PENDENTE: preencher apos conclusao dos dois treinamentos]`
+`[PENDENTE: preencher Experimento A após conclusão do upload e treinamento no Edge Impulse]`
 
 | Metrica | Exp A (Edge Impulse) | Exp B (TF Local) |
 |---------|---------------------|------------------|
-| Acuracia val set | - | - |
-| Acuracia test set | - | - |
-| Tamanho modelo (.tflite) | - | - |
-| Latencia ESP32-S3 | - | - |
+| Acuracia val set | [PENDENTE] | 97,79% (Época 28) |
+| **Acuracia test set** | **[PENDENTE]** | **98,13%** ✅ |
+| Tamanho FP32 (.tflite) | [PENDENTE] | 1.626 KB |
+| **Tamanho INT8 (.tflite)** | **[PENDENTE]** | **639 KB** ✅ |
+| Epochs (efetivas) | [PENDENTE] | 40 (10+30) |
+| Hardware treino | GPU Edge Impulse | RTX 3060 Ti |
+| Tempo treino | [PENDENTE] | ~2h |
+| Latencia ESP32-S3 | [PENDENTE Sprint 2] | [PENDENTE Sprint 2] |
 
 ### 5.2 Acurácia do Modelo
 

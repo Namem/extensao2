@@ -87,10 +87,10 @@ Exp B — TensorFlow local (WSL2):
 Sprint 0: CONCLUIDA — API Django + Motor IA + JWT (5/5 testes)
 Sprint 1: EM ANDAMENTO — MQTT + dataset + treino
   - [x] Dataset PlantVillage baixado e processado (88.949 imgs)
-  - [x] Upload Edge Impulse iniciado (Exp A)
-  - [x] WSL2 + TF local sendo configurado (Exp B)
-  - [ ] Treinamento Exp A concluido
-  - [ ] Treinamento Exp B concluido
+  - [x] Upload Edge Impulse iniciado (Exp A) — upload em andamento
+  - [x] WSL2 + TF local configurado (Exp B)
+  - [ ] Treinamento Exp A concluido (aguardando upload completar)
+  - [x] Treinamento Exp B concluido — 98,13% test acc, INT8 639KB
   - [ ] Firmware ESP32 MQTT
 Sprint 2: PENDENTE — deploy TFLite no ESP32-S3
 Sprint 3: PENDENTE — integração MQTT-Ceres completa

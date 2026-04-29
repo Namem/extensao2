@@ -69,3 +69,17 @@
 2026-04-28 20:26:24,264 ERROR 151a5c33-96d5-499e-a7b2-62d0cbc6bc91___YLCV_NREC 2766.JPG: ('Connection aborted.', ConnectionResetError(10054, 'Foi forçado o cancelamento de uma conexão existente pelo host remoto', None, 10054, None))
 2026-04-28 20:26:34,029 ERROR 151a5c33-96d5-499e-a7b2-62d0cbc6bc91___YLCV_NREC 2766__aug_bright_p.jpg: HTTPSConnectionPool(host='ingestion.edgeimpulse.com', port=443): Read timed out. (read timeout=30)
 2026-04-28 20:37:34,660 ERROR 26d0393e-baa5-4150-ac4f-d7a2c21724d7___YLCV_NREC 2150.JPG: ('Connection aborted.', ConnectionResetError(10054, 'Foi forçado o cancelamento de uma conexão existente pelo host remoto', None, 10054, None))
+2026-04-28 21:39:55,866 ERROR 8932d275-9859-46a4-9d47-60c1a88e1112___UF.GRC_YLCV_Lab 09415__aug_rot_m15.jpg: HTTPSConnectionPool(host='ingestion.edgeimpulse.com', port=443): Read timed out. (read timeout=30)
+2026-04-28 21:40:04,408 ERROR 89413a22-595f-410c-8144-d3f655d19e00___YLCV_GCREC 5456__aug_bright_p.jpg: HTTPSConnectionPool(host='ingestion.edgeimpulse.com', port=443): Read timed out. (read timeout=30)
+2026-04-28 21:40:05,832 ERROR 89413a22-595f-410c-8144-d3f655d19e00___YLCV_GCREC 5456__aug_flip_v.jpg: HTTPSConnectionPool(host='ingestion.edgeimpulse.com', port=443): Read timed out. (read timeout=30)
+2026-04-28 21:40:08,191 ERROR 89413a22-595f-410c-8144-d3f655d19e00___YLCV_GCREC 5456__aug_rot_p15.jpg: HTTPSConnectionPool(host='ingestion.edgeimpulse.com', port=443): Read timed out. (read timeout=30)
+2026-04-28 21:43:43,159 ERROR 8cebc9f3-bd56-4110-bc69-54dbba40619f___YLCV_NREC 2279__aug_rot_m15.jpg: ('Connection aborted.', ConnectionResetError(10054, 'Foi forçado o cancelamento de uma conexão existente pelo host remoto', None, 10054, None))
+2026-04-28 21:43:45,676 ERROR 8cebc9f3-bd56-4110-bc69-54dbba40619f___YLCV_NREC 2279__aug_flip_h.jpg: HTTPSConnectionPool(host='ingestion.edgeimpulse.com', port=443): Read timed out. (read timeout=30)
+2026-04-28 21:43:47,192 ERROR 8cf65a4a-7186-4d3b-ab25-b947ca20cb9b___YLCV_GCREC 5392.JPG: HTTPSConnectionPool(host='ingestion.edgeimpulse.com', port=443): Read timed out. (read timeout=30)
+2026-04-28 21:43:49,893 ERROR 8cf65a4a-7186-4d3b-ab25-b947ca20cb9b___YLCV_GCREC 5392__aug_bright_p.jpg: HTTPSConnectionPool(host='ingestion.edgeimpulse.com', port=443): Read timed out. (read timeout=30)
+2026-04-28 21:58:47,285 ERROR a730544f-6894-41b5-a00d-87e640a9a050___YLCV_GCREC 2506.JPG: HTTPSConnectionPool(host='ingestion.edgeimpulse.com', port=443): Read timed out. (read timeout=30)
+2026-04-28 22:53:58,500 ERROR faada609-213c-481d-8389-b13bf016820a___YLCV_NREC 2130__aug_rot_p15.jpg: HTTPSConnectionPool(host='ingestion.edgeimpulse.com', port=443): Read timed out. (read timeout=30)
+2026-04-28 22:56:57,835 INFO   D06_vira_cabeca                     26228 imgs  [15 ERROS]
+2026-04-28 23:08:35,346 INFO   D06b_mosaico                        1827 imgs  [OK]
+2026-04-28 23:13:06,340 ERROR 159ef3ee-ef23-4df6-b3bc-a7a8bc01aaa0___Com.G_SpM_FL 8921__aug_flip_v.jpg: HTTPSConnectionPool(host='ingestion.edgeimpulse.com', port=443): Read timed out. (read timeout=30)
+2026-04-28 23:13:07,040 ERROR 159ef3ee-ef23-4df6-b3bc-a7a8bc01aaa0___Com.G_SpM_FL 8921__aug_rot_m15.jpg: HTTPSConnectionPool(host='ingestion.edgeimpulse.com', port=443): Read timed out. (read timeout=30)

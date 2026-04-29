@@ -159,17 +159,56 @@ criar projeto separado com apenas as 18k originais para comparacao.
 - [ ] Treinar (max 60 min) e registrar acuracia val aqui
 - [ ] Exportar como Arduino Library para Sprint 2
 
-#### 2026-04-28 — Setup Experimento B — TensorFlow WSL2
+#### 2026-04-28 — Experimento B — TensorFlow Local WSL2 ✅ CONCLUÍDO
 
-Ambiente: WSL2 Ubuntu 24.04, Python 3.12.3
-GPU acessivel via WSL2 (nvidia-smi confirma RTX 3060 Ti + CUDA 13.2)
-Instalando: python3-venv, tensorflow[and-cuda], pillow, tqdm
+**Ambiente:**
+- WSL2 Ubuntu 24.04, Python 3.12.3, venv ~/venv_ceres/
+- GPU: RTX 3060 Ti (8GB VRAM, CUDA 13.2) — detectada via LD_LIBRARY_PATH fix
+- TensorFlow 2.21 com tensorflow[and-cuda]
 
-- [ ] Confirmar `import tensorflow as tf; tf.config.list_physical_devices('GPU')`
-- [ ] Criar script `datasets/scripts/train_local.py`
-- [ ] Treinar MobileNetV2 96x96 INT8 com 88.949 imgs
-- [ ] Exportar para TFLite INT8
-- [ ] Registrar acuracia e comparar com Experimento A
+**Fix LD_LIBRARY_PATH (GPU detection em WSL2):**
+```bash
+export LD_LIBRARY_PATH=$(find ~/venv_ceres/lib/python3.12/site-packages/nvidia \
+    -name "lib" -type d | tr '\n' ':'):/usr/lib/wsl/lib:$LD_LIBRARY_PATH
+```
+Salvo em `~/.bashrc` para persistência.
+
+**Arquitetura:** MobileNetV2 96×96 alpha=0.35 (mesmo do Edge Impulse)
+- Fase 1: backbone congelado, 10 epochs, LR=1e-3, Adam
+- Fase 2: fine-tuning últimas 30 camadas, 40 epochs, LR=5e-4, Adam
+
+**Incidente:** Treinamento travou na Época 29 step 1546/2780 por contenda de
+I/O (git add simultâneo ao treino). Checkpoint da Época 28 (best_fase2.keras,
+val_acc 97,79%) foi preservado pelo ModelCheckpoint callback.
+Treinamento retomado automaticamente, concluindo 40 épocas.
+Script `export_tflite.py` criado como contingência (carrega checkpoint se necessário).
+
+**Resultado final (2026-04-28):**
+
+| Métrica | Valor |
+|---------|-------|
+| Acurácia val set (melhor época) | 97,79% |
+| **Acurácia test set** | **98,13%** |
+| Loss test set | (ver relatorio_final.txt) |
+| TFLite FP32 | 1.626,0 KB |
+| **TFLite INT8** | **639,2 KB** |
+| Épocas totais | 40 (Fase 1: 10, Fase 2: 30 efetivas) |
+| Tempo total estimado | ~2h (RTX 3060 Ti) |
+
+**Arquivos gerados:**
+- `backend/datasets/modelo/best_fase1.keras` — melhor Fase 1
+- `backend/datasets/modelo/best_fase2.keras` — melhor Fase 2 (Época 28)
+- `backend/datasets/modelo/ceres_mobilenetv2.h5` — Keras completo
+- `backend/datasets/modelo/ceres_mobilenetv2.tflite` — FP32 (1,6 MB)
+- `backend/datasets/modelo/ceres_mobilenetv2_int8.tflite` — INT8 (639 KB) **← para ESP32-S3**
+- `backend/datasets/modelo/historico_treino.csv` — métricas por época
+- `backend/datasets/modelo/relatorio_final.txt` — acurácia + matriz de confusão
+
+**Scripts:**
+- `backend/datasets/scripts/train_local.py` ✅ commitar
+- `backend/datasets/scripts/export_tflite.py` ✅ commitar (contingência)
+
+✅ GPU OK | ✅ INT8 export OK | ✅ 98,13% test acc | ✅ 639 KB < 1MB (ESP32-S3)
 
 ### Frente A — Firmware ESP32 (PENDENTE)
 
@@ -212,6 +251,8 @@ Instalando: python3-venv, tensorflow[and-cuda], pillow, tqdm
 | 2026-04-28 | edge-impulse-cli falha ao instalar | node-gyp exige Visual Studio C++ | Usar --ignore-scripts; migrar para API REST Python |
 | 2026-04-28 | TensorFlow não suporta Python 3.13 | Suporte oficial até 3.12 | Usar Python 3.12 do WSL2 Ubuntu |
 | 2026-04-28 | python3.12-venv não encontrado no apt | Pacote ausente no Ubuntu WSL | sudo apt update + python3-venv |
+| 2026-04-28 | GPU RTX 3060 Ti não detectada no WSL2 | LD_LIBRARY_PATH sem paths CUDA nvidia | export LD_LIBRARY_PATH com paths nvidia + /usr/lib/wsl/lib |
+| 2026-04-28 | Treinamento travou época 29 step 1546/2780 | Contenda I/O: git add simultâneo ao treino | Ctrl+C; retomou; ModelCheckpoint preservou best_fase2.keras |
 
 ---
 
