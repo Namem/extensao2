@@ -1,6 +1,6 @@
         # Dataset Stats — PlantVillage (Tomate)
         **Gerado em:** 2026-04-28
-        **Projeto:** Ceres Diagnóstico — TCC IFMT Sorriso-MT
+        **Projeto:** Ceres Diagnóstico — TCC IFMT Cuiabá
 
         ## Resumo
 

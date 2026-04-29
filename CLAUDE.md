@@ -1,7 +1,7 @@
 # Ceres Diagnóstico — Contexto para Claude Code
 
 ## Projeto
-TCC de Engenharia da Computação — IFMT (Sorriso-MT).
+TCC de Engenharia da Computação — IFMT Cuiabá.
 Sistema embarcado de detecção precoce de doenças no
 tomateiro: ESP32-S3 TinyML + Django REST + Flutter.
 Autor: Namem Rachid Jaudy Neto

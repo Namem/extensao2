@@ -1,5 +1,5 @@
 # Fundamentação Técnica — Ceres Diagnóstico
-**TCC Engenharia da Computação — IFMT Sorriso-MT**
+**TCC Engenharia da Computação — IFMT Cuiabá**
 **Autor:** Namem Rachid Jaudy Neto
 **Última atualização:** 2026-04-28
 

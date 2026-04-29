@@ -1,5 +1,5 @@
         # Edge Impulse — Guia de Upload
-        **Projeto:** Ceres Diagnóstico — TCC IFMT Sorriso-MT
+        **Projeto:** Ceres Diagnóstico — TCC IFMT Cuiabá
         **Gerado em:** 2026-04-28
 
         ## Pré-requisitos

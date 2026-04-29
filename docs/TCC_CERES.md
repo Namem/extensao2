@@ -1,7 +1,7 @@
 # CERES DIAGNÓSTICO: SISTEMA EMBARCADO DE DETECÇÃO PRECOCE DE DOENÇAS NO TOMATEIRO COM TINYML E IoT
 
 **Trabalho de Conclusão de Curso**
-**Engenharia da Computação — IFMT Campus Sorriso-MT**
+**Engenharia da Computação — IFMT Campus Cuiabá**
 **Autor:** Namem Rachid Jaudy Neto
 **Orientador:** (a preencher)
 **Ano:** 2026
@@ -126,7 +126,7 @@ MobileNetV2, MQTT, Django REST, Flutter, agricultura de precisão.
 
 O Brasil é o nono maior produtor mundial de tomate, com produção de
 aproximadamente 4,4 milhões de toneladas em 2023 (FAO, 2024). O estado
-de Mato Grosso, onde está localizado o IFMT Campus Sorriso, apresenta
+de Mato Grosso, onde está localizado o IFMT Campus Cuiabá, apresenta
 expansão crescente da tomaticultura, impulsionada pela fronteira agrícola
 do Cerrado. Contudo, o manejo fitossanitário ainda é majoritariamente
 reativo: o produtor detecta a doença visualmente após o aparecimento de

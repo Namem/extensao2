@@ -1,5 +1,5 @@
 # Backlog de Escrita — TCC e Artigo Científico
-**TCC Engenharia da Computação — IFMT Sorriso-MT**
+**TCC Engenharia da Computação — IFMT Cuiabá**
 **Autor:** Namem Rachid Jaudy Neto
 **Última atualização:** 2026-04-23
 
