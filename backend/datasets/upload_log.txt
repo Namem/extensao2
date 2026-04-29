@@ -83,3 +83,30 @@
 2026-04-28 23:08:35,346 INFO   D06b_mosaico                        1827 imgs  [OK]
 2026-04-28 23:13:06,340 ERROR 159ef3ee-ef23-4df6-b3bc-a7a8bc01aaa0___Com.G_SpM_FL 8921__aug_flip_v.jpg: HTTPSConnectionPool(host='ingestion.edgeimpulse.com', port=443): Read timed out. (read timeout=30)
 2026-04-28 23:13:07,040 ERROR 159ef3ee-ef23-4df6-b3bc-a7a8bc01aaa0___Com.G_SpM_FL 8921__aug_rot_m15.jpg: HTTPSConnectionPool(host='ingestion.edgeimpulse.com', port=443): Read timed out. (read timeout=30)
+2026-04-28 23:55:18,752 ERROR eaf27f54-d679-4fec-831a-41d1d18b286d___Com.G_SpM_FL 8455__aug_bright_p.jpg: HTTPSConnectionPool(host='ingestion.edgeimpulse.com', port=443): Read timed out. (read timeout=30)
+2026-04-28 23:55:18,928 ERROR eaf27f54-d679-4fec-831a-41d1d18b286d___Com.G_SpM_FL 8455__aug_flip_v.jpg: HTTPSConnectionPool(host='ingestion.edgeimpulse.com', port=443): Read timed out. (read timeout=30)
+2026-04-28 23:59:12,788 INFO   D07_acaro_bronzeamento              8207 imgs  [4 ERROS]
+2026-04-29 00:58:21,263 INFO   D09_mancha_bacteriana               10416 imgs  [OK]
+2026-04-29 01:43:08,406 ERROR ec59e000-1ee0-4998-a68f-abbfa6f6d009___RS_HL 0226__aug_flip_v.jpg: HTTPSConnectionPool(host='ingestion.edgeimpulse.com', port=443): Read timed out. (read timeout=30)
+2026-04-29 01:43:11,155 ERROR ec768816-02c1-4726-9374-b6d0ccec49d2___RS_HL 0114.JPG: HTTPSConnectionPool(host='ingestion.edgeimpulse.com', port=443): Read timed out. (read timeout=30)
+2026-04-29 01:45:14,477 ERROR f9546cff-061d-4240-88ba-492272a92847___GH_HL Leaf 176.2__aug_rot_p15.jpg: HTTPSConnectionPool(host='ingestion.edgeimpulse.com', port=443): Read timed out. (read timeout=30)
+2026-04-29 01:45:19,882 ERROR f96987aa-d19d-415b-a68c-73a07a47d521___RS_HL 9736__aug_rot_p15.jpg: HTTPSConnectionPool(host='ingestion.edgeimpulse.com', port=443): Read timed out. (read timeout=30)
+2026-04-29 01:46:39,309 INFO   saudavel                            7787 imgs  [4 ERROS]
+2026-04-29 01:46:39,310 INFO --- val -> testing (10 classes) ---
+2026-04-29 01:48:09,341 INFO   D01_requeima                         286 imgs  [OK]
+2026-04-29 01:49:36,144 INFO   D02_septoriose                       265 imgs  [OK]
+2026-04-29 01:50:24,911 INFO   D03_pinta_preta                      150 imgs  [OK]
+2026-04-29 01:51:37,538 INFO   D03b_mancha_alvo                     210 imgs  [OK]
+2026-04-29 01:52:23,843 INFO   D05_mofo_foliar                      142 imgs  [OK]
+2026-04-29 01:56:40,012 INFO   D06_vira_cabeca                      803 imgs  [OK]
+2026-04-29 01:57:00,504 INFO   D06b_mosaico                          55 imgs  [OK]
+2026-04-29 01:58:30,648 INFO   D07_acaro_bronzeamento               251 imgs  [OK]
+2026-04-29 02:00:08,801 INFO   D09_mancha_bacteriana                319 imgs  [OK]
+2026-04-29 02:01:31,311 INFO   saudavel                             238 imgs  [OK]
+2026-04-29 02:01:31,311 INFO 
+=== Resultado Final ===
+2026-04-29 02:01:31,311 INFO Enviados com sucesso : 91590
+2026-04-29 02:01:31,311 INFO Erros               : 78
+2026-04-29 02:01:31,311 INFO Log completo        : C:\Users\Namem\Desktop\Codiguins\extensao\ceres-diagnostico\backend\datasets\upload_log.txt
+2026-04-29 02:01:31,311 WARNING 
+Upload com erros. Verifique upload_log.txt para detalhes.
