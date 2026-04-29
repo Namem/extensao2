@@ -475,14 +475,49 @@ O projeto realizou dois experimentos de treinamento para comparação:
 
 | Metrica | Exp A (Edge Impulse) | Exp B (TF Local) |
 |---------|---------------------|------------------|
-| Acuracia val set | [PENDENTE] | 97,79% (Época 28) |
-| **Acuracia test set** | **[PENDENTE]** | **98,13%** ✅ |
-| Tamanho FP32 (.tflite) | [PENDENTE] | 1.626 KB |
-| **Tamanho INT8 (.tflite)** | **[PENDENTE]** | **639 KB** ✅ |
-| Epochs (efetivas) | [PENDENTE] | 40 (10+30) |
-| Hardware treino | GPU Edge Impulse | RTX 3060 Ti |
-| Tempo treino | [PENDENTE] | ~2h |
-| Latencia ESP32-S3 | [PENDENTE Sprint 2] | [PENDENTE Sprint 2] |
+| Metrica | Exp A INT8 (EI) | Exp A FP32 (EI) | Exp B INT8 (TF Local) |
+|---------|----------------|-----------------|----------------------|
+| **Acuracia val set** | **62,0%** | **92,5%** | **97,79%** |
+| Acuracia test set | — | — | **98,13%** ✅ |
+| Loss | 4,13 | 0,22 | — |
+| AUC-ROC | 0,90 | 1,00 | — |
+| F1 ponderado | 0,62 | 0,92 | — |
+| Precisao ponderada | 0,71 | 0,92 | — |
+| Recall ponderado | 0,62 | 0,92 | — |
+| Flash (.tflite) | 547 KB | 1.600 KB | **639 KB** |
+| RAM pico | 232,9 KB | 441,8 KB | — |
+| **Latencia ESP32-S3** | 1.365 ms ⚠️ | 4.322 ms ⚠️ | [PENDENTE Sprint 2] |
+| Epochs | 40 cycles | 40 cycles | 40 (10+30 fases) |
+| Hardware treino | GPU Edge Impulse | GPU Edge Impulse | RTX 3060 Ti |
+| Estrategia | Fase unica | Fase unica | Duas fases + EarlyStopping |
+| Quantizacao | INT8 automatica (EI) | FP32 | INT8 com repr. dataset |
+
+**Analise dos resultados:**
+
+O Experimento A revelou dois fenomenos importantes para o TCC:
+
+1. **Quantization loss severo no Edge Impulse:** O modelo FP32 atingiu
+   92,5% de acuracia, mas a versao INT8 caiu para 62,0% — perda de ~30
+   pontos percentuais. Isso ocorre porque a quantizacao automatica do
+   Edge Impulse nao utiliza um dataset de calibracao representativo,
+   resultando em escalonamento impreciso dos pesos quantizados.
+
+2. **Gap Exp A FP32 vs Exp B INT8 (92,5% vs 98,13%):** Mesmo o modelo
+   float32 do Edge Impulse ficou abaixo do INT8 do Experimento B.
+   A diferenca se deve a estrategia de duas fases (backbone congelado +
+   fine-tuning das ultimas 30 camadas com LR reduzido), EarlyStopping e
+   ReduceLROnPlateau usados no Exp B — absent no treinamento gerenciado
+   do Edge Impulse.
+
+3. **Quantizacao correta no Exp B:** O script export_tflite.py usou
+   `representative_dataset` com 50 batches do val set real para calibrar
+   os parametros de quantizacao INT8, preservando a acuracia (98,13%).
+   Essa e a pratica recomendada pelo TensorFlow Lite (Jacob et al., 2018).
+
+4. **Latencia acima da meta:** Ambas versoes do Exp A superam 300ms
+   (1.365ms INT8, 4.322ms FP32). Isso e estimativa do simulador do
+   Edge Impulse — a latencia real no ESP32-S3 com TFLite Micro sera
+   medida na Sprint 2 com o modelo do Exp B (639 KB INT8).
 
 ### 5.2 Acurácia do Modelo
 

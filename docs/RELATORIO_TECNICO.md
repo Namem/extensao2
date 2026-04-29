@@ -154,10 +154,45 @@ gera dados experimentais originais para o artigo (seção 5 do TCC).
 Observacao: plano gratuito tem 60min/job. Se 88k imgs exceder,
 criar projeto separado com apenas as 18k originais para comparacao.
 
-- [ ] Confirmar upload completo no Edge Impulse Studio > Data acquisition
-- [ ] Configurar Impulse: Image 96x96 RGB > MobileNetV2 0.35 > INT8
-- [ ] Treinar (max 60 min) e registrar acuracia val aqui
-- [ ] Exportar como Arduino Library para Sprint 2
+#### 2026-04-29 — Treinamento Experimento A — Edge Impulse ✅ CONCLUÍDO
+
+**Configuração do Impulse:**
+- Input: Image 96×96 RGB, Squash
+- Processing: Image (RGB)
+- Learning: Transfer Learning — MobileNetV2 96×96 0.35
+- Training cycles: 30 | Learning rate: 0.0005 | Data augmentation: ON
+- Target device: ESP32-S3 N16R8, 240MHz
+
+**Resultado (2026-04-29):**
+
+| Métrica | Valor |
+|---------|-------|
+| Versão | Acurácia val | Loss | AUC | F1 | Flash | RAM | Latência ESP32-S3 |
+|--------|-------------|------|-----|-----|-------|-----|-------------------|
+| **INT8** | **62,0%** | 4,13 | 0,90 | 0,62 | 547 KB | 232,9 KB | 1.365 ms ⚠️ |
+| **FP32** | **92,5%** | 0,22 | 1,00 | 0,92 | 1.600 KB | 441,8 KB | 4.322 ms ⚠️ |
+| Tempo de treinamento | ~21 min (GPU EI) |||||| |
+
+**Acurácia por classe (val set):**
+- D01_requeima: 35,1% (pior — confundida com saudável 27,4%)
+- D02_septoriose: 72,8%
+- D03_pinta_preta: 31,8%
+- D03b_mancha_alvo: 32,9%
+- D05_mofo_foliar: 39,0%
+- D06_vira_cabeca: 69,9%
+- D06b_mosaico: 46,0%
+- D07_acaro_bronzeamento: 68,7%
+- D09_mancha_bacteriana: 64,7%
+- saudavel: 98,3% ✅
+
+**Análise:** Treinamento de fase única (30 cycles) resultou em modelo que
+acerta a classe dominante (saudável) mas confunde as doenças entre si.
+Contrastar com Exp B (98,13%) evidencia importância das duas fases + fine-tuning.
+
+- [x] Upload completo — 88.872 items no Edge Impulse Studio
+- [x] Impulse configurado: Image 96x96 RGB > MobileNetV2 0.35
+- [x] Treinamento concluído — 61,4% val acc
+- [ ] Exportar como Arduino Library para Sprint 2 (após melhorar acurácia se necessário)
 
 #### 2026-04-28 — Experimento B — TensorFlow Local WSL2 ✅ CONCLUÍDO
 
