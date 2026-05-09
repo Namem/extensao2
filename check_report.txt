@@ -1,5 +1,5 @@
 Ceres Diagnostico — Verificacao de Ambiente
-Data: 2026-05-08 23:36
+Data: 2026-05-08 23:38
 Maquina: DESKTOP-2UU9SQN
 Python: 3.13.13 | Plataforma: Windows
 ============================================================
@@ -11,7 +11,6 @@ Python: 3.13.13 | Plataforma: Windows
 [OK  ] backend/venv/ existe (Windows)
 [OK  ] django
 [OK  ] rest_framework
-[OK  ] rest_framework_simplejwt
 [OK  ] psycopg2
 [OK  ] dotenv
 [OK  ] paho.mqtt.client
@@ -20,13 +19,9 @@ Python: 3.13.13 | Plataforma: Windows
          — pip install numpy
 [AVISO] tflite_runtime
          (opcional) — pip install tflite-runtime  (ou tensorflow)
-[AVISO] tensorflow
-         (opcional) — pip install tensorflow
 [OK  ] tqdm
 [AVISO] rembg
          (opcional) — pip install rembg
-[AVISO] openpyxl
-         (opcional) — pip install openpyxl
 [OK  ] backend/.env existe
 [OK  ]   SECRET_KEY definida
 [OK  ]   DB_NAME definida
@@ -38,7 +33,7 @@ Python: 3.13.13 | Plataforma: Windows
 [OK  ] ei_ceres_int8.tflite (Exp A — arquivado)
 [OK  ] processed/train: 10 classes, ~88,948 imagens
 [OK  ] plantdoc/train: ~2,334 imagens de campo real
-[OK  ] processed_field/train: ~3,667 imagens (background aug)
+[OK  ] processed_field/train: ~4,369 imagens (background aug)
 [OK  ] datasets/raw/ existe
 [OK  ] prepare_plantvillage.py  (prepara dataset PlantVillage)
 [OK  ] train_local.py  (treinamento MobileNetV2 (WSL2))
@@ -46,8 +41,8 @@ Python: 3.13.13 | Plataforma: Windows
 [OK  ] avaliar_plantdoc.py  (avaliacao campo real PlantDoc)
 [OK  ] background_augment.py  (background augmentation (resolver gap lab-campo))
 [OK  ] Branch atual: main
-[AVISO] 15 arquivo(s) modificado(s) nao commitados
+[AVISO] 1 arquivo(s) modificado(s) nao commitados
          — faca git add + git commit antes de mudar de maquina
 [OK  ] Repositorio atualizado com origin/main
 
-RESUMO: 30 OK | 6 avisos | 1 erros
+RESUMO: 29 OK | 4 avisos | 1 erros

@@ -5,11 +5,18 @@ Verifica tudo que e necessario para continuar o desenvolvimento em qualquer
 maquina (PC desktop, notebook, WSL2). Roda sem dependencias externas.
 
 Uso:
-    python verificar_ambiente.py          # verifica tudo
-    python verificar_ambiente.py --fix    # tenta corrigir o que for possivel
-    python verificar_ambiente.py --wsl    # inclui verificacoes de GPU/WSL2
+    python verificar_ambiente.py               # verifica tudo
+    python verificar_ambiente.py --notebook    # modo notebook: so o essencial + apito se faltar algo
+    python verificar_ambiente.py --fix         # tenta corrigir o que for possivel
+    python verificar_ambiente.py --wsl         # inclui verificacoes de GPU/WSL2
+    python verificar_ambiente.py --silencioso  # sem apito (apenas visual)
 
 Saida: relatorio no terminal + arquivo check_report.txt
+
+Apito:
+    Se houver erros criticos, emite sons de alerta automaticamente.
+    Windows : winsound.Beep (sem dependencias extras)
+    Linux   : /usr/bin/beep ou echo -e '\\a' (terminal bell)
 """
 
 import sys
@@ -18,6 +25,7 @@ import subprocess
 import socket
 import importlib
 import argparse
+import time
 from pathlib import Path
 from datetime import datetime
 
@@ -29,10 +37,19 @@ RAIZ    = Path(__file__).resolve().parent
 BACKEND = RAIZ / "backend"
 
 parser = argparse.ArgumentParser(description="Verificador de ambiente Ceres")
-parser.add_argument("--fix",  action="store_true", help="Tentar corrigir problemas automaticamente")
-parser.add_argument("--wsl",  action="store_true", help="Incluir verificacoes GPU/WSL2 (Linux)")
-parser.add_argument("--json", action="store_true", help="Salvar resultado em check_report.json")
+parser.add_argument("--notebook",   action="store_true",
+    help="Modo notebook: verifica so o essencial para continuar o projeto + apito se faltar algo")
+parser.add_argument("--fix",        action="store_true",
+    help="Tentar corrigir problemas automaticamente")
+parser.add_argument("--wsl",        action="store_true",
+    help="Incluir verificacoes GPU/WSL2 (Linux)")
+parser.add_argument("--silencioso", action="store_true",
+    help="Desativar o apito sonoro (apenas saida visual)")
+parser.add_argument("--json",       action="store_true",
+    help="Salvar resultado em check_report.json")
 args = parser.parse_args()
+
+MODO_NOTEBOOK = args.notebook
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -45,13 +62,63 @@ AZUL     = "\033[94m"
 RESET    = "\033[0m"
 NEGRITO  = "\033[1m"
 
-def ok(msg):    print(f"  {VERDE}[OK]{RESET}  {msg}")
-def warn(msg):  print(f"  {AMARELO}[AV]{RESET}  {msg}")
-def erro(msg):  print(f"  {VERMELHO}[XX]{RESET}  {msg}")
-def info(msg):  print(f"  {AZUL}[--]{RESET}  {msg}")
-def titulo(msg): print(f"\n{NEGRITO}{msg}{RESET}")
+def ok(msg):     print(f"  {VERDE}[OK]{RESET}  {msg}")
+def warn(msg):   print(f"  {AMARELO}[AV]{RESET}  {msg}")
+def erro(msg):   print(f"  {VERMELHO}[XX]{RESET}  {msg}")
+def info(msg):   print(f"  {AZUL}[--]{RESET}  {msg}")
+def titulo(msg):
+    # No modo notebook, mostra titulos compactos
+    if MODO_NOTEBOOK:
+        print(f"\n{NEGRITO}» {msg}{RESET}")
+    else:
+        print(f"\n{NEGRITO}{msg}{RESET}")
 
 resultados = []   # lista de (status, item, detalhe)
+
+# ---------------------------------------------------------------------------
+# Funcao de apito / alerta sonoro
+# ---------------------------------------------------------------------------
+
+def apitar(n_erros: int, n_avisos: int):
+    """
+    Emite apitos de alerta sonoro proporcional a gravidade.
+    - Erros criticos : 5 bipes rapidos e agudos
+    - So avisos      : 2 bipes graves
+    - Tudo OK        : 1 bipe curto de confirmacao
+    Compativel com Windows (winsound) e Linux (terminal bell / beep).
+    """
+    if args.silencioso:
+        return
+
+    if sys.platform == "win32":
+        try:
+            import winsound
+            if n_erros > 0:
+                # 5 bipes agudos — problema critico
+                for _ in range(5):
+                    winsound.Beep(1200, 200)   # 1200 Hz, 200ms
+                    time.sleep(0.05)
+            elif n_avisos > 0:
+                # 2 bipes medios — avisos
+                winsound.Beep(800, 300)
+                time.sleep(0.1)
+                winsound.Beep(800, 300)
+            else:
+                # 1 bipe suave — tudo OK
+                winsound.Beep(600, 400)
+            return
+        except Exception:
+            pass  # fallback para bell
+
+    # Linux / macOS / fallback
+    if n_erros > 0:
+        for _ in range(5):
+            print("\a", end="", flush=True)
+            time.sleep(0.3)
+    elif n_avisos > 0:
+        print("\a\a", end="", flush=True)
+    else:
+        print("\a", end="", flush=True)
 
 def check(status: str, item: str, detalhe: str = ""):
     """Registra resultado: 'ok' | 'warn' | 'erro'"""
@@ -59,6 +126,22 @@ def check(status: str, item: str, detalhe: str = ""):
     if status == "ok":   ok(f"{item}  {detalhe}")
     elif status == "warn": warn(f"{item}  {detalhe}")
     else:                  erro(f"{item}  {detalhe}")
+
+# ---------------------------------------------------------------------------
+# Banner modo notebook
+# ---------------------------------------------------------------------------
+
+if MODO_NOTEBOOK:
+    print()
+    print("=" * 60)
+    print(f"{NEGRITO}  CERES DIAGNOSTICO — CHECKLIST NOTEBOOK{RESET}")
+    print(f"  {datetime.now().strftime('%d/%m/%Y %H:%M')}  |  {sys.platform}")
+    print("=" * 60)
+    print(f"  Verificando o que e necessario para continuar no notebook...")
+else:
+    print()
+    print(f"{NEGRITO}Ceres Diagnostico — Verificacao de Ambiente{RESET}")
+    print(f"Data: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
 
 # ---------------------------------------------------------------------------
 # 1. Python
@@ -111,27 +194,31 @@ elif sys.platform == "linux":
 
 titulo("3. Pacotes Python")
 
+# No modo notebook mostra apenas os pacotes criticos para continuar o desenvolvimento
 PACOTES = {
-    # (modulo_import, nome_pip, obrigatorio)
-    "django"               : ("django",              "Django>=6.0",            True),
-    "rest_framework"       : ("rest_framework",      "djangorestframework",    True),
-    "rest_framework_simplejwt": ("rest_framework_simplejwt", "djangorestframework-simplejwt", True),
-    "psycopg2"             : ("psycopg2",             "psycopg2-binary",        True),
-    "dotenv"               : ("dotenv",               "python-dotenv",          True),
-    "paho.mqtt.client"     : ("paho.mqtt.client",     "paho-mqtt>=2.0",         True),
-    "PIL"                  : ("PIL",                  "Pillow",                 True),
-    "numpy"                : ("numpy",                "numpy",                  True),
-    "tflite_runtime"       : ("tflite_runtime",       "tflite-runtime  (ou tensorflow)", False),
-    "tensorflow"           : ("tensorflow",           "tensorflow",             False),
-    "tqdm"                 : ("tqdm",                 "tqdm",                   False),
-    "rembg"                : ("rembg",                "rembg",                  False),
-    "openpyxl"             : ("openpyxl",             "openpyxl",               False),
+    # chave: (modulo_import, nome_pip, obrigatorio, critico_notebook)
+    "django"                  : ("django",               "Django>=6.0",                    True,  True),
+    "rest_framework"          : ("rest_framework",       "djangorestframework",             True,  True),
+    "rest_framework_simplejwt": ("rest_framework_simplejwt","djangorestframework-simplejwt",True,  False),
+    "psycopg2"                : ("psycopg2",              "psycopg2-binary",                True,  True),
+    "dotenv"                  : ("dotenv",                "python-dotenv",                  True,  True),
+    "paho.mqtt.client"        : ("paho.mqtt.client",      "paho-mqtt>=2.0",                 True,  True),
+    "PIL"                     : ("PIL",                   "Pillow",                         True,  True),
+    "numpy"                   : ("numpy",                 "numpy",                          True,  True),
+    "tflite_runtime"          : ("tflite_runtime",        "tflite-runtime  (ou tensorflow)",False, True),
+    "tensorflow"              : ("tensorflow",            "tensorflow",                     False, False),
+    "tqdm"                    : ("tqdm",                  "tqdm",                           False, True),
+    "rembg"                   : ("rembg",                 "rembg",                          False, True),
+    "openpyxl"                : ("openpyxl",              "openpyxl",                       False, False),
 }
 
 faltam_obrigatorios = []
 faltam_opcionais    = []
 
-for modulo, (import_path, pip_name, obrigatorio) in PACOTES.items():
+for modulo, (import_path, pip_name, obrigatorio, critico_notebook) in PACOTES.items():
+    # No modo notebook, pula pacotes nao criticos para o notebook
+    if MODO_NOTEBOOK and not critico_notebook:
+        continue
     try:
         importlib.import_module(import_path.split(".")[0])
         check("ok", import_path)
@@ -409,29 +496,52 @@ print(f"  {VERMELHO}Erros {RESET}: {n_err}")
 print()
 
 if n_err == 0 and n_warn == 0:
-    print(f"  {VERDE}{NEGRITO}Ambiente completo — pode continuar o desenvolvimento!{RESET}")
+    if MODO_NOTEBOOK:
+        print(f"  {VERDE}{NEGRITO}NOTEBOOK PRONTO — pode continuar o desenvolvimento!{RESET}")
+    else:
+        print(f"  {VERDE}{NEGRITO}Ambiente completo — pode continuar o desenvolvimento!{RESET}")
 elif n_err == 0:
-    print(f"  {AMARELO}{NEGRITO}Ambiente funcional com avisos — verifique os [AV] acima.{RESET}")
+    if MODO_NOTEBOOK:
+        print(f"  {AMARELO}{NEGRITO}NOTEBOOK QUASE PRONTO — verifique os avisos abaixo.{RESET}")
+    else:
+        print(f"  {AMARELO}{NEGRITO}Ambiente funcional com avisos — verifique os [AV] acima.{RESET}")
 else:
-    print(f"  {VERMELHO}{NEGRITO}Problemas encontrados — resolva os [XX] antes de continuar.{RESET}")
+    if MODO_NOTEBOOK:
+        print(f"  {VERMELHO}{NEGRITO}NOTEBOOK NAO PRONTO — resolva os erros antes de comecar!{RESET}")
+    else:
+        print(f"  {VERMELHO}{NEGRITO}Problemas encontrados — resolva os [XX] antes de continuar.{RESET}")
 
 print()
 
 # Acoes prioritarias
 if n_err > 0 or n_warn > 0:
-    print(f"{NEGRITO}Acoes prioritarias:{RESET}")
+    print(f"{NEGRITO}O que resolver:{RESET}")
     for status, item, detalhe in resultados:
         if status == "erro":
             print(f"  {VERMELHO}-> {item}{RESET}")
             if detalhe:
                 for linha in detalhe.split("\n"):
-                    print(f"     {linha.strip()}")
-    for status, item, detalhe in resultados:
-        if status == "warn":
-            print(f"  {AMARELO}-> {item}{RESET}")
-            if detalhe:
-                for linha in detalhe.split("\n"):
-                    print(f"     {linha.strip()}")
+                    if linha.strip():
+                        print(f"     {linha.strip()}")
+    if not MODO_NOTEBOOK:
+        for status, item, detalhe in resultados:
+            if status == "warn":
+                print(f"  {AMARELO}-> {item}{RESET}")
+                if detalhe:
+                    for linha in detalhe.split("\n"):
+                        if linha.strip():
+                            print(f"     {linha.strip()}")
+    print()
+
+# ---------------------------------------------------------------------------
+# APITO — chama aqui, apos mostrar o resumo
+# ---------------------------------------------------------------------------
+
+apitar(n_err, n_warn)
+
+if n_err > 0 and not args.silencioso:
+    print(f"  {VERMELHO}^ Apito emitido — {n_err} erro(s) critico(s) encontrado(s).{RESET}")
+    print()
 
 # ---------------------------------------------------------------------------
 # Salvar relatorio em arquivo
