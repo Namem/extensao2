@@ -584,7 +584,36 @@ Ran 5 tests in 3.234s — OK
 testado com pub/sub Python end-to-end.
 
 #### 4.2.5 Firmware ESP32 Genérico MQTT
-`[PENDENTE — próximo passo, precisa ESP32 genérico em mãos]`
+`[PENDENTE — fazer no notebook, precisa mesma rede WiFi que o ESP32]`
+
+#### 4.2.6 Experimento C — Background Augmentation (Gap Lab-Campo)
+
+A avaliacao do modelo no PlantDoc (2026-05-08) revelou acuracia de
+**20,77%** em campo real contra 98,13% no test set controlado.
+Analise identificou que o modelo aprendeu o fundo cinza uniforme do
+PlantVillage como feature discriminativa — evidenciado pela classe
+`saudavel` com apenas 1,8% no PlantDoc (folhas saudaveis do PlantVillage
+tem fundo escuro; no campo tem fundo verde natural).
+
+**Estrategia adotada (Singh et al., 2020):** remover o fundo das imagens
+PlantVillage com rembg (U2-Net) e recompor sobre fundos naturais do
+PlantDoc, gerando dataset `processed_field/train`. O paper original
+mostrou que apenas recortar folhas do fundo aumentou acuracia no PlantDoc
+de 29,73% para 70,53% (+40,8 pp).
+
+```
+Pipeline Exp C:
+PlantVillage (88.949 imgs, fundo cinza)
+    → rembg U2-Net (segmentacao automatica)
+    → recomposicao sobre fundos PlantDoc aleatorios
+    → processed_field/train (NxN imgs compostas)
+    → retreino MobileNetV2 (mesma arquitetura Exp B)
+    → avaliar_plantdoc.py (medir melhora)
+```
+
+**Script:** `backend/datasets/scripts/background_augment.py`
+**Status:** processamento em andamento (PC desktop, RTX 3060 Ti)
+**Meta:** > 70% no PlantDoc apos retreino
 
 ### 4.3 Sprint 2 — ESP32-S3 + TFLite ⏳ PENDENTE
 
@@ -776,28 +805,79 @@ para fundos naturais.
 
 ## 6. CONCLUSÃO
 
-`[PENDENTE: redigir versão final após Sprint 3]`
+`[VERSAO PARCIAL — Sprint 1 concluida. Complementar apos Sprints 2 e 3]`
 
-**Resultados parciais obtidos (Sprint 1):**
-- Modelo MobileNetV2 INT8 com 98,13% de acuracia no test set PlantVillage
-- Tamanho 639 KB — adequado para ESP32-S3 N16R8 (16MB flash)
-- Pipeline completo: dataset → treino → exportacao TFLite → backend MQTT
-- Comparativo experimental documentado: plataforma gerenciada vs treino customizado
-- Achado cientifico relevante: quantizacao INT8 sem calibracao causa queda de 30pp
+### 6.1 Resultados Obtidos na Sprint 1
 
-**Contribuicoes do trabalho:**
-1. Sistema embarcado completo de baixo custo (meta < R$200) para diagnostico fitossanitario
-2. Pipeline reproduzivel: PlantVillage → 88.949 imgs → MobileNetV2 INT8 → ESP32-S3
-3. Analise quantitativa do impacto da calibracao na quantizacao INT8 (Exp A vs Exp B)
-4. Comparativo edge vs cloud em contexto agricola brasileiro (Sprint 3)
+Este trabalho desenvolveu e validou um pipeline completo de TinyML para
+diagnostico de doencas em folhas de tomateiro, desde a preparacao do
+dataset ate a inferencia embarcada e backend IoT.
+
+**Modelo (Exp B — escolhido para producao):**
+
+| Metrica | Valor |
+|---|---|
+| Acuracia test set (PlantVillage) | **98,13%** |
+| Tamanho INT8 | **639 KB** |
+| Classes | 10 doencas do tomateiro |
+| Dataset treino | 88.949 imagens (apos augmentation x6) |
+| Melhor epoca (val acc) | Epoca 28 — 97,79% |
+
+**Acuracia por classe (test set):**
+
+| Classe | Acuracia |
+|---|---|
+| D06_vira_cabeca | 99,50% |
+| D06b_mosaico | 100,00% |
+| saudavel | 100,00% |
+| D09_mancha_bacteriana | 99,06% |
+| D02_septoriose | 98,50% |
+| D07_acaro_bronzeamento | 98,41% |
+| D01_requeima | 97,56% |
+| D05_mofo_foliar | 97,22% |
+| D03b_mancha_alvo | 95,28% |
+| D03_pinta_preta | 90,00% |
+
+**Validacao de campo (PlantDoc — 1.353 imagens reais):**
+
+Acuracia de **20,77%** — gap laboratorio-campo de 77 pp documentado e
+analisado. Consistente com literatura (Mohanty et al. 2016; Singh et al.
+2020). Causa identificada: modelo aprendeu fundo controlado como feature.
+Solucao em andamento: Exp C (background augmentation — rembg + fundos naturais).
+
+**Backend IoT:**
+- Pipeline MQTT completo: ESP32 → Mosquitto → mqtt_listener → PostgreSQL
+- Endpoint paginado `GET /api/diagnostico/historico/`
+- 5/5 testes automatizados passando
+
+**Achado cientifico relevante:**
+Quantizacao INT8 sem `representative_dataset` causou queda de **30,5 pp**
+(Exp A: 92,5% → 62,0%). Com calibracao adequada (Exp B), a queda foi
+eliminada (98,13% INT8 vs FP32). Resultado replicavel e documentado.
+
+### 6.2 Contribuicoes
+
+1. Pipeline reproduzivel: PlantVillage → 88.949 imgs → MobileNetV2 INT8 639KB → ESP32-S3
+2. Analise quantitativa do impacto da calibracao INT8 (Exp A vs Exp B: +36pp)
+3. Primeiro benchmark documentado de MobileNetV2 INT8 no PlantDoc (gap 77pp + causa)
+4. Backend IoT Django-MQTT production-ready com testes automatizados
 5. Codigo-fonte aberto para replicacao (GitHub: Namem/extensao2)
+
+### 6.3 Limitacoes e Trabalhos Futuros
+
+**Limitacoes identificadas:**
+- Gap laboratorio-campo: 98,13% (PlantVillage) → 20,77% (PlantDoc)
+  em andamento: Exp C (background augmentation) para superar 70%
+- Latencia real no ESP32-S3: estimada 1.365ms pelo simulador EI —
+  a ser medida na Sprint 2 com `esp_timer_get_time()`
+- Validacao com produtores reais: agendada para Sprint 3 (Sorriso-MT)
 
 **Trabalhos futuros:**
 - Ampliar para outras culturas (soja, milho, cafe) com mesmo pipeline
-- Modulo Flutter com YOLO on-device para deteccao de multiplas folhas simultaneamente
-- Integrar GPS no ESP32-S3 para georreferenciamento de ocorrencias
-- Federated learning para atualizacao do modelo sem enviar imagens ao servidor
-- Parceria com cooperativas agricolas de Sorriso-MT para validacao em escala
+- YOLO on-device no app Flutter para deteccao em multiplas folhas
+- GPS integrado ao ESP32-S3 para georreferenciamento de ocorrencias
+- Federated learning para atualizacao do modelo sem enviar imagens
+- Parceria com cooperativas de Sorriso-MT para validacao em escala
 
 ---
 
