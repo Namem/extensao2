@@ -1,7 +1,7 @@
 # Backlog do Produto — Ceres Diagnóstico
 **TCC Engenharia da Computação — IFMT Cuiabá**
 **Autor:** Namem Rachid Jaudy Neto
-**Última atualização:** 2026-04-29
+**Última atualização:** 2026-05-08
 
 > Backlog exclusivo do produto (software + firmware + hardware).
 > Para escrita do TCC e artigo científico, veja [BACKLOG_ESCRITA.md](BACKLOG_ESCRITA.md).
@@ -23,107 +23,119 @@
 
 ---
 
-## Sprint 1 — MQTT + Dataset + Treino 🔄 EM ANDAMENTO
+## Sprint 1 — MQTT + Dataset + Treino ✅ CONCLUÍDA (exceto firmware)
 
-**Critério de aceite:** ESP32 publicando JSON via MQTT, Django persistindo eventos com endpoint paginado, dataset PlantVillage preparado e modelos treinados.
+**Critério de aceite:** Django persistindo eventos MQTT com endpoint paginado,
+dataset PlantVillage preparado, modelos treinados e validados.
 
-### Firmware (ESP32 genérico disponível) — PENDENTE
+> ⚠️ Firmware ESP32 movido para Sprint 1b — precisa de notebook (mesma rede WiFi)
+
+### Backend Django MQTT ✅ CONCLUÍDO (2026-04-29)
+- [x] `paho-mqtt` adicionado ao `requirements.txt`
+- [x] Model `DiagnosticoEvento` + migration (device_id, classe_detectada, confianca, temperatura, umidade_ar, umidade_solo, timestamp, FK Diagnostico)
+- [x] Command `mqtt_listener` com retry exponencial e shutdown limpo
+- [x] Endpoint `GET /api/diagnostico/historico/` paginado (page_size=10)
+- [x] 5/5 testes passando (inclui MQTT e historico)
+- [x] Mosquitto 2.1.2 instalado e testado (localhost:1883)
+
+### Dataset & IA ✅ CONCLUÍDO (2026-04-29)
+- [x] Baixar PlantVillage do Kaggle — 18.160 imgs
+- [x] `prepare_plantvillage.py` — split 70/15/15, 6 augmentations → 88.949 imgs treino
+- [x] `datasets/dataset_stats.md` gerado
+- [x] **Experimento A (Edge Impulse):** MobileNetV2 96×96 0.35, 40 cycles — FP32 92,5% / INT8 62,0%
+- [x] **Experimento B (TF local WSL2):** MobileNetV2 96×96 0.35, 2 fases — **INT8 98,13% test acc, 639 KB** ← modelo escolhido
+- [x] `train_local.py` + `export_tflite.py` — scripts de treino e exportação INT8 calibrada
+- [x] `datasets/modelo/ceres_mobilenetv2_int8.tflite` — modelo para ESP32-S3
+- [x] Análise comparativa documentada (Exp A vs B, quantization loss -30pp)
+
+### Validação de Campo ✅ CONCLUÍDO (2026-05-08)
+- [x] PlantDoc copiado para `datasets/raw/plantdoc/` — 1.353 imgs campo real
+- [x] `avaliar_plantdoc.py` executado — **20,77% acurácia** em campo real
+- [x] Gap lab-campo documentado em `docs/plantdoc_results.md` e TCC seção 5.4
+- [x] Análise científica: consistente com literatura (Mohanty 2016, Singh 2020)
+
+### Background Augmentation 🔄 EM ANDAMENTO (2026-05-08)
+- [x] `background_augment.py` criado — rembg U2-Net + recomposição sobre fundos PlantDoc
+- [x] `FUNDAMENTACAO_TECNICA.md` atualizado com embasamento científico (seção 8)
+- [ ] Executar processamento completo das 88.949 imgs (`--n-backgrounds 2`)
+- [ ] Verificar qualidade visual das composições geradas
+- [ ] Retreinar MobileNetV2 no WSL2 com `processed_field` (`train_local.py --data-dir`)
+- [ ] Rodar `avaliar_plantdoc.py` pós-retreino — meta: **> 50% (conservador) / > 70% (meta TCC)**
+- [ ] Atualizar `docs/background_augment_stats.md` com resultado final
+
+### Firmware ESP32 — Sprint 1b ⚠️ AGUARDANDO NOTEBOOK
+- [ ] **Pré-requisito:** fazer no notebook (mesma rede WiFi que o ESP32)
 - [ ] Criar `firmware/esp32_mqtt_sensor/` com PlatformIO (`esp32dev`)
-- [ ] Conectar WiFi e broker Mosquitto local (192.168.x.x:1883)
+- [ ] Conectar WiFi e broker Mosquitto (192.168.x.x:1883)
 - [ ] Ler DHT22 no GPIO4 e sensor de umidade do solo no GPIO34 (ADC 12 bits)
 - [ ] Publicar JSON em `ceres/sensor/001` a cada 30s
 - [ ] Reconexão automática WiFi e MQTT
 - [ ] Testar com `mosquitto_sub -t ceres/sensor/+`
 
-### Backend Django — PENDENTE
-- [ ] Adicionar `paho-mqtt>=2.0.0` ao `requirements.txt`
-- [ ] Model `DiagnosticoEvento` + migration (device_id, classe_detectada, confianca, temperatura, umidade_ar, umidade_solo, timestamp, FK Diagnostico)
-- [ ] Command `mqtt_listener` com retry exponencial e shutdown limpo (SIGTERM)
-- [ ] Endpoint `GET /api/diagnostico/historico/` paginado (page_size=10)
-- [ ] Testes: `test_evento_criado_com_dados_validos` e `test_historico_retorna_lista_paginada`
-
-### Dataset & IA ✅ CONCLUÍDO (2026-04-29)
-- [x] Baixar PlantVillage do Kaggle (`abdallahalidev/plantvillage-dataset`) — 18.160 imgs
-- [x] `datasets/scripts/prepare_plantvillage.py` — split 70/15/15, 6 augmentations offline → 88.949 imgs treino
-- [x] `datasets/dataset_stats.md` gerado com contagem por classe
-- [x] `datasets/edge_impulse_upload_guide.md` gerado
-- [x] **Experimento A (Edge Impulse):** MobileNetV2 96×96 0.35, 40 cycles — FP32 92,5% / INT8 62,0% val acc
-- [x] **Experimento B (TF local WSL2):** MobileNetV2 96×96 0.35, 2 fases — **INT8 98,13% test acc, 639 KB** ← modelo escolhido
-- [x] `datasets/scripts/train_local.py` — script de treinamento completo
-- [x] `datasets/scripts/export_tflite.py` — exportação FP32 + INT8 com calibração
-- [x] `datasets/modelo/ceres_mobilenetv2_int8.tflite` — modelo pronto para Sprint 2
-- [x] `datasets/modelo/ei_ceres_fp32.tflite` + `ei_ceres_int8.tflite` — Exp A arquivado
-- [x] Análise comparativa documentada (quantization loss EI: -30pp sem calibração)
-
 ---
 
 ## Sprint 2 — ESP32-S3 + TFLite + Integração Completa ⏳ PENDENTE
 
-**Critério de aceite:** Modelo TFLite rodando no ESP32-S3 com latência < 300ms e RAM > 4MB; loop completo câmera → MQTT → Django → endpoint em menos de 5 segundos.
+**Pré-requisito:** ESP32-S3 N16R8 + OV5640 5MP (a comprar) + sensor solo resistivo
+**Critério de aceite:** Modelo TFLite rodando no ESP32-S3 com latência < 300ms;
+loop completo câmera → MQTT → Django → endpoint em menos de 5 segundos.
 
-### Hardware — ESP32-S3 N16R8 + OV5640
+### Hardware
+- [ ] Comprar ESP32-S3 N16R8 + OV5640 + sensor solo resistivo
 - [ ] Criar `firmware/esp32s3_ceres/` com PlatformIO (Flash 16MB, PSRAM habilitada)
 - [ ] Sketch de teste câmera OV5640 com pinout correto para N16R8
-- [ ] Documentar gravação via USB-C nativo
 
-### TFLite Micro
-- [ ] Exportar modelo Edge Impulse como Arduino Library
-- [ ] Integrar biblioteca ao PlatformIO (`lib/ei_ceres/`)
+### TFLite Micro no ESP32-S3
+- [ ] Integrar `ceres_mobilenetv2_int8.tflite` via TFLite Micro
 - [ ] Implementar `inference.h` / `inference.cpp` com alocação na PSRAM
-- [ ] Normalizar pixels para [-1, 1] e medir latência com `esp_timer_get_time()`
+- [ ] Normalizar pixels [-1, 1] e medir latência com `esp_timer_get_time()`
 - [ ] Validar: latência < 300ms, RAM livre > 4MB
 
 ### Firmware Integrado
-- [ ] Ciclo completo: captura OV5640 → `run_inference()` → leitura DHT22 + solo → publicação MQTT
+- [ ] Ciclo: captura OV5640 → `run_inference()` → DHT22 + solo → MQTT
 - [ ] Threshold configurável (default 0.70) em `include/config.h`
-- [ ] LED vermelho 3x (anomalia detectada) / LED verde 1x (sem anomalia)
-- [ ] Armazenar último evento válido na NVS
-- [ ] Watchdog timer de 60s (`esp_task_wdt`)
-- [ ] Reconexão automática WiFi (5s) e MQTT (10s)
+- [ ] LED vermelho 3x (anomalia) / verde 1x (saudável)
+- [ ] Watchdog 60s + reconexão automática WiFi/MQTT
 
-### Benchmark & Integração
-- [ ] Criar `datasets/scripts/benchmark_esp32s3.py` (50 imagens, latência + acurácia)
-- [ ] Gerar `docs/benchmark_results.md` e `docs/benchmark_raw.csv`
-- [ ] Teste end-to-end: medir T0→T4 para 5 eventos, meta < 5s
-- [ ] Documentar `docs/e2e_test_results.md`
+### Benchmark
+- [ ] `benchmark_esp32s3.py` — 50 imagens, latência + acurácia
+- [ ] `docs/benchmark_results.md` + `benchmark_raw.csv`
+- [ ] Teste end-to-end T0→T4 para 5 eventos, meta < 5s
 
 ---
 
 ## Sprint 3 — Flutter + Resiliência + Experimentos ⏳ PENDENTE
 
-**Critério de aceite:** App Flutter consumindo API com histórico paginado, status do sensor e funcionamento offline; experimento edge vs cloud documentado com dados para o artigo.
+**Critério de aceite:** App Flutter consumindo API, histórico paginado,
+funcionamento offline; experimento edge vs cloud documentado.
 
 ### Flutter — Telas
-- [ ] Design System Agrícola (Mobile First) — ícones e fotos, mínimo de digitação
-- [ ] `DiagnosticoResultadoScreen` (nome da doença, confiança, sensores, recomendação Embrapa)
-- [ ] `HistoricoScreen` com paginação infinita e pull-to-refresh
-- [ ] `SensorStatusScreen` com polling a cada 10s (online/offline, última leitura)
-- [ ] Integração com câmera para registro de foto da planta
+- [ ] Design System Agrícola (Mobile First)
+- [ ] `DiagnosticoResultadoScreen` (doença, confiança, sensores, recomendação Embrapa)
+- [ ] `HistoricoScreen` paginação infinita + pull-to-refresh
+- [ ] `SensorStatusScreen` polling 10s
 - [ ] `DiagnosticoEventoModel` + `DiagnosticoService` em Dart
 - [ ] `flutter analyze` sem warnings críticos
 
-### Resiliência & Gestão
-- [ ] Persistência offline com Drift (diagnóstico funciona sem internet)
-- [ ] Módulo de sincronização inteligente (upload ao reconectar)
-- [ ] Histórico de diagnósticos georreferenciados (mapa simples + lista)
-- [ ] Módulo de recomendação de manejo automático pós-diagnóstico
-- [ ] Sistema multi-tenant para associações/cooperativas
-- [ ] CI/CD e monitoramento configurados
-- [ ] Geração de relatórios técnicos (PDF/CSV) para agrônomos
+### Resiliência
+- [ ] Persistência offline com Drift
+- [ ] Sincronização ao reconectar
+- [ ] Geração de relatórios PDF/CSV para agrônomos
 
 ### Experimento Edge vs Cloud
-- [ ] Criar `datasets/scripts/experiment_edge_vs_cloud.py` (100 imagens test split)
-- [ ] Cenário Edge: latência real no ESP32-S3
-- [ ] Cenário Cloud simulado: tflite-runtime no PC + overhead 200ms (4G)
-- [ ] Gerar `docs/experiment_a_results.md` (tabela comparativa + gráfico ASCII)
+- [ ] `experiment_edge_vs_cloud.py` (100 imgs test split)
+- [ ] Cenário Edge: latência real ESP32-S3
+- [ ] Cenário Cloud simulado: tflite-runtime PC + overhead 200ms (4G)
+- [ ] `docs/experiment_a_results.md` com tabela comparativa
 
 ---
 
 ## Resumo
 
-| Sprint | Tema | Status | Tarefas |
-|--------|------|--------|---------|
+| Sprint | Tema | Status | Progresso |
+|--------|------|--------|-----------|
 | Sprint 0 | Motor de Diagnóstico | ✅ Concluída | 8/8 |
-| Sprint 1 | MQTT + Dataset + Treino | 🔄 Em andamento | 11/22 (IA concluída, MQTT pendente) |
-| Sprint 2 | ESP32-S3 + TFLite + Integração | ⏳ Pendente | 0/16 |
-| Sprint 3 | Flutter + Resiliência + Experimentos | ⏳ Pendente | 0/17 |
+| Sprint 1 | MQTT + Dataset + Treino | 🔄 Quase concluída | 17/24 — falta: background aug retreino + firmware |
+| Sprint 1b | Firmware ESP32 genérico | ⚠️ Aguardando notebook | 0/6 |
+| Sprint 2 | ESP32-S3 + TFLite + Integração | ⏳ Pendente — aguardando hardware | 0/15 |
+| Sprint 3 | Flutter + Resiliência + Experimentos | ⏳ Pendente | 0/14 |

@@ -75,16 +75,27 @@ datasets/plantvillage_ceres/
 **/datasets/processed/
 datasets/processed/
 
+# Dataset augmentado com fundos naturais (~6 GB) — gerado por background_augment.py
+**/datasets/processed_field/
+datasets/processed_field/
+
 # Dados brutos do benchmark (usar benchmark_results.md no lugar)
 docs/benchmark_raw.csv
 
-# Modelos treinados (binários grandes)
-*.tflite
+# Modelos treinados pesados — NÃO commitar
 *.h5
 *.pb
 *.onnx
 *.pt
 *.pth
+*.keras
+
+# Modelos TFLite — COMMITAR os pequenos (< 2 MB), ignorar os grandes
+*.tflite
+# Exceções: modelos finais do projeto (pequenos o suficiente para o git)
+!backend/datasets/modelo/ceres_mobilenetv2_int8.tflite
+!backend/datasets/modelo/ei_ceres_int8.tflite
+!backend/datasets/modelo/ei_ceres_fp32.tflite
 
 # =============================================================================
 # FIRMWARE ESP32 — PlatformIO

@@ -703,12 +703,65 @@ rapido que a estimativa do simulador EI em hardware real.
 
 ### 5.4 Validacao em Campo Real (PlantDoc)
 
-`[PENDENTE: Sprint 2 — testar ceres_mobilenetv2_int8.tflite nas ~500 imgs PlantDoc]`
+**Dataset:** PlantDoc (Thapa et al., 2020) — imagens de campo real com fundo natural
+**Script:** `backend/datasets/scripts/avaliar_plantdoc.py`
+**Data da execucao:** 2026-05-08
+**Modelo avaliado:** `ceres_mobilenetv2_int8.tflite` (639 KB)
 
-**Meta:** > 70% acuracia em imagens de campo (fundo natural, luz variavel)
-**Relevancia:** Mohanty et al. (2016) reportaram queda de 99% (laboratorio)
-para ~31% (campo real) — o gap laboratorio-campo e o principal desafio
-de sistemas de diagnostico por imagem.
+#### Resultados por classe
+
+| Classe | Corretas | Total | Acuracia |
+|---|---|---|---|
+| D01_requeima | 92 | 202 | 45,5% |
+| D02_septoriose | 51 | 279 | 18,3% |
+| D03_pinta_preta | 98 | 158 | 62,0% |
+| D05_mofo_foliar | 2 | 170 | 1,2% |
+| D06_vira_cabeca | 14 | 140 | 10,0% |
+| D06b_mosaico | 0 | 88 | 0,0% |
+| D07_acaro_bronzeamento | 0 | 4 | 0,0% |
+| D09_mancha_bacteriana | 22 | 202 | 10,9% |
+| saudavel | 2 | 110 | 1,8% |
+| **GERAL** | **281** | **1.353** | **20,77%** |
+
+**Meta definida:** > 70% | **Resultado:** 20,77% — **meta nao atingida**
+
+#### Analise: Gap laboratorio-campo
+
+A queda de **98,13% (PlantVillage)** para **20,77% (PlantDoc)** representa
+uma reducao de 77 pp e e consistente com o fenomeno documentado por
+Mohanty et al. (2016), que relataram desempenho de 99,35% em dataset
+controlado e apenas ~31,4% em imagens de campo para modelos de classificacao
+de doencas em plantas.
+
+**Causa principal identificada:** O PlantVillage foi fotografado com folhas
+isoladas sobre fundo cinza ou preto uniforme, com iluminacao difusa constante.
+O modelo aprendeu o fundo como feature discriminativa, nao apenas a lesao.
+
+**Evidencia principal — classe `saudavel` com 1,8%:** Folhas saudaveis do
+PlantVillage tem fundo escuro. No PlantDoc, o fundo e verde natural (outras
+folhas). O modelo nao reconhece folhas saudaveis em campo, o que confirma
+que o contexto visual foi incorporado ao padrao aprendido.
+
+**Classes mais resistentes ao gap:**
+- `D03_pinta_preta` (62,0%): manchas concentricas de textura visual saliente
+- `D01_requeima` (45,5%): lesao escura de borda irregular e visualmente forte
+
+**Classes mais afetadas pelo gap:**
+- `saudavel` (1,8%), `D05_mofo_foliar` (1,2%), `D06b_mosaico` (0,0%)
+
+#### Este resultado e uma contribuicao cientifica
+
+O trabalho documenta **quantitativamente** o gap lab-campo para um modelo
+TinyML INT8 de 639 KB no contexto agricola brasileiro. A Tabela 5.4
+demonstra que o pipeline proposto atinge alta acuracia em condicoes
+controladas e identifica o desafio principal para producao: generalizacao
+para fundos naturais.
+
+**Solucoes propostas para versao futura (Sprint 2+):**
+1. Pre-processamento de remocao de fundo (GrabCut ou segmentacao semantica leve)
+2. Data augmentation com fundos naturais (composicao de folha + background PlantDoc)
+3. Fine-tuning supervisionado no PlantDoc como conjunto de adaptacao de dominio
+4. Reducao do threshold de confianca (0,70 → 0,50) para aumentar recall em campo
 
 ### 5.5 Experimento Edge vs Cloud
 

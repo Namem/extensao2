@@ -312,6 +312,120 @@ Usar **Flutter (Dart)** com **Drift** para cache SQLite local.
 
 ---
 
+## 8. Gap Laboratorio-Campo e Background Augmentation
+
+### Contexto
+
+A avaliacao do modelo `ceres_mobilenetv2_int8.tflite` no PlantDoc
+(campo real) em 2026-05-08 resultou em **20,77% de acuracia** contra
+**98,13%** no test set PlantVillage (condicoes controladas).
+
+Esse fenomeno e conhecido como **lab-to-field gap** e esta amplamente
+documentado na literatura de visao computacional agricola.
+
+### Evidencias na Literatura
+
+| Paper | Resultado |
+|---|---|
+| Mohanty et al. (2016) | CNN PlantVillage: 99,35% lab → ~31% campo |
+| Singh et al. (2020) — PlantDoc | VGG16 sem adaptacao: 29,73% campo |
+| Salman et al. (2025) — ViT-MoE | Transferencia PV→PlantDoc: 68% |
+| Xu et al. (2024) | 99,72% PV → 41,81% campo (fundos complexos) |
+| Xiang et al. (2026) | ResNet-50: queda de 67,7 pp entre lab e campo |
+
+O resultado do Ceres (20,77%) e compativel com a faixa reportada para
+transferencia cross-domain sem adaptacao de dominio (20–56%).
+
+### Causa Principal Identificada
+
+O PlantVillage foi fotografado com **folhas isoladas sobre fundo cinza
+ou preto uniforme**. O modelo aprendeu o fundo como feature
+discriminativa. Evidencia: classe `saudavel` obteve apenas 1,8% no
+PlantDoc — folhas saudaveis em campo tem fundo verde natural, nao cinza.
+
+### Solucao Adotada — Background Augmentation
+
+**Decisao:** implementar `background_augment.py` que:
+1. Remove o fundo das imagens PlantVillage com **rembg** (U2-Net)
+2. Recompoe a folha segmentada sobre fundos naturais do PlantDoc
+3. Gera dataset em `datasets/processed_field/train`
+
+**Justificativa direta:** Singh et al. (2020), paper original do PlantDoc,
+mostrou que apenas **recortar a folha do fundo** aumentou a acuracia de
+29,73% para **70,53% (+40,8 pp)** sem mudar a arquitetura.
+
+A estrategia inversa — inserir fundos naturais no treino — deve produzir
+efeito equivalente, ensinando o modelo a focar na textura da folha,
+nao no fundo.
+
+**Alternativas consideradas e descartadas:**
+
+| Alternativa | Razao do descarte |
+|---|---|
+| Mudar arquitetura (ResNet, ViT) | Incompativel com TinyML — modelos > 1MB |
+| Domain Adversarial Training | Requer dados rotulados de campo real |
+| Few-shot fine-tuning | Requer coleta de campo — Sprint 3 |
+| GAN-based augmentation | Complexidade alta, artefatos frequentes |
+
+**Background augmentation** e a unica tecnica que:
+- Nao muda o tamanho do modelo final (ainda 639 KB INT8)
+- Nao requer dados rotulados de campo
+- Tem evidencia direta no paper do PlantDoc (+40,8 pp)
+- E implementavel no hardware disponivel (RTX 3060 Ti, WSL2)
+
+### Ferramenta — rembg (U2-Net)
+
+`rembg` e uma biblioteca Python que implementa o modelo **U2-Net**
+(Qin et al., 2020) para segmentacao de saliencia, especializado em
+remocao de fundo. Retorna imagem RGBA com canal alpha como mascara
+da regiao segmentada.
+
+**Por que U2-Net e nao GrabCut (OpenCV)?**
+- GrabCut: algoritmo classico, requer seed manual ou caixa delimitadora
+- U2-Net: rede neural treinada para remocao automatica sem seed
+- Qualidade da mascara U2-Net significativamente superior para objetos organicos
+- rembg oferece multiplos modelos (u2net, isnet-general-use, silueta)
+
+### Resultado Esperado
+
+Retreinar MobileNetV2 com `processed_field` (PlantVillage + fundos naturais)
+deve elevar a acuracia no PlantDoc de **20,77% para 50–65%** (estimativa
+baseada em resultados de tecnicas similares na literatura).
+
+Meta definida: atingir **> 70%** no PlantDoc apos retreino (compativel
+com estado da arte para modelos de porte similar).
+
+### Referencias
+
+- SINGH, D. et al. **PlantDoc: A Dataset for Visual Plant Disease Detection**.
+  *ACM CoDS-COMAD*, 2020. DOI: 10.1145/3371158.3371196
+
+- MOHANTY, S. P.; HUGHES, D. P.; SALATHE, M. **Using deep learning for image-based
+  plant disease detection**. *Frontiers in Plant Science*, v. 7, p. 1419, 2016.
+  DOI: 10.3389/fpls.2016.01419
+
+- QIN, X. et al. **U2-Net: Going deeper with nested U-structure for salient object detection**.
+  *Pattern Recognition*, v. 106, p. 107404, 2020.
+  DOI: 10.1016/j.patcog.2020.107404
+
+- SALMAN, Z. et al. **Plant disease classification in the wild using vision
+  transformers and mixture of experts**. *Frontiers in Plant Science*, 16, 2025.
+  DOI: 10.3389/fpls.2025.1522985
+
+- XU, M. et al. **Plant disease recognition datasets in the age of deep learning:
+  challenges and opportunities**. *Frontiers in Plant Science*, 15, 2024.
+  DOI: 10.3389/fpls.2024.1452551
+
+- YANG, S. et al. **From laboratory to field: cross-domain few-shot learning
+  for crop disease identification**. *Frontiers in Plant Science*, 15, 2024.
+  DOI: 10.3389/fpls.2024.1434222
+
+- WU, X. et al. **From Laboratory to Field: Unsupervised Domain Adaptation
+  for Plant Disease Recognition in the Wild**. *Plant Phenomics*, 2023.
+  DOI: 10.34133/plantphenomics.0038
+
+---
+
 ## Resumo das Decisões
 
 | Componente        | Escolha                  | Principal alternativa descartada | Razão |
@@ -325,3 +439,4 @@ Usar **Flutter (Dart)** com **Drift** para cache SQLite local.
 | Plataforma ML     | Edge Impulse             | TF/Keras manual                  | Export TFLite integrado |
 | Backend           | Django REST + PostgreSQL | FastAPI + SQLite                 | ORM, migrações, paho-mqtt |
 | App               | Flutter + Drift          | React Native                     | Performance nativa + offline |
+| Gap lab-campo     | Background Augmentation (rembg) | Domain adversarial training | Nao requer dados campo; nao altera tamanho final do modelo |

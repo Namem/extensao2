@@ -245,6 +245,53 @@ Script `export_tflite.py` criado como contingência (carrega checkpoint se neces
 
 ✅ GPU OK | ✅ INT8 export OK | ✅ 98,13% test acc | ✅ 639 KB < 1MB (ESP32-S3)
 
+#### 2026-05-08 — Validação PlantDoc (nível 3 da cadeia de validação) ✅ CONCLUÍDO
+
+**Script criado:** `backend/datasets/scripts/avaliar_plantdoc.py`
+
+**Dataset:** PlantDoc — copiado de `C:\Users\Namem\Desktop\PlantDoc-Dataset-master`
+para `backend/datasets/raw/plantdoc/` (pasta de campo real, não commitar).
+
+**Mapeamento de classes (PlantDoc → Ceres):**
+9 das 10 classes Ceres encontradas no PlantDoc. Ausente: D03b_mancha_alvo.
+D07_acaro_bronzeamento presente mas com apenas 4 imagens (resultado não conclusivo).
+
+**Problema encontrado e resolvido — bug INT8 preprocessing:**
+
+| | Versão errada | Versão correta |
+|--|--|--|
+| Passo | `arr / escala + zero` direto | Normalizar [-1,1] PRIMEIRO |
+| Código | `arr / 0.00784 + (-1)` → valores ~32.513, clip → tudo 127 | `arr / 127.5 - 1.0` → depois `norm / escala + zero` |
+| Sintoma | 1ª run: 13,45%; modelo previu tudo como D01_requeima (85,1%) | 2ª run: 20,77%; distribuição realista por classe |
+| Causa raiz | Escala é quantization scale (pequena ~0.008), não normalização | Quantização INT8 opera sobre float já normalizado |
+
+**Resultado final (2ª execução — 2026-05-08):**
+
+| Classe | Corretas | Total | Acurácia |
+|--------|----------|-------|----------|
+| D01_requeima | 92 | 202 | 45,5% |
+| D02_septoriose | 51 | 279 | 18,3% |
+| D03_pinta_preta | 98 | 158 | 62,0% |
+| D05_mofo_foliar | 2 | 170 | 1,2% |
+| D06_vira_cabeca | 14 | 140 | 10,0% |
+| D06b_mosaico | 0 | 88 | 0,0% |
+| D07_acaro_bronzeamento | 0 | 4 | 0,0% |
+| D09_mancha_bacteriana | 22 | 202 | 10,9% |
+| saudavel | 2 | 110 | 1,8% |
+| **GERAL** | **281** | **1.353** | **20,77%** |
+
+**Análise:** Gap laboratorio-campo de 77 pp (98,13% PlantVillage → 20,77% PlantDoc).
+Consistente com literatura: Mohanty et al. (2016) reportaram queda de 99% → 31%.
+Achado principal: classe `saudavel` com 1,8% confirma que modelo aprendeu o
+fundo cinza/preto do PlantVillage como feature discriminativa.
+Meta de 70% não atingida — documentado como limitação a resolver nas próximas sprints
+via augmentation com fundos naturais ou remoção de fundo (GrabCut).
+
+**Arquivos gerados/atualizados:**
+- `docs/plantdoc_results.md` — resultado completo + análise do gap
+- `docs/TCC_CERES.md` — seção 5.4 preenchida com dados reais
+- `docs/BACKLOG.md` — PlantDoc marcado como concluído
+
 ### Frente A — Firmware ESP32 (PENDENTE)
 
 - [ ] Instalar PlatformIO
@@ -288,6 +335,9 @@ Script `export_tflite.py` criado como contingência (carrega checkpoint se neces
 | 2026-04-28 | python3.12-venv não encontrado no apt | Pacote ausente no Ubuntu WSL | sudo apt update + python3-venv |
 | 2026-04-28 | GPU RTX 3060 Ti não detectada no WSL2 | LD_LIBRARY_PATH sem paths CUDA nvidia | export LD_LIBRARY_PATH com paths nvidia + /usr/lib/wsl/lib |
 | 2026-04-28 | Treinamento travou época 29 step 1546/2780 | Contenda I/O: git add simultâneo ao treino | Ctrl+C; retomou; ModelCheckpoint preservou best_fase2.keras |
+| 2026-05-08 | avaliar_plantdoc.py — 1ª run: modelo previu 85,1% como D01 | Bug INT8 preprocessing: `arr / escala` sem normalizar primeiro criava valores ~32.513, clip → tudo 127 | Normalizar para [-1,1] antes de quantizar; dequantizar saída antes do argmax |
+| 2026-05-08 | openpyxl: AttributeError 'MergedCell' object read-only | Row inserida no Excel herdou célula mesclada do header | Não inserir linha nova — atualizar a célula existente da tarefa EI |
+| 2026-05-08 | PowerShell: UnicodeEncodeError ao exibir emoji (✅) | Terminal cp1252 não suporta Unicode acima de U+00FF | Redirecionar output para arquivo com `-Encoding utf8` |
 
 ---
 

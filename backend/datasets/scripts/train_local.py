@@ -54,12 +54,28 @@ LR_1        = 1e-3        # Learning rate fase 1
 LR_2        = 5e-4        # Learning rate fase 2 (menor para fine-tuning)
 NUM_CLASSES = 10
 
+import argparse
+_parser = argparse.ArgumentParser(add_help=False)
+_parser.add_argument("--data-dir", type=str, default=None,
+    help="Pasta raiz do dataset (deve conter train/val/test). "
+         "Default: datasets/processed. "
+         "Use datasets/processed_field para treinar com background augmentation.")
+_args, _ = _parser.parse_known_args()
+
 BASE_DIR      = Path("/mnt/c/Users/Namem/Desktop/Codiguins/extensao/ceres-diagnostico/backend")
-TRAIN_DIR     = BASE_DIR / "datasets" / "processed" / "train"
-VAL_DIR       = BASE_DIR / "datasets" / "processed" / "val"
-TEST_DIR      = BASE_DIR / "datasets" / "processed" / "test"
+
+# Permite trocar o dataset via --data-dir (ex.: processed_field para background aug)
+_data_root = Path(_args.data_dir) if _args.data_dir else BASE_DIR / "datasets" / "processed"
+TRAIN_DIR     = _data_root / "train"
+VAL_DIR       = _data_root / "val"
+TEST_DIR      = _data_root / "test"
 MODELO_DIR    = BASE_DIR / "datasets" / "modelo"
 MODELO_DIR.mkdir(parents=True, exist_ok=True)
+
+print(f"Dataset raiz : {_data_root}")
+print(f"Train        : {TRAIN_DIR}")
+print(f"Val          : {VAL_DIR}")
+print(f"Test         : {TEST_DIR}")
 
 # ---------------------------------------------------------------------------
 # 1. Carregar datasets
