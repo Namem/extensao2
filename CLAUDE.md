@@ -67,35 +67,81 @@ Tomato___Tomato_Yellow_Leaf_Curl_Virus            → D06_vira_cabeca
 Tomato___Tomato_mosaic_virus                      → D06b_mosaico
 Tomato___healthy                                  → saudavel
 
-## Experimentos de treinamento (Sprint 1)
-Dois experimentos paralelos para comparação no artigo:
+## Experimentos de treinamento (Sprint 1) — AMBOS CONCLUÍDOS
 
-Exp A — Edge Impulse (nuvem):
+Exp A — Edge Impulse (nuvem) ✅ CONCLUÍDO:
   Projeto: ceres-diagnostico (Developer gratuito, privado)
   API Key: em backend/.env (EDGE_IMPULSE_API_KEY) — nunca commitar
-  Dataset: 88.949 imgs (train) + 2.719 (val) via upload_edge_impulse.py
-  Modelo: MobileNetV2 96x96 0.35 INT8
-  Limite: 60 min/job
+  Dataset: 88.872 imgs aceitas pelo EI
+  Modelo: MobileNetV2 96x96 0.35
+  Resultados: FP32 92,5% val acc / INT8 62,0% val acc
+  Tamanho: FP32 1.637KB / INT8 624KB
+  Latência estimada ESP32-S3: 1.365ms (INT8), 4.322ms (FP32)
+  Arquivos: backend/datasets/modelo/ei_ceres_fp32.tflite
+            backend/datasets/modelo/ei_ceres_int8.tflite
+  PROBLEMA: quantização INT8 automática sem representative_dataset
+            causou queda de 30pp (92.5% → 62.0%)
 
-Exp B — TensorFlow local (WSL2):
+Exp B — TensorFlow local (WSL2) ✅ CONCLUÍDO — MODELO ESCOLHIDO:
   Ambiente: WSL2 Ubuntu, Python 3.12, ~/venv_ceres/
   GPU: RTX 3060 Ti via tensorflow[and-cuda]
-  Dataset: 88.949 imgs augmentadas
-  Script: backend/datasets/scripts/train_local.py (a criar)
+  LD_LIBRARY_PATH: salvo em ~/.bashrc (nvidia paths + /usr/lib/wsl/lib)
+  Script treino: backend/datasets/scripts/train_local.py
+  Script export: backend/datasets/scripts/export_tflite.py
+  Fase 1: 10 epochs, LR=1e-3, backbone congelado
+  Fase 2: 40 epochs, LR=5e-4, fine-tuning últimas 30 camadas
+  Callbacks: EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+  Resultados: 98,13% test acc (2.734 imgs nunca vistas)
+  Tamanho INT8: 639KB (com representative_dataset calibrado)
+  Arquivos: backend/datasets/modelo/ceres_mobilenetv2_int8.tflite ← ESP32
+             backend/datasets/modelo/best_fase2.keras (checkpoint época 28)
+             backend/datasets/modelo/relatorio_final.txt (matriz confusão)
 
-## Estado atual das sprints
+Por que Exp B > Exp A:
+  1. Duas fases de treinamento (transfer learning correto)
+  2. Quantização INT8 com 50 batches do val set para calibração
+  3. EarlyStopping + ReduceLROnPlateau evitam overfitting
+
+YOLO foi descartado: detector de objetos (bounding box), não classificador.
+Incompatível com classificação de folha única. Tamanho mínimo ~6MB vs 639KB.
+
+## Estado atual das sprints (2026-04-29)
 Sprint 0: CONCLUIDA — API Django + Motor IA + JWT (5/5 testes)
-Sprint 1: EM ANDAMENTO — MQTT + dataset + treino
-  - [x] Dataset PlantVillage baixado e processado (88.949 imgs)
-  - [x] Upload Edge Impulse iniciado (Exp A) — upload em andamento
-  - [x] WSL2 + TF local configurado (Exp B)
-  - [ ] Treinamento Exp A concluido (aguardando upload completar)
-  - [x] Treinamento Exp B concluido — 98,13% test acc, INT8 639KB
-  - [ ] Firmware ESP32 MQTT
-Sprint 2: PENDENTE — deploy TFLite no ESP32-S3
-Sprint 3: PENDENTE — integração MQTT-Ceres completa
-Sprint 4: PENDENTE — Flutter + experimentos
-Sprint 5: PENDENTE — artigo + defesa
+Sprint 1: QUASE CONCLUIDA
+  - [x] Dataset PlantVillage: 18.160 imgs → 88.949 imgs (augmentation x6)
+  - [x] Exp A (Edge Impulse): FP32 92,5% / INT8 62,0% — documentado
+  - [x] Exp B (TF local WSL2): 98,13% test acc, INT8 639KB — ESCOLHIDO
+  - [x] Backend Django MQTT: DiagnosticoEvento + mqtt_listener + historico
+  - [x] Mosquitto 2.1.2 instalado e testado (localhost:1883)
+  - [x] 5/5 testes passando (inclui MQTT)
+  - [ ] Firmware ESP32 genérico MQTT (precisa ESP32 genérico em mãos)
+Sprint 2: PENDENTE — precisa ESP32-S3 N16R8 + OV5640 (a comprar)
+  - Carregar ceres_mobilenetv2_int8.tflite no ESP32-S3
+  - Medir latência real com esp_timer_get_time()
+  - Benchmark 50 imgs: Python vs ESP32 (predições devem ser idênticas)
+  - Testar PlantDoc (~500 imgs campo real, meta > 70%)
+  - Loop completo: câmera → MQTT → Django → app
+Sprint 3: PENDENTE — Flutter + artigo
+Sprint 4+: PENDENTE — defesa
+
+## Cadeia de validação do modelo (importante para defesa)
+Nível 1 ✅ FEITO: Test set PlantVillage — 98,13% (2.734 imgs controladas)
+Nível 2 ⏳ Sprint 2: Hardware real ESP32-S3 — latência real + comparação Python
+Nível 3 ⏳ Sprint 2: PlantDoc — ~500 fotos campo real, meta > 70%
+Nível 4 ⏳ Sprint 3: Produtores de Sorriso-MT — validação com usuários reais
+
+## Mosquitto — como iniciar
+  Windows: o serviço "mosquitto" sobe automaticamente
+  Testar: python -c "import paho.mqtt.client as mqtt; ..."
+  Config: C:\Program Files\mosquitto\mosquitto.conf
+          (listener 1883 localhost / allow_anonymous true)
+
+## Como retomar o treinamento WSL2 (se precisar retreinar)
+  wsl
+  source ~/venv_ceres/bin/activate
+  # GPU já configurada no .bashrc
+  python3 /mnt/c/.../backend/datasets/scripts/train_local.py
+  # Se travar: usar export_tflite.py para exportar do checkpoint salvo
 
 ## Regras de código
 - Python  : PEP8, docstrings em português

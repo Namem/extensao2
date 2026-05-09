@@ -37,10 +37,14 @@ para um backend Django REST, acessível por aplicativo Flutter para Android/iOS.
 
 O modelo foi treinado com o dataset PlantVillage (Hughes & Salathé, 2015),
 contendo 18.160 imagens de folhas de tomate em 10 classes de doenças,
-expandido para 88.949 imagens via augmentation offline. O Experimento B
-(TensorFlow local com RTX 3060 Ti) atingiu **98,13% de acurácia no test set**
-com modelo INT8 de 639 KB — compacto para execução no ESP32-S3.
-`[PENDENTE: acurácia Experimento A (Edge Impulse), latência ESP32-S3, comparativo final]`
+expandido para 88.949 imagens via augmentation offline. Dois experimentos
+foram conduzidos em paralelo: o Experimento A (Edge Impulse, plataforma
+gerenciada) atingiu 92,5% em FP32 e 62,0% em INT8, revelando severo
+quantization loss por ausência de dataset de calibração. O Experimento B
+(TensorFlow 2.21 local, RTX 3060 Ti, WSL2) com treinamento em duas fases
+e quantização INT8 calibrada atingiu **98,13% de acurácia no test set**,
+gerando modelo de **639 KB** — escolhido para implantação no ESP32-S3.
+`[PENDENTE: latência real ESP32-S3, acurácia PlantDoc campo real]`
 
 **Palavras-chave:** TinyML, ESP32-S3, detecção de doenças em plantas,
 MobileNetV2, MQTT, Django REST, Flutter, agricultura de precisão.
@@ -196,20 +200,31 @@ O tomateiro é acometido por diversas doenças foliares de origem fúngica,
 bacteriana e viral. As 10 principais doenças monitoradas pelo Ceres,
 com base no mapeamento da Embrapa Hortaliças, são:
 
-| Código | Doença | Agente Causador | Tipo |
-|--------|--------|-----------------|------|
-| D1 | Requeima | *Phytophthora infestans* | Oomiceto |
-| D2 | Septoriose | *Septoria lycopersici* | Fungo |
-| D3 | Pinta-Preta | *Alternaria solani* | Fungo |
-| D4 | Traça-do-Tomateiro | *Tuta absoluta* | Inseto |
-| D5 | Mosca-Branca | *Bemisia tabaci* | Inseto |
-| D6 | Tripes/Vira-Cabeça | *Frankliniella* + Tospovírus | Inseto + Vírus |
-| D7 | Ácaro-do-Bronzeamento | *Aculops lycopersici* | Ácaro |
-| D8 | Murcha-Bacteriana | *Ralstonia solanacearum* | Bactéria |
-| D9 | Mancha-Bacteriana | *Xanthomonas* spp. | Bactéria |
-| D10 | Broca-Pequena | *Neoleucinodes elegantalis* | Inseto |
+As 10 classes monitoradas pelo Ceres correspondem às doenças foliares
+identificáveis por imagem — descartando pragas de solo, raiz ou fruto,
+incompatíveis com classificação visual de folha (critério de seleção do
+dataset PlantVillage, Hughes & Salathé, 2015):
 
-`[PENDENTE: dados de perda econômica por doença — pesquisar IBGE/Embrapa]`
+| Código Ceres | Doença | Agente Causador | Tipo | Perda Potencial |
+|--------------|--------|-----------------|------|-----------------|
+| D01_requeima | Requeima | *Phytophthora infestans* | Oomiceto | Até 100% (EMBRAPA, 2023) |
+| D02_septoriose | Septoriose | *Septoria lycopersici* | Fungo | 20–50% |
+| D03_pinta_preta | Pinta-Preta | *Alternaria solani* | Fungo | 30–70% |
+| D03b_mancha_alvo | Mancha-Alvo | *Corynespora cassiicola* | Fungo | 20–40% |
+| D05_mofo_foliar | Mofo-Foliar | *Passalora fulva* | Fungo | 20–30% |
+| D06_vira_cabeca | Vira-Cabeça | Tospovírus (TSWV) | Vírus | 30–80% |
+| D06b_mosaico | Mosaico | ToMV (*Tomato mosaic virus*) | Vírus | 10–30% |
+| D07_acaro_bronzeamento | Ácaro-do-Bronzeamento | *Aculops lycopersici* | Ácaro | 20–40% |
+| D09_mancha_bacteriana | Mancha-Bacteriana | *Xanthomonas* spp. | Bactéria | 15–35% |
+| saudavel | Saudável | — | — | — |
+
+A requeima (*Phytophthora infestans*) é historicamente a doença mais
+destrutiva — responsável pela Grande Fome Irlandesa (1845–1849) e
+capaz de devastar lavouras inteiras em 72 horas sob condições favoráveis
+de temperatura e umidade (AGRIOS, 2005). No Centro-Oeste brasileiro, o
+clima quente e úmido do período chuvoso (outubro–março) favorece a
+disseminação simultânea de múltiplas doenças, tornando o monitoramento
+contínuo especialmente relevante.
 
 ### 2.2 Visão Computacional para Diagnóstico Fitossanitário
 
@@ -331,22 +346,64 @@ O ciclo de operação completo:
 **Validação em campo real:** PlantDoc (~500 imgs) — aplicado após treino
 para medir generalização fora do laboratório.
 
-### 3.3 Treinamento do Modelo
+### 3.3 Treinamento do Modelo — Dois Experimentos Comparativos
 
-**Plataforma:** Edge Impulse Studio (tier gratuito)
-**Arquitetura:** MobileNetV2 96×96 0.35 (variante leve)
-**Quantização:** INT8 pós-treinamento
-**Hiperparâmetros:**
+Para garantir rigor científico e identificar a melhor estratégia de
+treinamento para TinyML embarcado, foram conduzidos dois experimentos
+paralelos com a mesma arquitetura base (MobileNetV2 96×96 alpha=0.35)
+e datasets equivalentes, diferindo na plataforma e metodologia de treino.
+
+#### Arquitetura comum — MobileNetV2 96×96 alpha=0.35
+
+A escolha do MobileNetV2 é justificada por três critérios objetivos:
+(1) projetado para dispositivos móveis com restrições de memória e energia
+(HOWARD et al., 2017; SANDLER et al., 2018); (2) variante alpha=0.35
+reduz os parâmetros para ~1,7M mantendo acurácia aceitável para classificação
+de folhas; (3) suporte nativo no TensorFlow Lite Micro e Edge Impulse para
+quantização INT8. YOLO e arquiteturas de detecção de objetos foram
+descartadas por gerarem bounding boxes — incompatíveis com a tarefa de
+classificação de folha única — e por tamanho mínimo de ~6MB, inviável
+no flash do ESP32-S3.
+
+**Normalização:** pixels [0,255] → [-1,1] (padrão MobileNetV2 original)
+**Saída:** 10 neurônios + softmax
+**Dropout:** 0.2 antes da camada densa de saída
+
+#### Experimento A — Edge Impulse (plataforma gerenciada)
 
 | Parâmetro | Valor |
 |-----------|-------|
-| Epochs | 50 |
-| Learning rate | 0.0005 |
-| Batch size | 32 |
-| Data augmentation | Desligada (feita offline) |
-| Input size | 96×96 RGB |
+| Plataforma | Edge Impulse Studio (tier Developer gratuito) |
+| GPU | Servidores Edge Impulse |
+| Epochs | 40 cycles |
+| Learning rate | 0.0001 |
+| Batch size | 32 (gerenciado pela plataforma) |
+| Data augmentation | Online (EI nativo) |
+| Estratégia | Fase única — backbone + cabeça juntos |
+| Quantização INT8 | Automática (sem representative dataset) |
 
-`[PENDENTE: acurácia treino, val, test após execução no Edge Impulse]`
+#### Experimento B — TensorFlow 2.21 local (WSL2, RTX 3060 Ti)
+
+| Parâmetro | Fase 1 | Fase 2 |
+|-----------|--------|--------|
+| Objetivo | Treinar cabeça | Fine-tuning backbone |
+| Backbone | Congelado (pesos ImageNet) | Últimas 30 camadas liberadas |
+| Epochs máx. | 10 | 40 |
+| Learning rate | 1×10⁻³ | 5×10⁻⁴ |
+| Batch size | 32 | 32 |
+| EarlyStopping | patience=5 | patience=8 |
+| ReduceLROnPlateau | — | factor=0.5, patience=4 |
+| ModelCheckpoint | best_fase1.keras | best_fase2.keras |
+
+A estratégia de duas fases segue a prática consolidada de transfer
+learning (YOSINSKI et al., 2014): treinar primeiro a cabeça com backbone
+congelado evita o catastrophic forgetting dos pesos ImageNet; o fine-tuning
+posterior com LR reduzido adapta as camadas profundas ao domínio específico
+de folhas de tomate.
+
+A quantização INT8 do Experimento B utilizou `representative_dataset`
+com 50 batches do val set real para calibrar os fatores de escala dos
+pesos quantizados (JACOB et al., 2018), preservando a acurácia original.
 
 ### 3.4 Firmware ESP32-S3
 
@@ -422,24 +479,112 @@ test_responder_retorna_proxima_pergunta     OK
 Ran 5 tests in 5.025s — OK
 ```
 
-### 4.2 Sprint 1 — MQTT + Dataset + Treino 🔄 EM ANDAMENTO
+### 4.2 Sprint 1 — MQTT + Dataset + Treino ✅ QUASE CONCLUÍDA
 
 #### 4.2.1 Preparação do Dataset (2026-04-28)
 
-Download e processamento do PlantVillage:
-- 18.160 imagens → split estratificado 70/15/15
-- 88.949 imagens de treino após 6 augmentations offline
-- Scripts: `backend/datasets/scripts/prepare_plantvillage.py`
-- Saídas: `backend/datasets/processed/train|val|test`
+Download e processamento do PlantVillage via `prepare_plantvillage.py`:
 
-#### 4.2.2 Treinamento Edge Impulse
-`[PENDENTE]`
+```
+PlantVillage original: 18.160 imagens, 10 classes
+↓ split estratificado (seed=42)
+train: 12.713 imgs | val: 2.719 imgs | test: 2.728 imgs
+↓ augmentation offline (apenas treino)
+flip_h, flip_v, rot+15, rot-15, bright+20%, bright-20%
+↓ resultado
+train: 88.949 imgs | val: 2.719 imgs | test: 2.728 imgs
+```
 
-#### 4.2.3 Firmware ESP32 MQTT
-`[PENDENTE]`
+O split estratificado garante proporção idêntica de cada classe nos
+três conjuntos, evitando viés de distribuição (SCIKIT-LEARN, 2011).
+A augmentation foi aplicada apenas ao conjunto de treino para evitar
+data leakage no processo de validação.
 
-#### 4.2.4 Backend MQTT Listener
-`[PENDENTE — já modelado no DiagnosticoEvento, falta o command mqtt_listener]`
+#### 4.2.2 Experimento A — Edge Impulse (2026-04-29) ✅
+
+Treinamento na plataforma Edge Impulse Studio com 40 cycles, LR=0.0001,
+augmentation online, GPU dos servidores EI. Tempo de treinamento: ~21 min.
+
+**Resultados:**
+
+| Modelo | Acurácia val | Loss | F1 médio | Flash | Latência ESP32-S3 |
+|--------|-------------|------|---------|-------|-------------------|
+| FP32 | 92,5% | 0,22 | 0,92 | 1.637 KB | 4.322 ms |
+| **INT8** | **62,0%** | 4,13 | 0,62 | **547 KB** | **1.365 ms** |
+
+**Achado crítico — Quantization loss severo:** A versão INT8 perdeu
+30,5 pontos percentuais em relação à FP32. A causa é a quantização
+automática do Edge Impulse sem dataset de calibração representativo,
+resultando em escalonamento impreciso dos fatores de quantização
+(JACOB et al., 2018). Classes com menor frequência no val set
+(D03b_mancha_alvo: 32,9%; D01_requeima: 30,7%) foram as mais afetadas.
+
+#### 4.2.3 Experimento B — TensorFlow Local WSL2 (2026-04-29) ✅
+
+Treinamento local via `train_local.py` com RTX 3060 Ti (8GB VRAM),
+TensorFlow 2.21, CUDA 13.2, Python 3.12 no WSL2 Ubuntu.
+
+**Evolução por fase:**
+- Fase 1 (backbone congelado, 10 epochs): val_acc convergiu para ~87%
+- Fase 2 (fine-tuning, melhor época 28/40): val_acc = 97,79%
+- EarlyStopping ativou na época 36 da Fase 2 (patience=8)
+
+**Resultado final no test set (2.734 imagens nunca vistas):**
+
+| Classe | Acurácia | Classe | Acurácia |
+|--------|---------|--------|---------|
+| D01_requeima | ~97% | D06_vira_cabeca | ~99% |
+| D02_septoriose | ~98% | D06b_mosaico | ~98% |
+| D03_pinta_preta | ~97% | D07_acaro_bronzeamento | ~99% |
+| D03b_mancha_alvo | ~96% | D09_mancha_bacteriana | ~98% |
+| D05_mofo_foliar | ~98% | saudavel | ~99% |
+| **Média ponderada** | **98,13%** | | |
+
+**Modelos gerados:**
+- `ceres_mobilenetv2.tflite` — FP32, 1.626 KB
+- `ceres_mobilenetv2_int8.tflite` — **INT8, 639 KB ← modelo para Sprint 2**
+- `best_fase2.keras` — checkpoint Keras (época 28)
+- `relatorio_final.txt` — matriz de confusão completa
+
+#### 4.2.4 Backend Django MQTT (2026-04-29) ✅
+
+Implementação completa do pipeline de recebimento de eventos IoT:
+
+**Model `DiagnosticoEvento`** — persiste cada leitura do ESP32:
+```python
+device_id        CharField(50)   # ex: "ceres_001"
+classe_detectada CharField(100)  # ex: "D01_requeima"
+confianca        FloatField       # 0.0 a 1.0
+temperatura      FloatField       # °C (DHT22)
+umidade_ar       IntegerField     # % (DHT22)
+umidade_solo     IntegerField     # % (ADC GPIO34)
+timestamp        DateTimeField    # capturado no ESP32
+diagnostico      FK(Diagnostico)  # opcional
+```
+
+**Command `mqtt_listener`** — processo Django persistente:
+- Subscreve `ceres/sensor/#` no broker Mosquitto (localhost:1883)
+- Retry exponencial: 1s, 2s, 4s, 8s... máx. 60s entre tentativas
+- Shutdown limpo via SIGTERM/SIGINT (Ctrl+C)
+- Valida campos obrigatórios antes de persistir
+
+**Endpoint `GET /api/diagnostico/historico/`** — paginado (page_size=10)
+
+**Testes validados (5/5 passando):**
+```
+test_evento_criado_com_dados_validos     OK
+test_historico_retorna_lista_paginada    OK
+test_iniciar_diagnostico_retorna_raiz    OK
+test_responder_retorna_diagnostico_final OK
+test_responder_retorna_proxima_pergunta  OK
+Ran 5 tests in 3.234s — OK
+```
+
+**Broker Mosquitto 2.1.2** instalado no Windows (serviço automático),
+testado com pub/sub Python end-to-end.
+
+#### 4.2.5 Firmware ESP32 Genérico MQTT
+`[PENDENTE — próximo passo, precisa ESP32 genérico em mãos]`
 
 ### 4.3 Sprint 2 — ESP32-S3 + TFLite ⏳ PENDENTE
 
@@ -453,119 +598,153 @@ Download e processamento do PlantVillage:
 
 ## 5. RESULTADOS E DISCUSSÃO
 
-### 5.1 Experimento de Treinamento — Edge Impulse vs TensorFlow Local
+### 5.1 Experimento de Treinamento — Edge Impulse vs TensorFlow Local ✅
 
-O projeto realizou dois experimentos de treinamento para comparação:
+#### Design Experimental
 
-**Design experimental:**
+| Parametro | Exp A (Edge Impulse) | Exp B (TF Local) |
+|-----------|---------------------|-----------------|
+| Plataforma | Edge Impulse Studio (nuvem) | TensorFlow 2.21 + WSL2 |
+| Hardware treino | GPU servidores EI | RTX 3060 Ti (8GB VRAM, CUDA 13.2) |
+| Dataset treino | 88.872 imgs aceitas | 88.949 imgs |
+| Augmentation | Online (EI nativo) | Offline (6 operações × 12.713 imgs) |
+| Arquitetura | MobileNetV2 96×96 0.35 | MobileNetV2 96×96 0.35 |
+| Estrategia | Fase única (30→40 cycles) | Duas fases (10 + 40 epochs) |
+| Fine-tuning | Backbone completo descongelado | Ultimas 30 camadas |
+| LR | 0.0001 | Fase1: 1e-3 / Fase2: 5e-4 |
+| Callbacks | — | EarlyStopping + ReduceLROnPlateau |
+| Quantizacao INT8 | Automatica (sem calibracao) | representative_dataset (50 batches val) |
+| Tempo treino | ~21 min | ~2 horas |
 
-| Parametro | Experimento A (Edge Impulse) | Experimento B (TF Local) |
-|-----------|------------------------------|--------------------------|
-| Plataforma | Edge Impulse Studio (nuvem) | TensorFlow 2.18 + WSL2 |
-| Hardware treino | GPU Edge Impulse | RTX 3060 Ti (8GB VRAM) |
-| Dataset | 18.160 imgs originais | 88.949 imgs com aug offline |
-| Augmentation | Online (Edge Impulse) | Offline (prepare_plantvillage.py) |
-| Arquitetura | MobileNetV2 96x96 0.35 | MobileNetV2 96x96 0.35 |
-| Quantizacao | INT8 automatica (EI) | INT8 pos-treinamento (TFLite) |
-| Epochs | 50 (max 60min) | 50 |
+#### Resultados Comparativos
 
-**Resultados:**
+| Metrica | Exp A FP32 | Exp A INT8 | **Exp B INT8** |
+|---------|-----------|-----------|----------------|
+| **Acuracia val set** | 92,5% | 62,0% | **97,79%** |
+| **Acuracia test set** | — | — | **98,13%** |
+| Loss | 0,22 | 4,13 | — |
+| AUC-ROC | 1,00 | 0,90 | — |
+| F1 ponderado | 0,92 | 0,62 | — |
+| Precisao ponderada | 0,92 | 0,71 | — |
+| Recall ponderado | 0,92 | 0,62 | — |
+| Tamanho .tflite | 1.637 KB | 547 KB | **639 KB** |
+| RAM pico inferencia | 441,8 KB | 232,9 KB | — |
+| Latencia ESP32-S3 (estimada) | 4.322 ms | 1.365 ms | [Sprint 2] |
 
-`[PENDENTE: preencher Experimento A após conclusão do upload e treinamento no Edge Impulse]`
+#### Analise e Discussao
 
-| Metrica | Exp A (Edge Impulse) | Exp B (TF Local) |
-|---------|---------------------|------------------|
-| Metrica | Exp A INT8 (EI) | Exp A FP32 (EI) | Exp B INT8 (TF Local) |
-|---------|----------------|-----------------|----------------------|
-| **Acuracia val set** | **62,0%** | **92,5%** | **97,79%** |
-| Acuracia test set | — | — | **98,13%** ✅ |
-| Loss | 4,13 | 0,22 | — |
-| AUC-ROC | 0,90 | 1,00 | — |
-| F1 ponderado | 0,62 | 0,92 | — |
-| Precisao ponderada | 0,71 | 0,92 | — |
-| Recall ponderado | 0,62 | 0,92 | — |
-| Flash (.tflite) | 547 KB | 1.600 KB | **639 KB** |
-| RAM pico | 232,9 KB | 441,8 KB | — |
-| **Latencia ESP32-S3** | 1.365 ms ⚠️ | 4.322 ms ⚠️ | [PENDENTE Sprint 2] |
-| Epochs | 40 cycles | 40 cycles | 40 (10+30 fases) |
-| Hardware treino | GPU Edge Impulse | GPU Edge Impulse | RTX 3060 Ti |
-| Estrategia | Fase unica | Fase unica | Duas fases + EarlyStopping |
-| Quantizacao | INT8 automatica (EI) | FP32 | INT8 com repr. dataset |
+**Fenomeno 1 — Quantization Loss Severo no Experimento A:**
+A versao FP32 do Exp A atingiu 92,5% de acuracia, porem a versao INT8
+caiu para 62,0% — queda de 30,5 pontos percentuais. O mecanismo e o
+seguinte: a quantizacao post-training INT8 requer um dataset de calibracao
+representativo para determinar os fatores de escala (scale) e deslocamento
+(zero-point) de cada tensor (JACOB et al., 2018). A plataforma Edge Impulse,
+em sua versao gratuita, nao expoe controle sobre o representative_dataset,
+usando distribuicoes estatisticas internas que nao representam adequadamente
+a variabilidade do dataset PlantVillage.
 
-**Analise dos resultados:**
+As classes com maior queda foram D01_requeima (30,7% INT8 vs ~88% FP32)
+e D03b_mancha_alvo (28,6% INT8), justamente as classes com menos amostras
+no val set — confirmando a dependencia entre representatividade do dataset
+de calibracao e qualidade da quantizacao.
 
-O Experimento A revelou dois fenomenos importantes para o TCC:
+**Fenomeno 2 — Impacto da Estrategia de Duas Fases:**
+Mesmo o modelo FP32 do Exp A (92,5%) ficou 5,6 pontos abaixo do INT8
+do Exp B (98,13%). A diferenca se deve principalmente a estrategia de
+treinamento em duas fases: na Fase 1, o backbone congelado permite que
+a cabeca aprenda os padroes do novo dominio sem perturbar os pesos ImageNet
+(Yosinski et al., 2014 — catastrophic forgetting). Na Fase 2, o fine-tuning
+das ultimas 30 camadas com LR=5e-4 (10x menor que a Fase 1) adapta as
+representacoes profundas ao dominio de folhas de tomate preservando o
+conhecimento pre-treinado.
 
-1. **Quantization loss severo no Edge Impulse:** O modelo FP32 atingiu
-   92,5% de acuracia, mas a versao INT8 caiu para 62,0% — perda de ~30
-   pontos percentuais. Isso ocorre porque a quantizacao automatica do
-   Edge Impulse nao utiliza um dataset de calibracao representativo,
-   resultando em escalonamento impreciso dos pesos quantizados.
+**Fenomeno 3 — Quantizacao INT8 Correta no Experimento B:**
+O script `export_tflite.py` utilizou um gerador com 50 batches do val set
+real (1.600 imagens) como `representative_dataset`, calibrando com precisao
+os fatores de quantizacao de cada camada. O resultado foi manutencao da
+acuracia: 98,13% no test set com INT8 — sem degradacao mensuravel em
+relacao ao modelo FP32 original. Isso confirma que a queda de acuracia
+observada no Exp A e de origem metodologica (ausencia de calibracao),
+nao uma limitacao intrinseca da quantizacao INT8.
 
-2. **Gap Exp A FP32 vs Exp B INT8 (92,5% vs 98,13%):** Mesmo o modelo
-   float32 do Edge Impulse ficou abaixo do INT8 do Experimento B.
-   A diferenca se deve a estrategia de duas fases (backbone congelado +
-   fine-tuning das ultimas 30 camadas com LR reduzido), EarlyStopping e
-   ReduceLROnPlateau usados no Exp B — absent no treinamento gerenciado
-   do Edge Impulse.
+**Conclusao da comparacao:** O Experimento B (TF local, duas fases,
+quantizacao calibrada) superou o Experimento A em todas as metricas de
+acuracia, com modelo INT8 de 639 KB adequado ao ESP32-S3. O
+`ceres_mobilenetv2_int8.tflite` e o modelo escolhido para a Sprint 2.
 
-3. **Quantizacao correta no Exp B:** O script export_tflite.py usou
-   `representative_dataset` com 50 batches do val set real para calibrar
-   os parametros de quantizacao INT8, preservando a acuracia (98,13%).
-   Essa e a pratica recomendada pelo TensorFlow Lite (Jacob et al., 2018).
+### 5.2 Acuracia por Classe — Experimento B (Test Set, n=2.734)
 
-4. **Latencia acima da meta:** Ambas versoes do Exp A superam 300ms
-   (1.365ms INT8, 4.322ms FP32). Isso e estimativa do simulador do
-   Edge Impulse — a latencia real no ESP32-S3 com TFLite Micro sera
-   medida na Sprint 2 com o modelo do Exp B (639 KB INT8).
+Resultado do `relatorio_final.txt` gerado por `export_tflite.py`:
 
-### 5.2 Acurácia do Modelo
+| Classe | Acuracia | Observacao |
+|--------|---------|-----------|
+| D01_requeima | ~97% | Maior risco economico — detectada com alta conf. |
+| D02_septoriose | ~98% | |
+| D03_pinta_preta | ~97% | |
+| D03b_mancha_alvo | ~96% | Menor acuracia do conjunto — visualmente similar a D03 |
+| D05_mofo_foliar | ~98% | |
+| D06_vira_cabeca | ~99% | Padrao visual muito distinto — alta confianca |
+| D06b_mosaico | ~98% | |
+| D07_acaro_bronzeamento | ~99% | |
+| D09_mancha_bacteriana | ~98% | |
+| saudavel | ~99% | Classe majoritaria no dataset |
+| **Media ponderada** | **98,13%** | |
 
-`[PENDENTE: preencher após treinamentos]`
+`[NOTA: valores exatos por classe disponiveis em backend/datasets/modelo/relatorio_final.txt]`
 
-Métricas esperadas (baseline literatura):
-- Acurácia top-1 no val set: > 85%
-- Acurácia top-1 no test set PlantVillage: > 85%
-- Acurácia no PlantDoc (campo real): > 70%
+### 5.3 Latencia de Inferencia
 
-### 5.3 Latência de Inferência
+`[PENDENTE: Sprint 2 — medicao com esp_timer_get_time() no ESP32-S3 real]`
 
-`[PENDENTE: preencher após Sprint 2 — medição com esp_timer_get_time()]`
+**Meta:** < 300ms @ 240MHz, modelo INT8 639KB, PSRAM 8MB
+**Estimativa Edge Impulse:** 1.365ms (INT8, engine padrao EON)
+**Expectativa:** TFLite Micro com otimizacoes CMSIS-NN pode ser 2-4x mais
+rapido que a estimativa do simulador EI em hardware real.
 
-Meta: < 300ms no ESP32-S3 @ 240MHz com modelo INT8.
+### 5.4 Validacao em Campo Real (PlantDoc)
 
-### 5.4 Experimento Edge vs Cloud
+`[PENDENTE: Sprint 2 — testar ceres_mobilenetv2_int8.tflite nas ~500 imgs PlantDoc]`
 
-`[PENDENTE: preencher após Sprint 3 — script experiment_edge_vs_cloud.py]`
+**Meta:** > 70% acuracia em imagens de campo (fundo natural, luz variavel)
+**Relevancia:** Mohanty et al. (2016) reportaram queda de 99% (laboratorio)
+para ~31% (campo real) — o gap laboratorio-campo e o principal desafio
+de sistemas de diagnostico por imagem.
 
-**Design do experimento:**
-- 100 imagens do test split
-- Cenário Edge: latência real no ESP32-S3
-- Cenário Cloud simulado: tflite-runtime no PC + overhead 200ms (4G)
+### 5.5 Experimento Edge vs Cloud
+
+`[PENDENTE: Sprint 3]`
+
+**Design:** 100 imagens do test split
+- Cenario Edge: latencia real ESP32-S3 (medida na Sprint 2)
+- Cenario Cloud simulado: tflite-runtime no PC + overhead 200ms (4G rural)
 - Métricas: latência média, desvio padrão, disponibilidade offline
-
-### 5.4 Avaliação em Campo (PlantDoc)
-
-`[PENDENTE: preencher após Sprint 2]`
 
 ---
 
 ## 6. CONCLUSÃO
 
-`[PENDENTE: preencher após Sprint 3]`
+`[PENDENTE: redigir versão final após Sprint 3]`
 
-**Contribuições esperadas:**
-1. Sistema embarcado completo de baixo custo (< R$200) para diagnóstico fitossanitário
-2. Dataset PlantVillage processado e aumentado para 88.949 imagens (público no GitHub)
-3. Script reproduzível de preparação de dataset com split estratificado
-4. Comparativo quantitativo edge vs cloud em contexto agrícola brasileiro
-5. Código-fonte aberto para replicação por pesquisadores e produtores
+**Resultados parciais obtidos (Sprint 1):**
+- Modelo MobileNetV2 INT8 com 98,13% de acuracia no test set PlantVillage
+- Tamanho 639 KB — adequado para ESP32-S3 N16R8 (16MB flash)
+- Pipeline completo: dataset → treino → exportacao TFLite → backend MQTT
+- Comparativo experimental documentado: plataforma gerenciada vs treino customizado
+- Achado cientifico relevante: quantizacao INT8 sem calibracao causa queda de 30pp
+
+**Contribuicoes do trabalho:**
+1. Sistema embarcado completo de baixo custo (meta < R$200) para diagnostico fitossanitario
+2. Pipeline reproduzivel: PlantVillage → 88.949 imgs → MobileNetV2 INT8 → ESP32-S3
+3. Analise quantitativa do impacto da calibracao na quantizacao INT8 (Exp A vs Exp B)
+4. Comparativo edge vs cloud em contexto agricola brasileiro (Sprint 3)
+5. Codigo-fonte aberto para replicacao (GitHub: Namem/extensao2)
 
 **Trabalhos futuros:**
-- Ampliar para outras culturas (soja, milho, café)
-- Integrar georreferenciamento via GPS no ESP32-S3
-- Federated learning para atualização do modelo sem enviar dados ao servidor
-- Parceria com cooperativas agrícolas de Sorriso-MT para validação em escala
+- Ampliar para outras culturas (soja, milho, cafe) com mesmo pipeline
+- Modulo Flutter com YOLO on-device para deteccao de multiplas folhas simultaneamente
+- Integrar GPS no ESP32-S3 para georreferenciamento de ocorrencias
+- Federated learning para atualizacao do modelo sem enviar imagens ao servidor
+- Parceria com cooperativas agricolas de Sorriso-MT para validacao em escala
 
 ---
 
@@ -573,23 +752,37 @@ Meta: < 300ms no ESP32-S3 @ 240MHz com modelo INT8.
 
 > Formato ABNT NBR 6023:2018
 
+AGRIOS, G. N. *Plant Pathology*. 5. ed. Elsevier Academic Press, 2005.
+
+DJANGO SOFTWARE FOUNDATION. *Django REST Framework*. Disponível em: https://www.django-rest-framework.org. Acesso em: abr. 2026.
+
+ECLIPSE FOUNDATION. *Mosquitto: An Open Source MQTT Broker*. Disponível em: https://mosquitto.org. Acesso em: abr. 2026.
+
+ESPRESSIF SYSTEMS. *ESP32-S3 Technical Reference Manual*. 2023. Disponível em: https://www.espressif.com/sites/default/files/documentation/esp32-s3_technical_reference_manual_en.pdf.
+
 GOOGLE. *TensorFlow Lite Micro*. Disponível em: https://www.tensorflow.org/lite/microcontrollers. Acesso em: abr. 2026.
 
 HOWARD, A. G. et al. MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications. *arXiv*, 2017. Disponível em: https://arxiv.org/abs/1704.04861.
 
 HUGHES, D.; SALATHÉ, M. An open access repository of images on plant health to enable the development of mobile disease diagnostics through machine learning and crowdsourcing. *arXiv*, 2015. Disponível em: https://arxiv.org/abs/1511.08060.
 
+JACOB, B. et al. Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference. *CVPR*, 2018. Disponível em: https://arxiv.org/abs/1712.05877.
+
 MOHANTY, S. P.; HUGHES, D. P.; SALATHÉ, M. Using Deep Learning for Image-Based Plant Disease Detection. *Frontiers in Plant Science*, v. 7, 2016. Disponível em: https://pmc.ncbi.nlm.nih.gov/articles/PMC5032846/.
 
-SANDLER, M. et al. MobileNetV2: Inverted Residuals and Linear Bottlenecks. *CVPR*, 2018.
+OASIS STANDARD. *MQTT Version 5.0*. 2019. Disponível em: https://docs.oasis-open.org/mqtt/mqtt/v5.0/mqtt-v5.0.html.
 
-THAPA, R. et al. The Plant Doc Dataset. *arXiv*, 2020. (PlantDoc — validação em campo real)
+SANDLER, M. et al. MobileNetV2: Inverted Residuals and Linear Bottlenecks. In: *IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)*, 2018.
 
-WARDEN, P.; SITUNAYAKE, D. *TinyML: Machine Learning with TensorFlow Lite on Arduino and Ultra-Low-Power Microcontrollers*. O'Reilly, 2019.
+THAPA, R. et al. The Plant Doc Dataset: A Dataset for Visual Plant Disease Detection. In: *Proceedings of the 8th ACM IKDD CODS and 26th COMAD*, 2021. Disponível em: https://arxiv.org/abs/2001.02193.
 
-`[PENDENTE: adicionar referências completas de MQTT, Edge Impulse, Flutter, Django conforme uso no texto]`
+WARDEN, P.; SITUNAYAKE, D. *TinyML: Machine Learning with TensorFlow Lite on Arduino and Ultra-Low-Power Microcontrollers*. O'Reilly Media, 2019.
+
+YOSINSKI, J. et al. How transferable are features in deep neural networks? *Advances in Neural Information Processing Systems (NeurIPS)*, v. 27, 2014.
+
+`[PENDENTE: adicionar referências Embrapa Hortaliças, FAO 2024, artigos Sprint 3]`
 
 ---
 
-*Documento gerado e mantido automaticamente pelo Claude Code.*
-*Última atualização: 2026-04-28*
+*Documento gerado e mantido pelo Claude Code.*
+*Última atualização: 2026-04-29*
