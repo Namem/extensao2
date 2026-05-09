@@ -701,25 +701,65 @@ quantizacao calibrada) superou o Experimento A em todas as metricas de
 acuracia, com modelo INT8 de 639 KB adequado ao ESP32-S3. O
 `ceres_mobilenetv2_int8.tflite` e o modelo escolhido para a Sprint 2.
 
-### 5.2 Acuracia por Classe — Experimento B (Test Set, n=2.734)
+### 5.2 Curvas de Treinamento e Acuracia por Classe
 
-Resultado do `relatorio_final.txt` gerado por `export_tflite.py`:
+#### 5.2.1 Curvas de Treinamento (Exp B)
 
-| Classe | Acuracia | Observacao |
-|--------|---------|-----------|
-| D01_requeima | ~97% | Maior risco economico — detectada com alta conf. |
-| D02_septoriose | ~98% | |
-| D03_pinta_preta | ~97% | |
-| D03b_mancha_alvo | ~96% | Menor acuracia do conjunto — visualmente similar a D03 |
-| D05_mofo_foliar | ~98% | |
-| D06_vira_cabeca | ~99% | Padrao visual muito distinto — alta confianca |
-| D06b_mosaico | ~98% | |
-| D07_acaro_bronzeamento | ~99% | |
-| D09_mancha_bacteriana | ~98% | |
-| saudavel | ~99% | Classe majoritaria no dataset |
-| **Media ponderada** | **98,13%** | |
+A Figura 5.1 apresenta as curvas de acuracia e loss do Experimento B
+ao longo das 50 epocas globais (10 na Fase 1 + 40 na Fase 2).
 
-`[NOTA: valores exatos por classe disponiveis em backend/datasets/modelo/relatorio_final.txt]`
+**Figura 5.1 — Curvas de treinamento MobileNetV2 96×96 INT8**
+`[ver docs/historico_treino.png]`
+
+Observacoes sobre o comportamento das curvas:
+
+**Fase 1 (epocas 1–10, backbone congelado):**
+A acuracia de treino partiu de 82,9% e estabilizou em 88,6% na epoca 10.
+O val_loss apresentou oscilacao moderada (0,38–0,50), tipica de modelos
+com cabeca ainda nao especializada. A estabilizacao indica que o cabecalho
+FC atingiu seu limite sem descongelar o backbone.
+
+**Transicao Fase 1 → Fase 2:**
+Na primeira epoca da Fase 2 houve queda momentanea de acuracia (89,5% → 86,3%
+no val set) — efeito esperado do descongelamento das ultimas 30 camadas com
+LR reduzido (5e-4). O modelo rapidamente recuperou e superou o platô anterior.
+
+**Fase 2 (epocas 11–50, fine-tuning 30 camadas):**
+Convergencia progressiva e consistente. A val_acc atingiu pico em 97,79%
+na epoca 28 (global), coincidindo com o checkpoint salvo pelo ModelCheckpoint.
+Apos a epoca 28, val_acc permaneceu estavel entre 97,5% e 97,9%, indicando
+boa generalizacao sem overfitting severo.
+
+O val_loss manteve trajetoria decrescente ate a epoca 35,
+com leve alta nas epocas finais — sinal de overfitting incipiente,
+corretamente contido pelo ReduceLROnPlateau.
+
+#### 5.2.2 Acuracia por Classe (Test Set, n=2.734)
+
+Resultado extraido de `relatorio_final.txt` (gerado por `export_tflite.py`):
+
+| Classe | Corretas | Total | Acuracia |
+|--------|---------|-------|---------|
+| D06b_mosaico | 57 | 57 | **100,00%** |
+| saudavel | 240 | 240 | **100,00%** |
+| D06_vira_cabeca | 801 | 805 | 99,50% |
+| D09_mancha_bacteriana | 317 | 320 | 99,06% |
+| D02_septoriose | 263 | 267 | 98,50% |
+| D07_acaro_bronzeamento | 248 | 252 | 98,41% |
+| D01_requeima | 280 | 287 | 97,56% |
+| D05_mofo_foliar | 140 | 144 | 97,22% |
+| D03b_mancha_alvo | 202 | 212 | 95,28% |
+| D03_pinta_preta | 135 | 150 | **90,00%** |
+| **TOTAL** | **2.683** | **2.734** | **98,13%** |
+
+**Analise por classe:**
+- `D06b_mosaico` e `saudavel` atingiram 100%: padrao visual muito distinto
+  das demais classes no dataset PlantVillage
+- `D03_pinta_preta` foi a classe com menor acuracia (90%): confundida
+  principalmente com `D02_septoriose` (8 erros) — ambas apresentam manchas
+  folhares circulares, diferindo principalmente no halo amarelo da septoriose
+- `D03b_mancha_alvo` teve segunda menor acuracia (95,28%): confundida com
+  `D07_acaro_bronzeamento` (5 erros) — similaridade na textura das lesoes
 
 ### 5.3 Latencia de Inferencia
 
@@ -911,7 +951,17 @@ THAPA, R. et al. The Plant Doc Dataset: A Dataset for Visual Plant Disease Detec
 
 WARDEN, P.; SITUNAYAKE, D. *TinyML: Machine Learning with TensorFlow Lite on Arduino and Ultra-Low-Power Microcontrollers*. O'Reilly Media, 2019.
 
+YANG, S. et al. From laboratory to field: cross-domain few-shot learning for crop disease identification in the field. *Frontiers in Plant Science*, v. 15, 2024. DOI: 10.3389/fpls.2024.1434222.
+
 YOSINSKI, J. et al. How transferable are features in deep neural networks? *Advances in Neural Information Processing Systems (NeurIPS)*, v. 27, 2014.
+
+QIN, X. et al. U2-Net: Going deeper with nested U-structure for salient object detection. *Pattern Recognition*, v. 106, p. 107404, 2020. DOI: 10.1016/j.patcog.2020.107404.
+
+SINGH, D. et al. PlantDoc: A Dataset for Visual Plant Disease Detection. In: *Proceedings of the 8th ACM IKDD CODS and 26th COMAD*, 2020. DOI: 10.1145/3371158.3371196.
+
+WU, X. et al. From Laboratory to Field: Unsupervised Domain Adaptation for Plant Disease Recognition in the Wild. *Plant Phenomics*, 2023. DOI: 10.34133/plantphenomics.0038.
+
+XU, M. et al. Plant disease recognition datasets in the age of deep learning: challenges and opportunities. *Frontiers in Plant Science*, v. 15, 2024. DOI: 10.3389/fpls.2024.1452551.
 
 `[PENDENTE: adicionar referências Embrapa Hortaliças, FAO 2024, artigos Sprint 3]`
 

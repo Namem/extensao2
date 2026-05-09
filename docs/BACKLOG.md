@@ -57,11 +57,17 @@ dataset PlantVillage preparado, modelos treinados e validados.
 ### Background Augmentation 🔄 EM ANDAMENTO (2026-05-08)
 - [x] `background_augment.py` criado — rembg U2-Net + recomposição sobre fundos PlantDoc
 - [x] `FUNDAMENTACAO_TECNICA.md` atualizado com embasamento científico (seção 8)
+- [x] `plotar_historico.py` — curvas de treino geradas em `docs/historico_treino.png`
+- [x] `demo_inferencia.py` — demo visual de inferência com barra de confiança
+- [x] `sprint_review_roteiro.md` — roteiro completo slide a slide para apresentação
+- [x] TCC seção 5.2 — análise das curvas + acurácia por classe com valores reais
+- [x] TCC seção 6 — conclusão parcial Sprint 1 com tabela e contribuições
+- [x] TCC referências — Singh 2020, Wu 2023, Qin 2020, Yang 2024, Xu 2024 adicionadas
+- [x] `.env.example` atualizado — MQTT, ALLOWED_HOSTS, EDGE_IMPULSE_API_KEY
+- [x] `requirements_minimal.txt` criado — dependências mínimas para o notebook
 - [ ] Executar processamento completo das 88.949 imgs (`--n-backgrounds 2`)
-- [ ] Verificar qualidade visual das composições geradas
 - [ ] Retreinar MobileNetV2 no WSL2 com `processed_field` (`train_local.py --data-dir`)
 - [ ] Rodar `avaliar_plantdoc.py` pós-retreino — meta: **> 50% (conservador) / > 70% (meta TCC)**
-- [ ] Atualizar `docs/background_augment_stats.md` com resultado final
 
 ### Firmware ESP32 — Sprint 1b ⚠️ AGUARDANDO NOTEBOOK
 - [ ] **Pré-requisito:** fazer no notebook (mesma rede WiFi que o ESP32)
