@@ -948,18 +948,80 @@ transferencia para o dominio real — limitacao conhecida em domain adaptation
 - `saudavel` (0,0%), `D03_pinta_preta` (6,8%), `D09_mancha_bacteriana` (5,5%)
 - Caracteristica comum: aparencia depende fortemente do contexto visual do fundo
 
-#### 5.4.4 Contribuicao Cientifica e Caminhos Futuros
+#### 5.4.5 Validacao Independente — Dataset Tomato-Village (2026-05-09)
+
+Para verificar se o ganho de Exp D (+10pp sobre PlantDoc/test) reflete melhora
+real ou especificidade geografica ao PlantDoc, o modelo foi avaliado no dataset
+**Tomato-Village** (Girase et al., 2024) — 217 imagens de campo coletadas em
+Rajasthan, India, completamente independentes de todos os experimentos.
+
+**Classes avaliadas (4 das 8 do dataset com mapeamento valido para Ceres):**
+
+| Classe Tomato-Village | Classe Ceres | Corretas | Total | Acuracia | Top predicao errada |
+|---|---|---|---|---|---|
+| Late_blight | D01_requeima | 19 | 92 | 20,7% | D02_septoriose (31x) |
+| Early_blight | D03_pinta_preta | 6 | 50 | 12,0% | D05_mofo_foliar (20x) |
+| Spotted Wilt Virus | D06_vira_cabeca | 0 | 53 | 0,0% | D02_septoriose (26x) |
+| Healthy | saudavel | 0 | 22 | 0,0% | D02_septoriose (16x) |
+| **GERAL** | — | **25** | **217** | **11,52%** | — |
+
+**Resultado: 11,52%** — inferior ao PlantDoc/test (30,43%) e inferior ao Exp B
+sem fine-tuning (~20%).
+
+**Padrão critico — colapso para D02_septoriose:**
+
+O modelo classificou `D02_septoriose` como classe dominante em 3 das 4 classes
+reais, incluindo folhas **saudaveis** (16/22 = 73% rotuladas como septoriose).
+Isso caracteriza **colapso de classe sob shift de dominio extremo**: sob entradas
+muito fora-da-distribuicao, o modelo converge para a classe visualmente mais
+"generica" — septoriose (pequenas manchas em fundo verde) coincide com
+imperfeicoes naturais, poeira e textura de folhas indianas.
+
+**Problema de mapeamento D06_vira_cabeca:**
+
+O Ceres D06 corresponde ao **TYLCV** (Tomato Yellow Leaf Curl Virus — folha
+enrolada, amarelamento de margens). O Tomato-Village "Spotted Wilt Virus" e
+**TSWV** (Tomato Spotted Wilt Virus — manchas necrоticas anulares, bronzeamento),
+transmitido por tripes em vez de mosca-branca. Sao doencas distintas com
+apresentacao visual completamente diferente. O 0% nessa classe nao indica
+falha do modelo — o mapeamento de classes e biologicamente incorreto para
+este dataset. Para o TCC, apenas o resultado geral das 3 classes validas
+(Late_blight, Early_blight, Healthy) seria mais rigoroso: 25/169 = 14,8%.
+
+**Gap geografico vs. gap de fundo:**
+
+| Fator | PlantDoc | Tomato-Village |
+|---|---|---|
+| Regiao geografica | EUA/Europa | Rajasthan, India |
+| Distancia do PV | Moderada | Alta |
+| Resultado Exp D | 30,43% | 11,52% |
+
+O fine-tuning com PlantDoc melhorou o desempenho especificamente em PlantDoc,
+mas nao generalizou para condicoes de campo significativamente mais distantes.
+Este resultado confirma Barbedo (2019): modelos PlantVillage exibem forte
+especificidade geografica — variedades locais, condicoes de iluminacao
+tropical e estagio fenologico diferente reduzem a acuracia drasticamente.
+
+#### 5.4.6 Conclusao Cientifica e Caminhos Futuros
 
 Este trabalho documenta **quantitativamente** o gap lab-campo para modelo
 TinyML INT8 de 639 KB e a ineficacia de augmentation sintetica isolada.
 Trata-se de resultado negativo documentado — contribuicao valida segundo
 as diretrizes de reproducibilidade em ML (Pineau et al., 2021).
 
+**Sumario dos experimentos:**
+
+| Experimento | Dataset treino | PlantVillage test | PlantDoc (campo) | Tomato-Village (campo) |
+|---|---|---|---|---|
+| Exp B | PlantVillage (88.949) | 98,13% | 20,24% (746) | — |
+| Exp C | PV + sintetico (266.847) | ~97% | 20,24% (746) | — |
+| Exp D | PV + PlantDoc/train (95.719) | 97,55% | **30,43%** (69 unseen) | 11,52% (217) |
+
 **Estrategias para versoes futuras:**
-1. Coleta de imagens reais de campo em Sorriso-MT para fine-tuning supervisionado
+1. Coleta de imagens reais em Sorriso-MT para fine-tuning supervisionado com dados brasileiros
 2. Domain adaptation (DANN — Ganin et al., 2016) sem necessidade de labels de campo
-3. Pre-processamento com remocao de fundo em tempo real (MobileNetV3-Small segmentacao)
-4. Reducao do threshold de confianca (0,70 → 0,50) para aumentar recall em campo
+3. Reducao do threshold de confianca (0,70 → 0,50) para aumentar recall em campo
+4. Avaliacao em campo real com produtores de Sorriso-MT (Sprint 3 — validacao de nivel 4)
 
 ### 5.5 Experimento Edge vs Cloud
 

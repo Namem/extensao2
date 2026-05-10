@@ -81,6 +81,10 @@ datasets/processed_field/
 **/datasets/processed_mixed/
 datasets/processed_mixed/
 
+# Dataset Tomato-Village (campo real, Rajasthan 2022 — NÃO commitar)
+**/datasets/raw/tomato_village/
+datasets/raw/tomato_village/
+
 # Dados brutos do benchmark (usar benchmark_results.md no lugar)
 docs/benchmark_raw.csv
 

@@ -80,6 +80,13 @@ dataset PlantVillage preparado, modelos treinados e validados.
   - Lab (PlantVillage test): **97,55%** | Campo geral (746 imgs): **88,47%** | Campo justo (69 imgs): **30,43%**
   - Melhora real em campo não visto: ~20% → 30,43% (+10pp)
   - Modelo final escolhido: `ceres_mobilenetv2_int8.tflite` 639 KB (Exp D)
+- [x] **Validação independente Tomato-Village** (2026-05-09)
+  - `avaliar_tomatovillage.py` — 217 imgs campo real, Rajasthan, Índia — 4 classes com mapeamento Ceres
+  - Resultado Exp D: **11,52%** — gap geográfico maior que o do PlantDoc (30,43%)
+  - Achado: colapso para D02_septoriose sob shift de domínio extremo; saudavel=0%
+  - Achado: mapeamento D06 biologicamente incorreto (TSWV ≠ TYLCV)
+  - Conclusão: fine-tuning com PlantDoc não generaliza para regiões geográficas muito distintas
+  - Documentado em `docs/tomatovillage_results.md` e TCC seção 5.4.5
 
 ### Firmware ESP32 — Sprint 1b ⚠️ AGUARDANDO NOTEBOOK
 - [ ] **Pré-requisito:** fazer no notebook (mesma rede WiFi que o ESP32)
