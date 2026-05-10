@@ -49,7 +49,8 @@ modelo.summary()
 normalizacao = tf.keras.layers.Rescaling(scale=1.0/127.5, offset=-1.0)
 
 def carregar(pasta, shuffle=False):
-    ds = tf.keras.utils.image_dataset_from_directory(
+    """Carrega dataset e retorna (dataset_prefetchado, class_names)."""
+    ds_raw = tf.keras.utils.image_dataset_from_directory(
         str(pasta),
         image_size=(IMG_SIZE, IMG_SIZE),
         batch_size=BATCH_SIZE,
@@ -57,14 +58,15 @@ def carregar(pasta, shuffle=False):
         seed=SEED,
         label_mode="categorical",
     )
-    return ds.map(
+    class_names = ds_raw.class_names  # captura antes de map/prefetch
+    ds = ds_raw.map(
         lambda x, y: (normalizacao(x), y),
         num_parallel_calls=tf.data.AUTOTUNE
     ).prefetch(tf.data.AUTOTUNE)
+    return ds, class_names
 
-ds_val  = carregar(VAL_DIR)
-ds_test = carregar(TEST_DIR)
-CLASSES = ds_val.class_names
+ds_val,  CLASSES = carregar(VAL_DIR)
+ds_test, _       = carregar(TEST_DIR)
 
 # ---------------------------------------------------------------------------
 # Exportar TFLite FP32

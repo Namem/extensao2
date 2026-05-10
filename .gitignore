@@ -75,9 +75,11 @@ datasets/plantvillage_ceres/
 **/datasets/processed/
 datasets/processed/
 
-# Dataset augmentado com fundos naturais (~6 GB) — gerado por background_augment.py
+# Datasets gerados localmente — NÃO commitar (symlinks WSL2 + arquivos grandes)
 **/datasets/processed_field/
 datasets/processed_field/
+**/datasets/processed_mixed/
+datasets/processed_mixed/
 
 # Dados brutos do benchmark (usar benchmark_results.md no lugar)
 docs/benchmark_raw.csv

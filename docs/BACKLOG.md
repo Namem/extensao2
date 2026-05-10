@@ -54,7 +54,7 @@ dataset PlantVillage preparado, modelos treinados e validados.
 - [x] Gap lab-campo documentado em `docs/plantdoc_results.md` e TCC seção 5.4
 - [x] Análise científica: consistente com literatura (Mohanty 2016, Singh 2020)
 
-### Background Augmentation 🔄 EM ANDAMENTO (2026-05-08)
+### Background Augmentation ✅ CONCLUÍDA (2026-05-09)
 - [x] `background_augment.py` criado — rembg U2-Net + recomposição sobre fundos PlantDoc
 - [x] `FUNDAMENTACAO_TECNICA.md` atualizado com embasamento científico (seção 8)
 - [x] `plotar_historico.py` — curvas de treino geradas em `docs/historico_treino.png`
@@ -65,9 +65,21 @@ dataset PlantVillage preparado, modelos treinados e validados.
 - [x] TCC referências — Singh 2020, Wu 2023, Qin 2020, Yang 2024, Xu 2024 adicionadas
 - [x] `.env.example` atualizado — MQTT, ALLOWED_HOSTS, EDGE_IMPULSE_API_KEY
 - [x] `requirements_minimal.txt` criado — dependências mínimas para o notebook
-- [ ] Executar processamento completo das 88.949 imgs (`--n-backgrounds 2`)
-- [ ] Retreinar MobileNetV2 no WSL2 com `processed_field` (`train_local.py --data-dir`)
-- [ ] Rodar `avaliar_plantdoc.py` pós-retreino — meta: **> 50% (conservador) / > 70% (meta TCC)**
+- [x] TCC seção 2.2 — Transfer Learning, Quantização INT8, gap lab-campo com refs reais
+- [x] TCC seção 2.5 — tabela trabalhos relacionados atualizada com resultados reais
+- [x] TCC seção 3.2 — dataset e pré-processamento revisado
+- [x] `RELATORIO_TECNICO.md` — log 2026-05-09 registrado
+- [x] `docs/resumo_executivo.md` — resumo em linguagem simples (banca/orientador/produtores)
+- [x] `verificar_ambiente.py` — instruções de correção salvas no check_report.txt
+- [x] Processamento completo concluído — 177.698 composições, 0 erros, 650min (2026-05-09)
+- [x] Retreinar MobileNetV2 no WSL2 com `processed_field` — **Exp C: 96,20% lab / 20,24% campo** (2026-05-09)
+- [x] Rodar `avaliar_plantdoc.py` pós-retreino — resultado: **20,24%** (meta não atingida; resultado negativo documentado)
+- [x] `avaliar_plantdoc.py` corrigido — avalia train+test splits (746 imgs); análise por classe registrada
+- [x] `export_tflite.py` corrigido — `class_names` capturado antes de `map/prefetch`
+- [x] **Exp D — Fine-tuning PlantDoc real:** `preparar_mixed.py` + retreino com 95.719 imgs (2026-05-09)
+  - Lab (PlantVillage test): **97,55%** | Campo geral (746 imgs): **88,47%** | Campo justo (69 imgs): **30,43%**
+  - Melhora real em campo não visto: ~20% → 30,43% (+10pp)
+  - Modelo final escolhido: `ceres_mobilenetv2_int8.tflite` 639 KB (Exp D)
 
 ### Firmware ESP32 — Sprint 1b ⚠️ AGUARDANDO NOTEBOOK
 - [ ] **Pré-requisito:** fazer no notebook (mesma rede WiFi que o ESP32)
@@ -141,7 +153,7 @@ funcionamento offline; experimento edge vs cloud documentado.
 | Sprint | Tema | Status | Progresso |
 |--------|------|--------|-----------|
 | Sprint 0 | Motor de Diagnóstico | ✅ Concluída | 8/8 |
-| Sprint 1 | MQTT + Dataset + Treino | 🔄 Quase concluída | 17/24 — falta: background aug retreino + firmware |
+| Sprint 1 | MQTT + Dataset + Treino | ✅ Concluída (exc. firmware) | 21/24 — falta apenas firmware (notebook) |
 | Sprint 1b | Firmware ESP32 genérico | ⚠️ Aguardando notebook | 0/6 |
 | Sprint 2 | ESP32-S3 + TFLite + Integração | ⏳ Pendente — aguardando hardware | 0/15 |
 | Sprint 3 | Flutter + Resiliência + Experimentos | ⏳ Pendente | 0/14 |

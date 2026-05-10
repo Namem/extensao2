@@ -561,6 +561,20 @@ with open(relatorio_path, "w", encoding="utf-8") as f:
             for linha in detalhe.split("\n"):
                 f.write(f"         {linha.strip()}\n")
     f.write(f"\nRESUMO: {n_ok} OK | {n_warn} avisos | {n_err} erros\n")
+    # Instrucoes de instalacao se necessario
+    if n_err > 0 or n_warn > 0:
+        f.write("\n\nPASSOS PARA CORRIGIR:\n")
+        f.write("1. Ativar venv:\n")
+        f.write("     Windows : backend\\venv\\Scripts\\activate\n")
+        f.write("     Linux   : source ~/venv_ceres/bin/activate\n")
+        f.write("2. Instalar dependencias minimas:\n")
+        f.write("     pip install -r backend/requirements_minimal.txt\n")
+        f.write("3. Para inferencia TFLite (sem TF completo):\n")
+        f.write("     pip install tflite-runtime\n")
+        f.write("4. Para background augmentation:\n")
+        f.write("     pip install rembg onnxruntime\n")
+        f.write("5. Copiar .env:\n")
+        f.write("     copy backend\\.env.example backend\\.env\n")
 
 print(f"\n  Relatorio salvo em: {relatorio_path}")
 print()

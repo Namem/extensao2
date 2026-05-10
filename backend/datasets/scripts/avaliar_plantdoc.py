@@ -3,12 +3,14 @@ Avalia o modelo ceres_mobilenetv2_int8.tflite no dataset PlantDoc.
 Valida a generalização do modelo para imagens de campo real.
 
 Uso:
-    python avaliar_plantdoc.py
+    python avaliar_plantdoc.py                   # sem remoção de fundo
+    python avaliar_plantdoc.py --remover-fundo   # Opção A: rembg antes de inferir
 
 Saída:
     docs/plantdoc_results.md
 """
 
+import argparse
 import numpy as np
 import tensorflow as tf
 from pathlib import Path
@@ -16,13 +18,36 @@ from datetime import datetime
 from PIL import Image
 
 # ---------------------------------------------------------------------------
+# Argumentos
+# ---------------------------------------------------------------------------
+
+_parser = argparse.ArgumentParser(add_help=False)
+_parser.add_argument("--remover-fundo", action="store_true",
+    help="Aplica rembg para remover fundo antes de inferir (Opção A diagnóstico).")
+_args, _ = _parser.parse_known_args()
+
+REMOVER_FUNDO = _args.remover_fundo
+
+if REMOVER_FUNDO:
+    try:
+        from rembg import remove as rembg_remove
+        print("[Opção A] rembg carregado — fundo será removido antes de inferir")
+    except ImportError:
+        raise SystemExit("ERRO: rembg não instalado. Execute: pip install rembg")
+
+# ---------------------------------------------------------------------------
 # Configurações
 # ---------------------------------------------------------------------------
 
 BASE_DIR    = Path(__file__).resolve().parents[2]
 MODELO_PATH = BASE_DIR / "datasets" / "modelo" / "ceres_mobilenetv2_int8.tflite"
-PLANTDOC    = BASE_DIR / "datasets" / "raw" / "plantdoc" / "train"
-RESULTADO   = BASE_DIR.parent / "docs" / "plantdoc_results.md"
+PLANTDOC    = BASE_DIR / "datasets" / "raw" / "plantdoc"
+# Avalia train + test para comparação justa com avaliação original (1353 imgs)
+PLANTDOC_SPLITS = ["train", "test"]
+# Nota: para Exp D (treinou com PlantDoc/train), use ["test"] para métrica justa (69 imgs)
+# Arquivo de saída separado por modo para preservar ambos os resultados
+_sufixo     = "_opcao_a" if REMOVER_FUNDO else ""
+RESULTADO   = BASE_DIR.parent / "docs" / f"plantdoc_results{_sufixo}.md"
 
 IMG_SIZE    = 96
 
@@ -68,9 +93,20 @@ print(f"Classes: {CLASSES_CERES}")
 # Função de inferência
 # ---------------------------------------------------------------------------
 
+def remover_fundo(img: Image.Image) -> Image.Image:
+    """Remove fundo via rembg e cola sobre cinza 128 (igual ao PlantVillage)."""
+    img_rgba = rembg_remove(img)                          # → RGBA
+    fundo    = Image.new("RGB", img_rgba.size, (128, 128, 128))
+    fundo.paste(img_rgba, mask=img_rgba.split()[3])       # alpha como máscara
+    return fundo
+
+
 def inferir(caminho_img: Path) -> str:
     """Retorna o nome da classe predita para uma imagem."""
-    img = Image.open(caminho_img).convert("RGB").resize((IMG_SIZE, IMG_SIZE))
+    img = Image.open(caminho_img).convert("RGB")
+    if REMOVER_FUNDO:
+        img = remover_fundo(img)
+    img = img.resize((IMG_SIZE, IMG_SIZE))
     arr = np.array(img, dtype=np.float32)
 
     # Passo 1: normalizar para [-1, 1] igual ao treinamento (Rescaling 1/127.5 - 1)
@@ -94,19 +130,21 @@ def inferir(caminho_img: Path) -> str:
 # Avaliar por classe
 # ---------------------------------------------------------------------------
 
-print(f"\nAvaliando imagens em: {PLANTDOC}")
+print(f"\nAvaliando imagens em: {PLANTDOC} (splits: {PLANTDOC_SPLITS})")
 
 resultados = {}   # classe_ceres → {"corretas": int, "total": int}
 erros_global = 0
 
 for pasta_plantdoc, classe_ceres in MAPA_CLASSES.items():
-    pasta = PLANTDOC / pasta_plantdoc
-    if not pasta.exists():
-        print(f"  [AVISO] Pasta não encontrada: {pasta_plantdoc}")
+    imagens = []
+    for split in PLANTDOC_SPLITS:
+        pasta = PLANTDOC / split / pasta_plantdoc
+        if pasta.exists():
+            imagens += list(pasta.glob("*.jpg")) + list(pasta.glob("*.JPG")) + \
+                       list(pasta.glob("*.png")) + list(pasta.glob("*.jpeg"))
+    if not imagens:
+        print(f"  [AVISO] Pasta não encontrada em nenhum split: {pasta_plantdoc}")
         continue
-
-    imagens = list(pasta.glob("*.jpg")) + list(pasta.glob("*.JPG")) + \
-              list(pasta.glob("*.png")) + list(pasta.glob("*.jpeg"))
 
     corretas = 0
     for img_path in imagens:

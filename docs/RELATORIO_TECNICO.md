@@ -294,10 +294,89 @@ via augmentation com fundos naturais ou remoção de fundo (GrabCut).
 
 ### Frente A — Firmware ESP32 (PENDENTE)
 
-- [ ] Instalar PlatformIO
+- [ ] Instalar PlatformIO no notebook
 - [ ] Criar `firmware/esp32_mqtt_sensor/`
 - [ ] Implementar WiFi + MQTT + DHT22 + umidade solo
 - [ ] Testar publicação em `ceres/sensor/001`
+
+#### 2026-05-09 — Scripts de apoio + documentação Sprint 1 ✅
+
+**Scripts criados (todos em `backend/datasets/scripts/`):**
+
+`plotar_historico.py`
+- Lê `historico_treino.csv` e gera `docs/historico_treino.png`
+- Gráfico com 2 subplots (accuracy + loss), marcação de Fase 1 vs Fase 2,
+  linha da melhor época (ep 28, val_acc 97,79%), anotação do test set 98,13%
+- Dependência: matplotlib (instalado no venv Windows)
+- Uso: `python plotar_historico.py`
+
+`demo_inferencia.py`
+- Demo visual de inferência do `ceres_mobilenetv2_int8.tflite`
+- Aceita `--imagem` ou `--pasta`, exibe tabela com barra de confiança colorida
+- Salva relatório em `docs/demo_results.md`
+- Uso: `python demo_inferencia.py --pasta "caminho/pasta" --max 10`
+
+`background_augment.py`
+- Remove fundo de 88.949 imgs PlantVillage (rembg U2-Net)
+- Recompoe sobre fundos naturais do PlantDoc
+- Gera `processed_field/train/` para retreino (Exp C)
+- Resumível (pula arquivos já gerados), usa `--sample N` para teste
+- Status: rodando em background no PC desktop (2026-05-08 →)
+
+**Documentação atualizada:**
+- `docs/sprint_review_roteiro.md` — roteiro completo 12 slides Sprint Review
+- `docs/historico_treino.png` — gráfico de curvas de treinamento
+- `docs/TCC_CERES.md` — seção 5.2 (curvas + acurácia por classe reais),
+  seção 6 (conclusão parcial Sprint 1), seção 4.2.6 (Exp C), refs novas
+- `backend/.env.example` — adicionado MQTT_BROKER, MQTT_PORT, ALLOWED_HOSTS
+- `backend/requirements_minimal.txt` — dependências mínimas para notebook
+- `verificar_ambiente.py` — modo `--notebook`, apito sonoro, `--fix`
+
+#### 2026-05-09 (tarde) — Exp C concluído + análise de resultados ✅
+
+**Exp C — Retreino com background augmentation:**
+- Dataset: 266.847 imgs (88.949 originais + 177.698 composições sintéticas)
+- Splits val/test: symlinks para `processed/val` e `processed/test` (avaliação justa)
+- Resultado lab (PlantVillage test): **96,20%** (vs 98,13% Exp B — -1,93 pp)
+- Resultado campo (PlantDoc, 746 imgs): **20,24%** (vs 20,77% Exp B — -0,53 pp)
+- Conclusão: **background augmentation sintética não melhora generalização de campo**
+
+**Bugs corrigidos:**
+- `export_tflite.py` linha 67: `class_names` capturado do dataset raw antes de `.map().prefetch()`
+- `avaliar_plantdoc.py`: script corrigido para varrer `train/` + `test/` (746 imgs vs 677 anterior)
+
+**Análise por classe (Exp C — campo):**
+- Melhor: D01_requeima 66,7% | D02_septoriose 32,5% (lesões visualmente salientes)
+- Pior: saudavel 0,0% | D07_acaro 0,0% | D09_mancha_bacteriana 5,5%
+- Diagnóstico: fundo verde natural de campo não reconhecido como "saudável"
+
+**Documentação atualizada:**
+- `docs/TCC_CERES.md` seção 5.4 — comparativo Exp B vs Exp C, análise do gap, caminhos futuros
+- `docs/BACKLOG.md` — Sprint 1 marcada 21/24 (pendente apenas firmware ESP32)
+
+#### 2026-05-09 (noite) — Exp D Fine-tuning PlantDoc real ✅
+
+**Dataset misto criado por `preparar_mixed.py`:**
+- 88.949 imgs PlantVillage (symlinks) + 6.770 cópias PlantDoc/train (677 únicas × 10)
+- Total treino: 95.719 imagens | 7,1% campo real
+
+**Resultados Exp D:**
+- Lab (PlantVillage test, 2.734 imgs): **97,55%** (vs 98,13% Exp B — -0,58pp)
+- Campo geral (PlantDoc train+test, 746 imgs, inclui treino): **88,47%**
+- Campo justo (PlantDoc test-only, 69 imgs, nunca visto): **30,43%** (+10pp vs Exp B ~20%)
+
+**Diagnóstico intermediário (Opção A — rembg no teste):**
+- PlantDoc test+train com rembg: 21,05% — sem melhora → fundo não é causa única
+- D06_vira_cabeca: +50pp com rembg (fundo era causa nessa classe específica)
+- D02_septoriose: -22pp com rembg (spots nas bordas cortados pelo rembg)
+
+**Conclusão da cadeia experimental:**
+- Exp B → C: augmentação sintética ineficaz (gap persiste)
+- Exp D: fine-tuning com dados reais: +10pp campo não visto; limitado pelo tamanho do PlantDoc
+- Fator crítico: mais dados reais de campo (Sorriso-MT) para superar 70%
+
+**Modelo final escolhido:** Exp D `ceres_mobilenetv2_int8.tflite` 639 KB
+**Scripts criados:** `preparar_mixed.py` (dataset misto), `avaliar_plantdoc.py --remover-fundo` (Opção A)
 
 ---
 
