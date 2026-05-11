@@ -1,4 +1,4 @@
-# Relatório Técnico — Ceres Diagnóstico
+﻿# Relatório Técnico — Ceres Diagnóstico
 **TCC Engenharia da Computação — IFMT Cuiabá**
 **Autor:** Namem Rachid Jaudy Neto
 **Orientador:** (a preencher)
@@ -458,3 +458,35 @@ kaggle datasets download abdallahalidev/plantvillage-dataset `
     -p datasets/raw/ --unzip
 python datasets/scripts/prepare_plantvillage.py
 ```
+
+
+---
+
+## 2026-05-11 — Sprint 1b: Firmware ESP32-S3 MQTT
+
+### Ambiente
+- Notebook Windows 11, Python 3.12, PlatformIO 6.1.19
+- ESP32-S3-WROOM-1-N16R8 (16MB Flash + 8MB PSRAM) via COM5 (CH343)
+- Mosquitto 2.1.2 reconfigurado para listener 1883 (todas as interfaces)
+
+### O que foi feito
+1. Projeto PlatformIO criado em firmware/esp32_mqtt_sensor/
+2. include/config.h com WiFi SSID/PASS + broker IP + topico (excluido do git via .gitignore)
+3. src/main.cpp com WiFi + MQTT + JSON simulado + reconexao automatica
+4. Mosquitto reconfigurado: listener 1883 sem bind a localhost + allow_anonymous true
+5. Regra de firewall adicionada para porta 1883
+6. Upload via pio run --target upload concluido em 38s
+
+### Resultados
+- ESP32-S3 conectado ao broker: 192.168.15.94 -> 192.168.15.22:1883 ESTABLISHED
+- 74 eventos persistidos no PostgreSQL via mqtt_listener
+- Endpoint GET /api/diagnostico/historico/ retornando JSON paginado com JWT
+- Pilha completa validada: ESP32-S3 -> WiFi -> Mosquitto -> Django -> PostgreSQL -> REST API
+
+### Problemas encontrados e solucoes
+- Boot loop: flag board_build.arduino.memory_type=qio_opi conflita com Arduino framework -> removida
+- Serial silencioso: ARDUINO_USB_CDC_ON_BOOT=1 redireciona Serial para USB nativa -> flags removidas
+- MQTT rc=-2: Mosquitto so escutava em localhost -> listener 1883 sem bind no mosquitto.conf
+
+### Proximo passo
+- Sprint 2: comprar OV5640 + DHT22 + sensor solo; integrar TFLite no ESP32-S3

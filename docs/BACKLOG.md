@@ -88,14 +88,17 @@ dataset PlantVillage preparado, modelos treinados e validados.
   - Conclusão: fine-tuning com PlantDoc não generaliza para regiões geográficas muito distintas
   - Documentado em `docs/tomatovillage_results.md` e TCC seção 5.4.5
 
-### Firmware ESP32 — Sprint 1b ⚠️ AGUARDANDO NOTEBOOK
-- [ ] **Pré-requisito:** fazer no notebook (mesma rede WiFi que o ESP32)
-- [ ] Criar `firmware/esp32_mqtt_sensor/` com PlatformIO (`esp32dev`)
-- [ ] Conectar WiFi e broker Mosquitto (192.168.x.x:1883)
-- [ ] Ler DHT22 no GPIO4 e sensor de umidade do solo no GPIO34 (ADC 12 bits)
-- [ ] Publicar JSON em `ceres/sensor/001` a cada 30s
-- [ ] Reconexão automática WiFi e MQTT
-- [ ] Testar com `mosquitto_sub -t ceres/sensor/+`
+### Firmware ESP32-S3 — Sprint 1b ✅ CONCLUÍDA (2026-05-11)
+- [x] **Pré-requisito:** feito no notebook (mesma rede WiFi que o ESP32)
+- [x] Criar `firmware/esp32_mqtt_sensor/` com PlatformIO (`esp32-s3-devkitc-1`)
+- [x] Conectar WiFi e broker Mosquitto (192.168.15.22:1883)
+- [x] Publicar JSON simulado em `ceres/sensor/001` a cada 30s (sem sensores em mãos)
+- [x] Reconexão automática WiFi e MQTT
+- [x] Testado com `mosquitto_sub -t ceres/sensor/+` — 74 eventos persistidos no Django
+- [x] Pilha completa validada: ESP32-S3 → WiFi → Mosquitto → mqtt_listener → PostgreSQL → API REST
+
+**Hardware utilizado:** ESP32-S3-WROOM-1-N16R8 (16MB Flash + 8MB PSRAM) — mesmo chip do Sprint 2
+**Nota:** valores simulados — substituir por DHT22 + ADC quando sensores chegarem
 
 ---
 
@@ -160,7 +163,7 @@ funcionamento offline; experimento edge vs cloud documentado.
 | Sprint | Tema | Status | Progresso |
 |--------|------|--------|-----------|
 | Sprint 0 | Motor de Diagnóstico | ✅ Concluída | 8/8 |
-| Sprint 1 | MQTT + Dataset + Treino | ✅ Concluída (exc. firmware) | 21/24 — falta apenas firmware (notebook) |
-| Sprint 1b | Firmware ESP32 genérico | ⚠️ Aguardando notebook | 0/6 |
+| Sprint 1 | MQTT + Dataset + Treino | ✅ Concluída | 24/24 |
+| Sprint 1b | Firmware ESP32-S3 MQTT | ✅ Concluída | 7/7 |
 | Sprint 2 | ESP32-S3 + TFLite + Integração | ⏳ Pendente — aguardando hardware | 0/15 |
 | Sprint 3 | Flutter + Resiliência + Experimentos | ⏳ Pendente | 0/14 |

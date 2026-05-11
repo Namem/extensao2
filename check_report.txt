@@ -1,10 +1,10 @@
 Ceres Diagnostico — Verificacao de Ambiente
-Data: 2026-05-08 23:38
-Maquina: DESKTOP-2UU9SQN
-Python: 3.13.13 | Plataforma: Windows
+Data: 2026-05-10 00:29
+Maquina: RACHID
+Python: 3.12.10 | Plataforma: Windows
 ============================================================
 
-[OK  ] Python 3.13.13
+[OK  ] Python 3.12.10
          (>= 3.10)
 [AVISO] Nenhum venv ativo
          — ative com: backend\venv\Scripts\activate  (Windows) ou  source ~/venv_ceres/bin/activate  (WSL2)
@@ -15,11 +15,11 @@ Python: 3.13.13 | Plataforma: Windows
 [OK  ] dotenv
 [OK  ] paho.mqtt.client
 [OK  ] PIL
-[ERRO ] numpy
-         — pip install numpy
+[OK  ] numpy
 [AVISO] tflite_runtime
          (opcional) — pip install tflite-runtime  (ou tensorflow)
-[OK  ] tqdm
+[AVISO] tqdm
+         (opcional) — pip install tqdm
 [AVISO] rembg
          (opcional) — pip install rembg
 [OK  ] backend/.env existe
@@ -32,8 +32,12 @@ Python: 3.13.13 | Plataforma: Windows
 [OK  ] ceres_mobilenetv2_int8.tflite (639 KB) — Exp B, modelo escolhido
 [OK  ] ei_ceres_int8.tflite (Exp A — arquivado)
 [OK  ] processed/train: 10 classes, ~88,948 imagens
-[OK  ] plantdoc/train: ~2,334 imagens de campo real
-[OK  ] processed_field/train: ~4,369 imagens (background aug)
+[AVISO] datasets/raw/plantdoc/ nao encontrado
+         — copie o PlantDoc para datasets/raw/plantdoc/
+         (necessario para background_augment.py e avaliar_plantdoc.py)
+[AVISO] datasets/processed_field/ nao encontrado
+         — execute: python backend/datasets/scripts/background_augment.py
+         (gera dataset com fundos naturais para melhorar acuracia campo)
 [OK  ] datasets/raw/ existe
 [OK  ] prepare_plantvillage.py  (prepara dataset PlantVillage)
 [OK  ] train_local.py  (treinamento MobileNetV2 (WSL2))
@@ -41,8 +45,22 @@ Python: 3.13.13 | Plataforma: Windows
 [OK  ] avaliar_plantdoc.py  (avaliacao campo real PlantDoc)
 [OK  ] background_augment.py  (background augmentation (resolver gap lab-campo))
 [OK  ] Branch atual: main
-[AVISO] 1 arquivo(s) modificado(s) nao commitados
+[AVISO] 4 arquivo(s) modificado(s) nao commitados
          — faca git add + git commit antes de mudar de maquina
 [OK  ] Repositorio atualizado com origin/main
 
-RESUMO: 29 OK | 4 avisos | 1 erros
+RESUMO: 27 OK | 7 avisos | 0 erros
+
+
+PASSOS PARA CORRIGIR:
+1. Ativar venv:
+     Windows : backend\venv\Scripts\activate
+     Linux   : source ~/venv_ceres/bin/activate
+2. Instalar dependencias minimas:
+     pip install -r backend/requirements_minimal.txt
+3. Para inferencia TFLite (sem TF completo):
+     pip install tflite-runtime
+4. Para background augmentation:
+     pip install rembg onnxruntime
+5. Copiar .env:
+     copy backend\.env.example backend\.env

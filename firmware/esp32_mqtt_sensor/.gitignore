@@ -1,0 +1,4 @@
+.pio
+
+# Credenciais WiFi e broker — nunca commitar
+include/config.h
