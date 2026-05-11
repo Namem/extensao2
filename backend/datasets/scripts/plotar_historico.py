@@ -8,7 +8,7 @@ Uso:
     python plotar_historico.py
 
 Saida:
-    docs/historico_treino.png
+    docs/assets/historico_treino.png
 """
 
 import csv
@@ -20,7 +20,7 @@ from pathlib import Path
 
 BASE_DIR  = Path(__file__).resolve().parents[2]
 CSV_PATH  = BASE_DIR / "datasets" / "modelo" / "historico_treino.csv"
-OUT_PNG   = BASE_DIR.parent / "docs" / "historico_treino.png"
+OUT_PNG   = BASE_DIR.parent / "docs" / "assets" / "historico_treino.png"
 
 # ---------------------------------------------------------------------------
 # Ler CSV

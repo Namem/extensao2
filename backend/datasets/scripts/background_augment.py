@@ -27,7 +27,7 @@ Saida:
         <nome>_bg1.jpg      — folha + fundo PlantDoc aleatorio #2
         ...
 
-    docs/background_augment_stats.md  — relatorio de execucao
+    docs/resultados/background_augment_stats.md  — relatorio de execucao
 
 Dependencias (instalar no venv):
     pip install rembg[gpu] tqdm pillow onnxruntime-gpu
@@ -54,7 +54,7 @@ BASE_DIR      = Path(__file__).resolve().parents[2]          # backend/
 SOURCE_TRAIN  = BASE_DIR / "datasets" / "processed" / "train"
 PLANTDOC_DIR  = BASE_DIR / "datasets" / "raw" / "plantdoc" / "train"
 OUTPUT_TRAIN  = BASE_DIR / "datasets" / "processed_field" / "train"
-RESULTADO     = BASE_DIR.parent / "docs" / "background_augment_stats.md"
+RESULTADO     = BASE_DIR.parent / "docs" / "resultados" / "background_augment_stats.md"
 
 IMG_SIZE = 96   # mesma resolucao do treinamento original
 

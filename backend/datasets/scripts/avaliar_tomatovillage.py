@@ -17,7 +17,7 @@ Uso:
     python avaliar_tomatovillage.py --split all  # train + val + test
 
 Saída:
-    docs/tomatovillage_results.md
+    docs/resultados/tomatovillage_results.md
 """
 
 import argparse
@@ -50,7 +50,7 @@ SPLITS = ["test"] if args.split == "test" else ["train", "val", "test"]
 BASE_DIR    = Path(__file__).resolve().parents[2]
 MODELO_PATH = BASE_DIR / "datasets" / "modelo" / "ceres_mobilenetv2_int8.tflite"
 TV_DIR      = BASE_DIR / "datasets" / "raw" / "tomato_village"
-RESULTADO   = BASE_DIR.parent / "docs" / "tomatovillage_results.md"
+RESULTADO   = BASE_DIR.parent / "docs" / "resultados" / "tomatovillage_results.md"
 
 IMG_SIZE    = 96
 

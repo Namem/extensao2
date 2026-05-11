@@ -7,7 +7,7 @@ Uso:
     python avaliar_plantdoc.py --remover-fundo   # Opção A: rembg antes de inferir
 
 Saída:
-    docs/plantdoc_results.md
+    docs/resultados/plantdoc_results.md
 """
 
 import argparse
@@ -47,7 +47,7 @@ PLANTDOC_SPLITS = ["train", "test"]
 # Nota: para Exp D (treinou com PlantDoc/train), use ["test"] para métrica justa (69 imgs)
 # Arquivo de saída separado por modo para preservar ambos os resultados
 _sufixo     = "_opcao_a" if REMOVER_FUNDO else ""
-RESULTADO   = BASE_DIR.parent / "docs" / f"plantdoc_results{_sufixo}.md"
+RESULTADO   = BASE_DIR.parent / "docs" / "resultados" / f"plantdoc_results{_sufixo}.md"
 
 IMG_SIZE    = 96
 
