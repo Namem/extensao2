@@ -3,9 +3,9 @@
 ## Como retomar o contexto em uma nova sessão
 Leia ESTE arquivo (CLAUDE.md) — ele é suficiente para retomar qualquer sprint.
 Se precisar de detalhes técnicos específicos, leia também:
-  docs/RELATORIO_TECNICO.md  → log cronológico completo de tudo implementado
-  docs/BACKLOG.md            → estado atual de cada tarefa
-  docs/plantdoc_results.md   → resultado da validação campo real
+  docs/core/RELATORIO_TECNICO.md          → log cronológico completo de tudo implementado
+  docs/core/BACKLOG.md                    → estado atual de cada tarefa
+  docs/resultados/plantdoc_results.md     → resultado da validação campo real
 
 ## Projeto
 TCC de Engenharia da Computação — IFMT Cuiabá.
@@ -62,7 +62,7 @@ VALIDAÇÃO: PlantDoc (~1.353 imgs campo real)
            backend/datasets/raw/plantdoc/ — NÃO commitar
 OUTROS   : Qualquer dataset pode ser usado se necessário (Roboflow, Kaggle,
            Hugging Face, etc.) — desde que documentado em
-           docs/FUNDAMENTACAO_TECNICA.md com justificativa e licença
+           docs/core/FUNDAMENTACAO_TECNICA.md com justificativa e licença
 ATENÇÃO  : Roboflow "Tomato Fruit Disease Detection" é Object Detection
            de fruto (bounding box) — incompatível com classificação de
            folhas. Só usar se a tarefa mudar para detecção de objetos.
@@ -235,23 +235,23 @@ verificar_ambiente.py       → checklist de ambiente com apito sonoro
 - Após cada bloco de mudanças: sugerir commit (sem co-autor Claude)
 - Antes de criar documentação: ler backlog em Pre_arquivos/
 - Após qualquer implementação que der certa: SEMPRE atualizar
-  TCC_CERES.md, RELATORIO_TECNICO.md e FUNDAMENTACAO_TECNICA.md
+  docs/core/TCC_CERES.md, docs/core/RELATORIO_TECNICO.md e docs/core/FUNDAMENTACAO_TECNICA.md
 - Após qualquer implementação que der certa: SEMPRE atualizar
-  docs/BACKLOG.md marcando o que foi concluído, OU perguntar ao
+  docs/core/BACKLOG.md marcando o que foi concluído, OU perguntar ao
   usuário se pode atualizar antes de fazê-lo
 
 ## Regra de fundamentação técnica
 SEMPRE que uma tecnologia, método, biblioteca ou arquitetura
 for adicionada OU removida do projeto, atualizar:
-  docs/FUNDAMENTACAO_TECNICA.md
+  docs/core/FUNDAMENTACAO_TECNICA.md
 com justificativa técnica, comparativo com alternativas e
 referência acadêmica (Google Scholar, PMC, Springer, IEEE).
 Obrigatório para a defesa do TCC.
 
 ## Documentos vivos (atualizar ao final de cada implementação)
-docs/TCC_CERES.md             → rascunho do TCC, seções [PENDENTE] a preencher
-docs/RELATORIO_TECNICO.md     → log cronológico de tudo implementado
-docs/FUNDAMENTACAO_TECNICA.md → justificativa técnica + refs acadêmicas
+docs/core/TCC_CERES.md             → rascunho do TCC, seções [PENDENTE] a preencher
+docs/core/RELATORIO_TECNICO.md     → log cronológico de tudo implementado
+docs/core/FUNDAMENTACAO_TECNICA.md → justificativa técnica + refs acadêmicas
 SEMPRE atualizar os três ao final de cada sprint ou bloco significativo.
 
 ## Estrutura de pastas
