@@ -87,6 +87,14 @@ dataset PlantVillage preparado, modelos treinados e validados.
   - Achado: mapeamento D06 biologicamente incorreto (TSWV ≠ TYLCV)
   - Conclusão: fine-tuning com PlantDoc não generaliza para regiões geográficas muito distintas
   - Documentado em `docs/tomatovillage_results.md` e TCC seção 5.4.5
+- [x] **Validação independente Daffodil BD** (2026-05-11)
+  - `avaliar_daffodil.py` — 1.616 imgs campo real, Bangladesh — 7 classes com mapeamento Ceres
+  - Dataset: Daffodil International University, iPhone 11, campo aberto, Khagan/Charabag
+  - Resultado Exp D: **9,59%** — terceiro gap geográfico confirmado
+  - Achado: D05_mofo_foliar 77,3% — hipótese de distinção visual (Passalora fulva textura invariante)
+  - Achado: D02_septoriose atrator universal sob shift de domínio extremo
+  - Achado: mapeamento D06 corrigido — TLCV (begomovirus) = TYLCV biologicamente válido
+  - Documentado em `docs/resultados/daffodil_results.md`
 
 ### Firmware ESP32-S3 — Sprint 1b ✅ CONCLUÍDA (2026-05-11)
 - [x] **Pré-requisito:** feito no notebook (mesma rede WiFi que o ESP32)
