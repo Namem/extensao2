@@ -1,0 +1,45 @@
+============================================================
+RELATÓRIO EXPERIMENTO E — Focal Loss + Aug Agressiva
+Data     : 2026-05-11 23:34
+Hardware : RTX 3060 Ti (WSL2), TF 2.21.0
+Dataset  : datasets/processed_mixed
+============================================================
+
+Acurácia test set : 98.43%
+Macro F1 test set : 0.9791
+Loss test set     : 0.0882
+Tamanho FP32      : 1624.9 KB
+Tamanho INT8      : 638.1 KB
+
+Relatório por classe (precision / recall / f1):
+------------------------------------------------------------
+                        precision    recall  f1-score   support
+
+          D01_requeima       0.98      0.99      0.99       287
+        D02_septoriose       0.98      0.97      0.98       267
+       D03_pinta_preta       0.98      0.93      0.96       150
+      D03b_mancha_alvo       0.96      0.96      0.96       212
+       D05_mofo_foliar       0.99      0.96      0.97       144
+       D06_vira_cabeca       1.00      1.00      1.00       805
+          D06b_mosaico       0.98      0.98      0.98        57
+D07_acaro_bronzeamento       0.96      0.99      0.97       252
+ D09_mancha_bacteriana       0.99      1.00      1.00       320
+              saudavel       0.98      1.00      0.99       240
+
+              accuracy                           0.98      2734
+             macro avg       0.98      0.98      0.98      2734
+          weighted avg       0.98      0.98      0.98      2734
+
+
+Matriz de Confusão (linhas=real, colunas=predito):
+              D01_re  D02_se  D03_pi  D03b_m  D05_mo  D06_vi  D06b_m  D07_ac  D09_ma  saudav
+D01_requeima     284       1       0       0       0       0       0       0       0       2
+D02_septorio       1     260       3       1       1       0       1       0       0       0
+D03_pinta_pr       4       1     140       5       0       0       0       0       0       0
+D03b_mancha_       0       2       0     203       0       0       0       4       1       2
+D05_mofo_fol       0       0       0       1     138       1       0       4       0       0
+D06_vira_cab       0       0       0       0       0     802       0       2       1       0
+D06b_mosaico       0       0       0       0       1       0      56       0       0       0
+D07_acaro_br       0       0       0       2       0       1       0     249       0       0
+D09_mancha_b       0       0       0       0       0       1       0       0     319       0
+    saudavel       0       0       0       0       0       0       0       0       0     240

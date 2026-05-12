@@ -79,22 +79,24 @@ dataset PlantVillage preparado, modelos treinados e validados.
 - [x] **Exp D — Fine-tuning PlantDoc real:** `preparar_mixed.py` + retreino com 95.719 imgs (2026-05-09)
   - Lab (PlantVillage test): **97,55%** | Campo geral (746 imgs): **88,47%** | Campo justo (69 imgs): **30,43%**
   - Melhora real em campo não visto: ~20% → 30,43% (+10pp)
-  - Modelo final escolhido: `ceres_mobilenetv2_int8.tflite` 639 KB (Exp D)
 - [x] **Validação independente Tomato-Village** (2026-05-09)
   - `avaliar_tomatovillage.py` — 217 imgs campo real, Rajasthan, Índia — 4 classes com mapeamento Ceres
-  - Resultado Exp D: **11,52%** — gap geográfico maior que o do PlantDoc (30,43%)
+  - Resultado Exp D: **11,52%** — gap geográfico maior que o do PlantDoc
   - Achado: colapso para D02_septoriose sob shift de domínio extremo; saudavel=0%
   - Achado: mapeamento D06 biologicamente incorreto (TSWV ≠ TYLCV)
-  - Conclusão: fine-tuning com PlantDoc não generaliza para regiões geográficas muito distintas
-  - Documentado em `docs/tomatovillage_results.md` e TCC seção 5.4.5
+  - Documentado em `docs/resultados/tomatovillage_results.md`
 - [x] **Validação independente Daffodil BD** (2026-05-11)
   - `avaliar_daffodil.py` — 1.616 imgs campo real, Bangladesh — 7 classes com mapeamento Ceres
-  - Dataset: Daffodil International University, iPhone 11, campo aberto, Khagan/Charabag
-  - Resultado Exp D: **9,59%** — terceiro gap geográfico confirmado
-  - Achado: D05_mofo_foliar 77,3% — hipótese de distinção visual (Passalora fulva textura invariante)
-  - Achado: D02_septoriose atrator universal sob shift de domínio extremo
-  - Achado: mapeamento D06 corrigido — TLCV (begomovirus) = TYLCV biologicamente válido
+  - Resultado Exp D: **9,59%** | Resultado Exp E: **18,13%** (+8,54pp)
+  - Achado: D05_mofo_foliar 77,3% (Exp D) — hipótese de distinção visual Passalora fulva
   - Documentado em `docs/resultados/daffodil_results.md`
+- [x] **Experimento E — Focal Loss + Augmentação Agressiva** (2026-05-12)
+  - `train_expe.py` — Focal Loss (γ=2, label_smoothing=0.1) + aug cor + backbone completo LR=1e-5
+  - Lab: **98,43%** test acc | Macro F1: **0,9791** | Tamanho: **638 KB**
+  - Tomato-Village Exp E: **27,65%** (+16,13pp sobre Exp D)
+  - Daffodil BD Exp E: **18,13%** (+8,54pp sobre Exp D)
+  - Atrator mudou: D02_septoriose → D01_requeima/D09 (features mais discriminativas)
+  - **Modelo final atualizado: `ceres_expe_int8.tflite` 638 KB** ← substitui Exp D
 
 ### Firmware ESP32-S3 — Sprint 1b ✅ CONCLUÍDA (2026-05-11)
 - [x] **Pré-requisito:** feito no notebook (mesma rede WiFi que o ESP32)

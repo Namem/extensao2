@@ -39,6 +39,8 @@ parser.add_argument(
     help="Split(s) a avaliar. 'test' = apenas test (padrão, métrica justa). "
          "'all' = train+val+test (para diagnóstico).",
 )
+parser.add_argument("--modelo", type=str, default=None,
+    help="Nome do .tflite em datasets/modelo/. Ex: --modelo ceres_expe_int8.tflite")
 args = parser.parse_args()
 
 SPLITS = ["test"] if args.split == "test" else ["train", "val", "test"]
@@ -48,7 +50,8 @@ SPLITS = ["test"] if args.split == "test" else ["train", "val", "test"]
 # ---------------------------------------------------------------------------
 
 BASE_DIR    = Path(__file__).resolve().parents[2]
-MODELO_PATH = BASE_DIR / "datasets" / "modelo" / "ceres_mobilenetv2_int8.tflite"
+_modelo_nome = args.modelo if args.modelo else "ceres_mobilenetv2_int8.tflite"
+MODELO_PATH = BASE_DIR / "datasets" / "modelo" / _modelo_nome
 TV_DIR      = BASE_DIR / "datasets" / "raw" / "tomato_village"
 RESULTADO   = BASE_DIR.parent / "docs" / "resultados" / "tomatovillage_results.md"
 

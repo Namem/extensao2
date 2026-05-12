@@ -24,6 +24,8 @@ from PIL import Image
 _parser = argparse.ArgumentParser(add_help=False)
 _parser.add_argument("--remover-fundo", action="store_true",
     help="Aplica rembg para remover fundo antes de inferir (Opção A diagnóstico).")
+_parser.add_argument("--modelo", type=str, default=None,
+    help="Caminho alternativo para o .tflite. Ex: --modelo ceres_expe_int8.tflite")
 _args, _ = _parser.parse_known_args()
 
 REMOVER_FUNDO = _args.remover_fundo
@@ -40,7 +42,8 @@ if REMOVER_FUNDO:
 # ---------------------------------------------------------------------------
 
 BASE_DIR    = Path(__file__).resolve().parents[2]
-MODELO_PATH = BASE_DIR / "datasets" / "modelo" / "ceres_mobilenetv2_int8.tflite"
+_modelo_nome = _args.modelo if _args.modelo else "ceres_mobilenetv2_int8.tflite"
+MODELO_PATH = BASE_DIR / "datasets" / "modelo" / _modelo_nome
 PLANTDOC    = BASE_DIR / "datasets" / "raw" / "plantdoc"
 # Avalia train + test para comparação justa com avaliação original (1353 imgs)
 PLANTDOC_SPLITS = ["train", "test"]

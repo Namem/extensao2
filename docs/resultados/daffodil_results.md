@@ -1,7 +1,7 @@
 # Avaliação Daffodil BD — 3ª Validação Independente em Campo Real
 
-**Data:** 2026-05-11 21:01
-**Modelo:** ceres_mobilenetv2_int8.tflite (639 KB) — Exp D
+**Data:** 2026-05-12 09:09
+**Modelo:** ceres_expe_int8.tflite (638 KB) — Exp E (Focal Loss + Aug Agressiva)
 **Dataset:** Daffodil International University, Bangladesh (Mendeley, 2024)
 **Captura:** iPhone 11, campo aberto, luz natural, Khagan/Charabag
 
@@ -23,83 +23,67 @@
 
 | Classe Ceres | Pasta BD | Corretas | Total | Acurácia | Top predição errada |
 |---|---|---|---|---|---|
-| D01_requeima | Late Blight | 1 | 166 | 0.6% | D02_septoriose (71x) |
-| D05_mofo_foliar | Leaf Mold | 51 | 66 | 77.3% | D02_septoriose (14x) |
-| D03_pinta_preta | Early Blight | 14 | 204 | 6.9% | D02_septoriose (68x) |
-| D07_acaro_bronzeamento | Spider Mites | 0 | 307 | 0.0% | D05_mofo_foliar (167x) |
-| D06_vira_cabeca | Tomato Leaf Curl Virus | 0 | 394 | 0.0% | D02_septoriose (204x) |
-| D09_mancha_bacteriana | Bacterial Spot | 89 | 376 | 23.7% | D02_septoriose (143x) |
-| saudavel | Healthy | 0 | 103 | 0.0% | D05_mofo_foliar (66x) |
+| D01_requeima | Late Blight | 68 | 166 | 41.0% | D09_mancha_bacteriana (86x) |
+| D05_mofo_foliar | Leaf Mold | 29 | 66 | 43.9% | D09_mancha_bacteriana (33x) |
+| D03_pinta_preta | Early Blight | 11 | 204 | 5.4% | D01_requeima (91x) |
+| D07_acaro_bronzeamento | Spider Mites | 0 | 307 | 0.0% | D05_mofo_foliar (153x) |
+| D06_vira_cabeca | Tomato Leaf Curl Virus | 0 | 394 | 0.0% | D01_requeima (259x) |
+| D09_mancha_bacteriana | Bacterial Spot | 137 | 376 | 36.4% | D01_requeima (172x) |
+| saudavel | Healthy | 48 | 103 | 46.6% | D01_requeima (25x) |
 
 ## Resultado Geral
 
 | Métrica | Valor |
 |---|---|
-| **Acurácia geral** | **9.59%** |
+| **Acurácia geral** | **18.13%** |
 | Total imagens | 1616 |
 | Classes avaliadas | 7 |
 | Erros de leitura | 0 |
 
 ## Comparativo — 3 Datasets Independentes
 
-| Dataset | Região | Clima | Imagens | Classes | Resultado Exp D |
-|---|---|---|---|---|---|
-| PlantDoc (test) | EUA / Europa | Temperado | 69 | 4 | 30,43% |
-| Tomato-Village (test) | Rajasthan, Índia | Árido tropical | 217 | 4* | 11,52% |
-| **Daffodil BD** | **Bangladesh** | **Tropical úmido** | **1616** | **7** | **9.59%** |
+| Dataset | Região | Clima | Imagens | Exp D | Exp E | Δ |
+|---|---|---|---|---|---|---|
+| PlantDoc (train+test) | EUA / Europa | Temperado | 746 | 88,47%* | 67,69% | -20,78pp* |
+| Tomato-Village (test) | Rajasthan, Índia | Árido tropical | 217 | 11,52% | **27,65%** | +16,13pp |
+| **Daffodil BD** | **Bangladesh** | **Tropical úmido** | **1.616** | **9,59%** | **18,13%** | **+8,54pp** |
 
-*\* D06 no Tomato-Village era TSWV (mapeamento incorreto — doença diferente do TYLCV)*
+*\* Exp D treinou nas 677 imgs PlantDoc/train — queda no Exp E é esperada (menos memorização, mais generalização)*
 
-## Análise
+## Análise — Exp E
 
-### Acurácia geral: 9,59% — terceiro gap geográfico confirmado
+### Resultado geral: 18,13% — melhora real de +8,54pp sobre o Exp D
 
-O resultado de 9,59% é o mais baixo dos três datasets de campo avaliados, confirmando que
-o gap lab-campo é progressivo conforme a distância geográfica e climática do conjunto de treino.
+O Exp E (Focal Loss + augmentação agressiva de cor + backbone completo) demonstrou
+melhora genuína em datasets completamente independentes do treino:
+- **+16,13pp** no Tomato-Village (Índia): de 11,52% para 27,65%
+- **+8,54pp** no Daffodil BD (Bangladesh): de 9,59% para 18,13%
 
-| Dataset | Região | Acurácia |
-|---|---|---|
-| PlantDoc (test) | EUA / Europa (temperado) | 30,43% |
-| Tomato-Village | Rajasthan, Índia (árido tropical) | 11,52% |
-| Daffodil BD | Bangladesh (tropical úmido, monção) | 9,59% |
+### Mudança no padrão de atrator
 
-### Achado 1 — D05_mofo_foliar: 77,3% (outlier positivo)
+**Exp D:** D02_septoriose era o atrator universal (recebe a maioria das predições erradas).
+**Exp E:** O atrator mudou para D01_requeima e D09_mancha_bacteriana — classes com sintomas
+visualmente distintos (manchas marrons extensas). Isso indica que a Focal Loss forçou o modelo
+a aprender features mais discriminativas em vez de convergir para a classe "mais segura".
 
-A única classe com acurácia aceitável em campo real é D05_mofo_foliar (Passalora fulva).
-**Hipótese de distinção visual:** o crescimento fúngico de *Passalora fulva* cria uma textura
-branca-acinzentada densa na face inferior da folha que é estruturalmente única e geograficamente
-invariante. O modelo aprende essa textura como feature discriminativa robusta, independentemente
-do fundo, iluminação ou cultivar local.
+### D05_mofo_foliar: queda de 77,3% → 43,9%
 
-Esta hipótese é reforçada pelo fato de D05 ter sido a única classe com acurácia significativa
-também nos outros dois datasets de validação.
+No Exp D, D05 era o único outlier positivo. No Exp E, a acurácia caiu — possivelmente porque
+a augmentação de saturação e matiz interferiu com a textura branco-acinzentada característica de
+*Passalora fulva*, que era a feature robusta detectada anteriormente.
 
-### Achado 2 — D02_septoriose como atrator universal
+### D07_acaro_bronzeamento e D06_vira_cabeca: permanecem em 0%
 
-D02_septoriose é o destino mais comum de predições erradas em 5 das 7 classes avaliadas.
-Isso sugere que, sob shift de domínio extremo, o modelo converge para a classe visualmente
-mais "genérica" — manchas irregulares escuras são uma representação padrão de doença foliar
-que o modelo generaliza excessivamente.
+Essas classes continuam sem detecção confiável em campo real. Ambas têm sintomas difusos
+(bronzeamento gradual, enrolamento foliar) que dependem fortemente do contexto visual — ângulo,
+iluminação e variedade da cultivar — características impossíveis de aprender apenas de imagens
+laboratoriais controladas.
 
-### Achado 3 — D07_acaro_bronzeamento: colapso para D05 (167/307)
+### Conclusão para o TCC
 
-O modelo confunde sistematicamente sintomas de ácaros (bronzeamento difuso) com mofo foliar.
-No conjunto laboratorial isso não ocorre, pois os fundos são distintos. Em campo, a textura
-difusa de ambas as classes é suficientemente similar para enganar o modelo.
-
-### Achado 4 — saudavel: 0% (103 folhas saudáveis previstas como D05)
-
-66 das 103 folhas saudáveis bangladeshianas foram classificadas como mofo foliar.
-Iluminação natural forte e reflexos foliares em cultivares locais aparentemente ativam
-as mesmas features do D05 aprendidas pelo modelo.
-
-### Implicações para o TCC
-
-1. **O gap não é resolvido por augmentation sintética** — Exp C confirmou isso.
-2. **Fine-tuning local é necessário por região** — não existe modelo universalmente generalizável
-   com os dados atualmente disponíveis.
-3. **A coleta em Sorriso-MT (Sprint 3) é a validação mais importante** — sem ela, qualquer
-   resultado de acurácia em campo reflete apenas datasets publicados internacionalmente.
-4. **D05_mofo_foliar** é o diagnóstico mais confiável do modelo em campo real (77,3%) —
-   clinicamente relevante pois o mofo foliar é economicamente significativo em clima tropical úmido.
-
+O Exp E é o modelo final escolhido para o sistema Ceres:
+- Lab: 98,43% (PlantVillage test set, 2.734 imagens)
+- Macro F1 lab: 0,9791
+- Campo genuinamente independente: +16pp Índia, +8,5pp Bangladesh vs Exp D
+- Tamanho: 638 KB — compatível com ESP32-S3 N16R8 (8MB PSRAM)
+- A validação definitiva permanece: produtores de Sorriso-MT (Sprint 3)

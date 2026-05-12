@@ -16,6 +16,7 @@ Saída:
     docs/daffodil_results.md
 """
 
+import argparse
 import numpy as np
 import tensorflow as tf
 from pathlib import Path
@@ -24,11 +25,21 @@ from collections import Counter
 from PIL import Image
 
 # ---------------------------------------------------------------------------
+# Argumentos
+# ---------------------------------------------------------------------------
+
+_parser = argparse.ArgumentParser(add_help=False)
+_parser.add_argument("--modelo", type=str, default=None,
+    help="Nome do .tflite em datasets/modelo/. Ex: --modelo ceres_expe_int8.tflite")
+_args, _ = _parser.parse_known_args()
+
+# ---------------------------------------------------------------------------
 # Configurações
 # ---------------------------------------------------------------------------
 
 BASE_DIR    = Path(__file__).resolve().parents[2]
-MODELO_PATH = BASE_DIR / "datasets" / "modelo" / "ceres_mobilenetv2_int8.tflite"
+_modelo_nome = _args.modelo if _args.modelo else "ceres_mobilenetv2_int8.tflite"
+MODELO_PATH = BASE_DIR / "datasets" / "modelo" / _modelo_nome
 BD_DIR      = BASE_DIR / "datasets" / "raw" / "daffodil_bd" / "Tomato leaf diseases" / "Tomato Leaf"
 RESULTADO   = BASE_DIR.parent / "docs" / "resultados" / "daffodil_results.md"
 

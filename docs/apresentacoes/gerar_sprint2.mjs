@@ -110,10 +110,11 @@ function addHighlight(sl, x, y, w, h, text, color) {
   });
 
   // Tags rodapé
-  const tags = ["TinyML", "ESP32-S3", "MobileNetV2 INT8", "MQTT", "Django REST", "Flutter"];
+  const tags = ["TinyML", "MobileNetV2 INT8", "PlantVillage", "Focal Loss", "3 Continentes"];
   tags.forEach((t, i) => {
     const col = i % 3, row = Math.floor(i / 3);
-    const bx = 1.7 + col * 3.3, by = 5.6 + row * 0.52;
+    const offsetX = row === 1 ? 1.65 : 0; // centraliza a linha de 2 tags
+    const bx = 1.7 + offsetX + col * 3.3, by = 5.6 + row * 0.52;
     sl.addShape(pptx.ShapeType.rect, {
       x: bx, y: by, w: 2.9, h: 0.38, fill: { color: CARD2_BG }, line: { color: VERDE, pt: 1 }, rectRadius: 0.06
     });
@@ -207,212 +208,307 @@ function addHighlight(sl, x, y, w, h, text, color) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// SLIDE 4 — O QUE FOI ENTREGUE
+// SLIDE 4 — DATASET DE TREINAMENTO
 // ═══════════════════════════════════════════════════════════════════════════
 {
-  const sl = newSlide("O que foi entregue");
+  const sl = newSlide("Dataset de treinamento: PlantVillage", "Hughes & Salathé (2015) · arXiv:1511.08060 · CC BY 4.0");
 
-  const rows = [
-    { frente: "Exp C — Background Augmentation sintética",     status: "✅", cor: LARANJA, resultado: "20,24% campo — igual ao anterior. Meta 70% não atingida." },
-    { frente: "Exp D — Fine-tuning com fotos reais de campo",  status: "✅", cor: VERDE,   resultado: "97,55% lab · 30,43% campo não visto · +10pp" },
-    { frente: "Validação Tomato-Village (Rajasthan, Índia)",   status: "✅", cor: VERDE,   resultado: "11,52% · 217 imgs · gap geográfico confirmado" },
-    { frente: "Validação Daffodil BD (Bangladesh) — 3ª opinião", status: "✅", cor: VERDE, resultado: "9,59% · 1.616 imgs · D05_mofo 77,3% (outlier positivo)" },
-    { frente: "Firmware ESP32-S3 + Pipeline MQTT completo",    status: "✅", cor: VERDE,   resultado: "74 eventos · ESP32-S3 → Mosquitto → Django → PostgreSQL → API" },
+  // Card esquerdo — origem e paper
+  sl.addShape(pptx.ShapeType.rect, {
+    x: 0.25, y: 1.15, w: 6.1, h: 2.9, fill: { color: CARD_BG }, line: { color: "1565C0", pt: 1.5 }, rectRadius: 0.08
+  });
+  sl.addText("Origem e justificativa", {
+    x: 0.45, y: 1.25, w: 5.7, h: 0.38,
+    fontFace: TITLE_FONT, fontSize: 15, bold: true, color: "5C9BF5"
+  });
+  sl.addText(
+    '"An open access repository of images on plant health to enable the development of mobile disease diagnostics"\n\n' +
+    "Hughes & Salathé (2015) criaram o PlantVillage como o maior benchmark público " +
+    "de doenças de plantas: imagens coletadas em laboratório, fundo controlado, " +
+    "alta resolução.\n\n" +
+    "Usado como base nos dois trabalhos do slide de literatura:\n" +
+    "• Mohanty et al. (2016) — 99,35% lab\n" +
+    "• Singh et al. (2020) — comparação lab vs campo\n\n" +
+    "Licença CC BY 4.0 — uso acadêmico e comercial permitido.",
+    {
+      x: 0.45, y: 1.7, w: 5.7, h: 2.25,
+      fontFace: BODY_FONT, fontSize: 13, color: BRANCO, wrap: true
+    }
+  );
+
+  // Card direito — números
+  sl.addShape(pptx.ShapeType.rect, {
+    x: 6.6, y: 1.15, w: 6.45, h: 2.9, fill: { color: CARD_BG }, line: { color: VERDE, pt: 1.5 }, rectRadius: 0.08
+  });
+  sl.addText("Números do dataset", {
+    x: 6.8, y: 1.25, w: 6.05, h: 0.38,
+    fontFace: TITLE_FONT, fontSize: 15, bold: true, color: VERDE
+  });
+  const nums = [
+    { label: "Imagens originais", val: "18.160" },
+    { label: "Após augmentation 6× (offline, seed=42)", val: "88.949" },
+    { label: "Split treino / val / teste", val: "70 / 15 / 15%" },
+    { label: "Classes (tomateiro)", val: "10" },
+  ];
+  nums.forEach((n, i) => {
+    sl.addText(n.label, {
+      x: 6.8, y: 1.72 + i * 0.56, w: 3.8, h: 0.48,
+      fontFace: BODY_FONT, fontSize: 13, color: CINZA, valign: "middle"
+    });
+    sl.addText(n.val, {
+      x: 10.65, y: 1.72 + i * 0.56, w: 2.2, h: 0.48,
+      fontFace: BODY_FONT, fontSize: 14, bold: true, color: VERDE, valign: "middle", align: "right"
+    });
+  });
+
+  // Tabela de mapeamento de classes
+  sl.addShape(pptx.ShapeType.rect, {
+    x: 0.25, y: 4.18, w: 12.8, h: 0.38, fill: { color: "1A3A5C" }, line: { color: "1A3A5C" }
+  });
+  sl.addText("Mapeamento PlantVillage → Ceres (10 classes)", {
+    x: 0.45, y: 4.22, w: 12.4, h: 0.3,
+    fontFace: TITLE_FONT, fontSize: 13, bold: true, color: BRANCO
+  });
+
+  const classes = [
+    ["D01 Requeima", "D02 Septoriose", "D03 Pinta-preta", "D03b Mancha-alvo", "D05 Mofo-foliar"],
+    ["D06 Vira-cabeça", "D06b Mosaico", "D07 Ácaro-bronzeamento", "D09 Mancha-bacteriana", "Saudável"],
+  ];
+  classes.forEach((row, ri) => {
+    row.forEach((cls, ci) => {
+      const bx = 0.25 + ci * 2.57, by = 4.65 + ri * 0.82;
+      const isLast = ri === 1 && ci === 4;
+      sl.addShape(pptx.ShapeType.rect, {
+        x: bx, y: by, w: 2.45, h: 0.72,
+        fill: { color: isLast ? "0A3D2E" : CARD2_BG },
+        line: { color: isLast ? VERDE : CINZA, pt: 0.5 }, rectRadius: 0.05
+      });
+      sl.addText(cls, {
+        x: bx + 0.08, y: by + 0.06, w: 2.28, h: 0.6,
+        fontFace: BODY_FONT, fontSize: 11, color: isLast ? VERDE : BRANCO,
+        bold: isLast, align: "center", valign: "middle", wrap: true
+      });
+    });
+  });
+
+  // Limitação conhecida
+  addHighlight(sl, 0.25, 6.35, 12.8, 0.65,
+    "⚠  Limitação conhecida: fundo cinza uniforme controlado → modelo aprende o fundo como feature → gap lab-campo. Motivação dos experimentos C, D e E.",
+    LARANJA);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SLIDE 5 — JORNADA DOS EXPERIMENTOS (A → E)
+// ═══════════════════════════════════════════════════════════════════════════
+{
+  const sl = newSlide("O que foi entregue — jornada dos experimentos");
+
+  // Colunas: Exp | Nome descritivo | Lab | Campo | Resultado-chave
+  const exps = [
+    {
+      exp: "A", nome: "Edge Impulse — treinamento automático (nuvem)",
+      lab: "62% INT8",  campo: "—",
+      resultado: "Quantização automática sem calibração: -30pp. Descartado.",
+      cor: LARANJA, bg: CARD_BG,
+    },
+    {
+      exp: "B", nome: "TensorFlow local + quantização INT8 calibrada",
+      lab: "98,13%", campo: "~20%",
+      resultado: "Modelo base do projeto. 50 batches val como calibração → 0pp de perda.",
+      cor: VERDE, bg: CARD2_BG,
+    },
+    {
+      exp: "C", nome: "Augmentação sintética de fundo (rembg U2-Net)",
+      lab: "96,20%", campo: "20,24%",
+      resultado: "177k composições, 650 min. 0pp de ganho em campo. Resultado negativo documentado.",
+      cor: LARANJA, bg: CARD_BG,
+    },
+    {
+      exp: "D", nome: "Fine-tuning com imagens reais de campo (PlantDoc)",
+      lab: "97,55%", campo: "30,43%",
+      resultado: "+10pp em imagens nunca vistas. Dados reais > augmentação sintética.",
+      cor: VERDE, bg: CARD2_BG,
+    },
+    {
+      exp: "E", nome: "Focal Loss + augmentação de cor agressiva",
+      lab: "98,43%", campo: "27,65%*",
+      resultado: "+16pp Índia · +8,5pp Bangladesh. Modelo final: 638 KB ✅",
+      cor: VERDE, bg: "0A3D2E",
+    },
   ];
 
-  const headers = ["Entrega", "Status", "Resultado"];
-  const colX = [0.25, 8.2, 9.6];
-  const colW = [7.75, 1.2, 3.5];
+  const hdrs = ["Exp", "Nome do Experimento", "Lab", "Campo", "Resultado-chave"];
+  const colX  = [0.25, 1.15, 7.35, 8.85, 10.25];
+  const colW  = [0.78, 6.0,  1.3,  1.2,   2.85];
 
-  // Header da tabela
   sl.addShape(pptx.ShapeType.rect, {
-    x: 0.25, y: 1.05, w: 12.8, h: 0.42, fill: { color: "1A3A5C" }, line: { color: "1A3A5C" }
+    x: 0.25, y: 1.05, w: 12.8, h: 0.4, fill: { color: "1A3A5C" }, line: { color: "1A3A5C" }
   });
-  headers.forEach((h, i) => {
+  hdrs.forEach((h, i) => {
     sl.addText(h, {
-      x: colX[i] + 0.1, y: 1.05, w: colW[i], h: 0.42,
-      fontFace: TITLE_FONT, fontSize: 13, bold: true, color: BRANCO, align: "left"
+      x: colX[i] + 0.07, y: 1.05, w: colW[i], h: 0.4,
+      fontFace: TITLE_FONT, fontSize: 12, bold: true, color: BRANCO, align: "left"
+    });
+  });
+
+  exps.forEach((r, idx) => {
+    const ry = 1.5 + idx * 0.96;
+    sl.addShape(pptx.ShapeType.rect, {
+      x: 0.25, y: ry, w: 12.8, h: 0.88,
+      fill: { color: r.bg }, line: { color: r.cor, pt: idx === 4 ? 1.5 : 0.5 }, rectRadius: 0.05
+    });
+    // Badge Exp
+    sl.addShape(pptx.ShapeType.rect, {
+      x: 0.25, y: ry, w: 0.78, h: 0.88, fill: { color: r.cor }, line: { color: r.cor }, rectRadius: 0.05
+    });
+    sl.addText(r.exp, {
+      x: 0.25, y: ry, w: 0.78, h: 0.88,
+      fontFace: TITLE_FONT, fontSize: 18, bold: true, color: BG, align: "center", valign: "middle"
+    });
+    // Nome
+    sl.addText(r.nome, {
+      x: colX[1] + 0.07, y: ry + 0.08, w: colW[1] - 0.1, h: 0.72,
+      fontFace: BODY_FONT, fontSize: 12, bold: idx === 4, color: idx === 4 ? VERDE : BRANCO,
+      valign: "middle", wrap: true
+    });
+    // Lab
+    sl.addText(r.lab, {
+      x: colX[2] + 0.07, y: ry + 0.08, w: colW[2] - 0.1, h: 0.72,
+      fontFace: BODY_FONT, fontSize: 13, bold: true,
+      color: r.lab.includes("62") ? LARANJA : VERDE,
+      valign: "middle", align: "center"
+    });
+    // Campo
+    sl.addText(r.campo, {
+      x: colX[3] + 0.07, y: ry + 0.08, w: colW[3] - 0.1, h: 0.72,
+      fontFace: BODY_FONT, fontSize: 13, bold: idx >= 3,
+      color: r.campo === "—" ? CINZA : idx >= 3 ? VERDE : LARANJA,
+      valign: "middle", align: "center"
+    });
+    // Resultado
+    sl.addText(r.resultado, {
+      x: colX[4] + 0.07, y: ry + 0.08, w: colW[4] - 0.1, h: 0.72,
+      fontFace: BODY_FONT, fontSize: 10, color: idx === 4 ? VERDE : CINZA,
+      valign: "middle", wrap: true
+    });
+  });
+
+  sl.addText("⚠ Exp C: artefatos de borda do rembg criaram domínio sintético — modelo aprendeu franjas inexistentes em campo → 0pp de ganho → motivou o Exp D com dados reais  |  * Campo = Tomato-Village, 217 imgs, nunca vistas", {
+    x: 0.25, y: 6.3, w: 12.8, h: 0.35,
+    fontFace: BODY_FONT, fontSize: 10, color: LARANJA, italic: true, align: "center"
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SLIDE 6 — VALIDAÇÃO EM 3 DATASETS + EXP D vs EXP E
+// ═══════════════════════════════════════════════════════════════════════════
+{
+  const sl = newSlide("Validação em 3 datasets independentes", "Exp D vs Exp E — nenhum dataset usado em treino");
+
+  // Tabela: Dataset | Região | Imgs | Exp D | Exp E | Δ
+  const rows = [
+    { ds: "PlantDoc / test",       regiao: "EUA / Europa",      imgs: "69",    expD: "30,43%", expE: "~67%*",   delta: "—",      corE: CINZA,  corD: CINZA },
+    { ds: "Tomato-Village / test", regiao: "Rajasthan, Índia",  imgs: "217",   expD: "11,52%", expE: "27,65%",  delta: "+16pp",  corE: VERDE,  corD: LARANJA },
+    { ds: "Daffodil BD",           regiao: "Bangladesh",         imgs: "1.616", expD: "9,59%",  expE: "18,13%",  delta: "+8,5pp", corE: VERDE,  corD: LARANJA },
+  ];
+
+  const hdrs = ["Dataset", "Região", "Imgs", "Exp D", "Exp E ✨", "Δ"];
+  const colX = [0.25, 3.55, 6.55, 7.75,  9.55, 11.35];
+  const colW = [3.1,  2.8,  1.0,  1.65,  1.65,  1.35];
+
+  sl.addShape(pptx.ShapeType.rect, {
+    x: 0.25, y: 1.08, w: 12.8, h: 0.45, fill: { color: "1A3A5C" }, line: { color: "1A3A5C" }
+  });
+  hdrs.forEach((h, i) => {
+    sl.addText(h, {
+      x: colX[i] + 0.08, y: 1.08, w: colW[i], h: 0.45,
+      fontFace: TITLE_FONT, fontSize: 13, bold: true,
+      color: i === 4 ? VERDE : BRANCO, align: "left"
     });
   });
 
   rows.forEach((r, idx) => {
-    const ry = 1.53 + idx * 1.1;
+    const ry = 1.58 + idx * 0.82;
     const bg = idx % 2 === 0 ? CARD_BG : CARD2_BG;
     sl.addShape(pptx.ShapeType.rect, {
-      x: 0.25, y: ry, w: 12.8, h: 1.0, fill: { color: bg }, line: { color: r.cor, pt: 1 }, rectRadius: 0.05
+      x: 0.25, y: ry, w: 12.8, h: 0.76, fill: { color: bg }, line: { color: r.corE, pt: 1.5 }, rectRadius: 0.05
     });
-    sl.addText(r.frente, {
-      x: colX[0] + 0.1, y: ry + 0.08, w: colW[0] - 0.2, h: 0.84,
-      fontFace: BODY_FONT, fontSize: 12, bold: true, color: BRANCO, valign: "middle", wrap: true
-    });
-    sl.addText(r.status, {
-      x: colX[1] + 0.05, y: ry + 0.08, w: colW[1] - 0.05, h: 0.84,
-      fontFace: BODY_FONT, fontSize: 15, bold: true, color: r.cor, valign: "middle", align: "center"
-    });
-    sl.addText(r.resultado, {
-      x: colX[2] + 0.1, y: ry + 0.08, w: colW[2] - 0.2, h: 0.84,
-      fontFace: BODY_FONT, fontSize: 11, color: BRANCO, valign: "middle", wrap: true
+    [r.ds, r.regiao, r.imgs, r.expD, r.expE, r.delta].forEach((val, i) => {
+      const cor = i === 3 ? r.corD : i >= 4 ? r.corE : BRANCO;
+      sl.addText(val, {
+        x: colX[i] + 0.08, y: ry + 0.1, w: colW[i] - 0.1, h: 0.56,
+        fontFace: BODY_FONT, fontSize: i >= 3 ? 14 : 13,
+        color: cor, bold: i >= 3, valign: "middle", wrap: true
+      });
     });
   });
-}
 
-// ═══════════════════════════════════════════════════════════════════════════
-// SLIDE 5 — EXP C: QUANDO O PLANO FALHA
-// ═══════════════════════════════════════════════════════════════════════════
-{
-  const sl = newSlide("Exp C — Background Augmentation: por que falhou?");
+  // Nota PlantDoc
+  sl.addText("* PlantDoc avaliado em train+test (746 imgs) — Exp D treinou nesse split, não é comparação justa", {
+    x: 0.25, y: 4.08, w: 12.8, h: 0.35,
+    fontFace: BODY_FONT, fontSize: 11, color: CINZA, italic: true
+  });
 
-  // Card esquerdo — O que fizemos
+  // Conclusão Exp E
   sl.addShape(pptx.ShapeType.rect, {
-    x: 0.25, y: 1.15, w: 5.9, h: 5.5, fill: { color: CARD_BG }, line: { color: CINZA, pt: 1 }, rectRadius: 0.08
-  });
-  sl.addText("O que fizemos", {
-    x: 0.4, y: 1.25, w: 5.6, h: 0.4,
-    fontFace: TITLE_FONT, fontSize: 15, bold: true, color: CINZA
-  });
-  const itens = [
-    "177.698 composições sintéticas geradas",
-    "rembg (rede U2-Net) remove fundo da folha",
-    "Recompõe sobre fundos naturais do PlantDoc",
-    "650 minutos de processamento contínuo",
-    "Retreino completo WSL2 (RTX 3060 Ti)",
-    "96,20% acurácia no laboratório",
-  ];
-  itens.forEach((it, i) => {
-    sl.addText("• " + it, {
-      x: 0.4, y: 1.75 + i * 0.72, w: 5.6, h: 0.65,
-      fontFace: BODY_FONT, fontSize: 13, color: BRANCO, wrap: true
-    });
-  });
-
-  // Card direito — Resultado
-  sl.addShape(pptx.ShapeType.rect, {
-    x: 6.4, y: 1.15, w: 6.7, h: 2.4, fill: { color: CARD_BG }, line: { color: LARANJA, pt: 2 }, rectRadius: 0.08
-  });
-  sl.addText("Resultado", {
-    x: 6.6, y: 1.25, w: 6.3, h: 0.4,
-    fontFace: TITLE_FONT, fontSize: 15, bold: true, color: LARANJA
-  });
-  sl.addText("Antes (Exp B):  20,24%\nDepois (Exp C): 20,24%\nDiferença:         0 pp ❌", {
-    x: 6.6, y: 1.72, w: 6.3, h: 1.65,
-    fontFace: "Consolas", fontSize: 17, color: BRANCO, wrap: true
-  });
-
-  // Caixa por quê falhou
-  sl.addShape(pptx.ShapeType.rect, {
-    x: 6.4, y: 3.75, w: 6.7, h: 1.65, fill: { color: "3E2000" }, line: { color: LARANJA, pt: 1.5 }, rectRadius: 0.08
-  });
-  sl.addText("Por quê falhou?", {
-    x: 6.6, y: 3.83, w: 6.3, h: 0.38,
-    fontFace: TITLE_FONT, fontSize: 14, bold: true, color: LARANJA
+    x: 0.25, y: 4.52, w: 12.8, h: 0.65, fill: { color: "0A3D2E" }, line: { color: VERDE, pt: 1.5 }, rectRadius: 0.07
   });
   sl.addText(
-    "Alpha-matting gera artefatos de borda e iluminação inconsistente. " +
-    "O modelo aprendeu o domínio sintético, não o real.\n" +
-    "Singh et al. (2020) usaram fotos reais — por isso funcionou para eles.",
-    {
-      x: 6.6, y: 4.24, w: 6.3, h: 1.1,
-      fontFace: BODY_FONT, fontSize: 12, color: BRANCO, wrap: true
-    }
+    "Exp E generalizou melhor em 2/3 datasets independentes. " +
+    "Focal Loss corrigiu o colapso para D02 — atrator mudou para D01/D09 (features mais discriminativas).",
+    { x: 0.45, y: 4.57, w: 12.4, h: 0.55, fontFace: BODY_FONT, fontSize: 13, color: VERDE, bold: true, wrap: true }
   );
 
-  // Por que não usamos fotos reais desde o início?
+  // Card único: por que Exp E melhorou — largura total
   sl.addShape(pptx.ShapeType.rect, {
-    x: 6.4, y: 5.55, w: 6.7, h: 1.6, fill: { color: CARD2_BG }, line: { color: CINZA, pt: 1 }, rectRadius: 0.08
+    x: 0.25, y: 5.3, w: 12.8, h: 1.55, fill: { color: CARD2_BG }, line: { color: VERDE, pt: 1 }, rectRadius: 0.07
   });
-  sl.addText("Por que não usamos fotos reais de campo?", {
-    x: 6.6, y: 5.63, w: 6.3, h: 0.38,
-    fontFace: TITLE_FONT, fontSize: 13, bold: true, color: CINZA
+  sl.addText("Por que Exp E melhorou nos datasets independentes?", {
+    x: 0.45, y: 5.37, w: 12.4, h: 0.38,
+    fontFace: TITLE_FONT, fontSize: 13, bold: true, color: VERDE
   });
   sl.addText(
-    "Não existe dataset público de folhas de tomate em campo brasileiro. " +
-    "O PlantDoc (fotos reais, EUA/Europa) foi usado no Exp D (+10pp). " +
-    "A coleta no Brasil acontece na próxima sprint (Sorriso-MT).",
-    {
-      x: 6.6, y: 6.05, w: 6.3, h: 1.0,
-      fontFace: BODY_FONT, fontSize: 12, color: BRANCO, wrap: true
-    }
+    "Focal Loss (Lin et al. 2017, γ=2): exemplos difíceis (erros confiantes) recebem 4× mais gradiente — força aprender features discriminativas em vez de colapsar numa classe 'segura'.  " +
+    "Augmentação de cor (brilho ±30%, contraste ±40%, saturação 50–160%, matiz ±8°): simula variações de iluminação solar e câmeras distintas.  " +
+    "Backbone completo descongelado (LR=1e-5): todas as features do ImageNet reajustadas para domínio de campo.",
+    { x: 0.45, y: 5.78, w: 12.4, h: 1.0, fontFace: BODY_FONT, fontSize: 12, color: BRANCO, wrap: true }
   );
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// SLIDE 6 — EXP D: PIVÔ CIENTÍFICO
+// SLIDE 8 — COMPARAÇÃO COM LITERATURA
 // ═══════════════════════════════════════════════════════════════════════════
 {
-  const sl = newSlide("Exp D — Fine-tuning com Dados Reais de Campo", "Quando o plano A falha, você faz ciência");
+  const sl = newSlide("Nosso resultado não é anomalia — é o padrão da área");
 
-  // Estratégia
-  sl.addShape(pptx.ShapeType.rect, {
-    x: 0.25, y: 1.28, w: 12.8, h: 0.65, fill: { color: "0A3D2E" }, line: { color: VERDE, pt: 1 }, rectRadius: 0.07
-  });
-  sl.addText("Estratégia: 677 fotos reais do PlantDoc/train + PlantVillage = 95.719 imagens no treino total", {
-    x: 0.45, y: 1.33, w: 12.4, h: 0.55,
-    fontFace: BODY_FONT, fontSize: 14, color: VERDE, bold: true
-  });
-
-  // Tabela comparativa
+  // Colunas: Autor | Título / Venue | Lab | Campo | Diferencial
   const rows = [
-    { metrica: "Lab — PlantVillage test",       expB: "98,13%", expD: "97,55%",         cor: CINZA },
-    { metrica: "Campo — imagens CONHECIDAS",     expB: "—",      expD: "88,47%",         cor: CINZA },
-    { metrica: "Campo — imagens NUNCA VISTAS",   expB: "~20%",   expD: "30,43% ← +10pp", cor: VERDE },
-    { metrica: "Tamanho do modelo",              expB: "639 KB", expD: "639 KB (igual)", cor: CINZA },
+    {
+      autor: "Mohanty et al.",
+      titulo: '"Using Deep Learning for Image-Based Plant Disease Detection"\nFrontiers in Plant Science, 2016',
+      lab: "99,35%", campo: "~31%",
+      dif: "Só modelo, sem hardware embarcado",
+      cor: CINZA, bg: CARD_BG,
+    },
+    {
+      autor: "Singh et al.",
+      titulo: '"Deep Learning-based Plant Disease Identification using Real Field Images"\nIEEE Access, 2020',
+      lab: "~95%", campo: "~55%",
+      dif: "Usou fotos reais de campo (+40,8pp vs lab sintético)",
+      cor: CINZA, bg: CARD2_BG,
+    },
+    {
+      autor: "Ceres (Jaudy Neto)",
+      titulo: "TCC IFMT Cuiabá, 2026. Exp D: Fine-tuning com dados reais. Exp E: Focal Loss + Aug Agressiva",
+      lab: "98,43%", campo: "30,43%*",
+      dif: "ESP32-S3 638 KB + MQTT + Django + App Flutter",
+      cor: VERDE, bg: "0A3D2E",
+    },
   ];
 
-  const headers = ["Métrica", "Exp B (linha base)", "Exp D (fine-tuning)"];
-  const colX = [0.25, 6.2, 9.5];
-  const colW = [5.7, 3.0, 3.6];
-
-  sl.addShape(pptx.ShapeType.rect, {
-    x: 0.25, y: 2.1, w: 12.8, h: 0.48, fill: { color: "1A3A5C" }, line: { color: "1A3A5C" }
-  });
-  headers.forEach((h, i) => {
-    sl.addText(h, {
-      x: colX[i] + 0.1, y: 2.1, w: colW[i], h: 0.48,
-      fontFace: TITLE_FONT, fontSize: 13, bold: true, color: BRANCO, align: "left"
-    });
-  });
-
-  rows.forEach((r, idx) => {
-    const ry = 2.63 + idx * 0.78;
-    const isHighlight = r.cor === VERDE;
-    const bg = isHighlight ? "0A3D2E" : (idx % 2 === 0 ? CARD_BG : CARD2_BG);
-    sl.addShape(pptx.ShapeType.rect, {
-      x: 0.25, y: ry, w: 12.8, h: 0.72, fill: { color: bg }, line: { color: bg }
-    });
-    sl.addText(r.metrica, {
-      x: colX[0] + 0.1, y: ry + 0.08, w: colW[0] - 0.2, h: 0.56,
-      fontFace: BODY_FONT, fontSize: 13, color: isHighlight ? VERDE : BRANCO, bold: isHighlight, valign: "middle"
-    });
-    sl.addText(r.expB, {
-      x: colX[1] + 0.1, y: ry + 0.08, w: colW[1] - 0.2, h: 0.56,
-      fontFace: BODY_FONT, fontSize: 13, color: CINZA, align: "center", valign: "middle"
-    });
-    sl.addText(r.expD, {
-      x: colX[2] + 0.1, y: ry + 0.08, w: colW[2] - 0.2, h: 0.56,
-      fontFace: BODY_FONT, fontSize: 14, color: isHighlight ? VERDE : BRANCO, bold: isHighlight, align: "center", valign: "middle"
-    });
-  });
-
-  addHighlight(sl, 0.25, 6.3, 12.8, 0.65,
-    "Modelo final escolhido: Exp D — mesmo tamanho (639 KB), melhor desempenho em campo", VERDE);
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// SLIDE 7 — VALIDAÇÃO EM 3 DATASETS INDEPENDENTES
-// ═══════════════════════════════════════════════════════════════════════════
-{
-  const sl = newSlide("Validação em 3 datasets independentes", "Nenhum deles foi usado em qualquer etapa de treino");
-
-  // Tabela comparativa 3 datasets
-  const rows = [
-    { ds: "PlantDoc / test",       regiao: "EUA / Europa",       clima: "Temperado",       imgs: "69",    classes: "4", res: "30,43%", cor: VERDE },
-    { ds: "Tomato-Village / test", regiao: "Rajasthan, Índia",   clima: "Árido tropical",  imgs: "217",   classes: "4", res: "11,52%", cor: LARANJA },
-    { ds: "Daffodil BD",           regiao: "Bangladesh",          clima: "Tropical úmido",  imgs: "1.616", classes: "7", res: "9,59%",  cor: "F57C00" },
-  ];
-
-  const hdrs = ["Dataset", "Região", "Clima", "Imgs", "Cls", "Exp D"];
-  const colX = [0.25, 3.5, 6.4, 9.35, 10.5, 11.3];
-  const colW = [3.0,  2.7, 2.75, 0.95, 0.65, 1.7];
+  const hdrs = ["Autor", "Título / Venue", "Lab", "Campo"];
+  const colX = [0.25, 2.55, 9.9, 11.5];
+  const colW = [2.1,  7.1,  1.4,  1.35];
 
   sl.addShape(pptx.ShapeType.rect, {
     x: 0.25, y: 1.1, w: 12.8, h: 0.45, fill: { color: "1A3A5C" }, line: { color: "1A3A5C" }
@@ -425,301 +521,87 @@ function addHighlight(sl, x, y, w, h, text, color) {
   });
 
   rows.forEach((r, idx) => {
-    const ry = 1.6 + idx * 0.82;
-    const bg = idx % 2 === 0 ? CARD_BG : CARD2_BG;
+    const ry = 1.6 + idx * 1.35;
     sl.addShape(pptx.ShapeType.rect, {
-      x: 0.25, y: ry, w: 12.8, h: 0.76, fill: { color: bg }, line: { color: r.cor, pt: 1.5 }, rectRadius: 0.05
+      x: 0.25, y: ry, w: 12.8, h: 1.28,
+      fill: { color: r.bg }, line: { color: r.cor, pt: idx === 2 ? 1.5 : 0 }
     });
-    [r.ds, r.regiao, r.clima, r.imgs, r.classes, r.res].forEach((val, i) => {
-      sl.addText(val, {
-        x: colX[i] + 0.08, y: ry + 0.1, w: colW[i] - 0.1, h: 0.56,
-        fontFace: BODY_FONT, fontSize: i === 5 ? 15 : 13,
-        color: i === 5 ? r.cor : BRANCO, bold: i === 5, valign: "middle", wrap: true
-      });
+    // Autor (bold)
+    sl.addText(r.autor, {
+      x: colX[0] + 0.08, y: ry + 0.1, w: colW[0] - 0.1, h: 1.08,
+      fontFace: BODY_FONT, fontSize: 13, bold: true, color: r.cor, valign: "middle", wrap: true
+    });
+    // Título em duas fontes: título em itálico menor
+    sl.addText(r.titulo, {
+      x: colX[1] + 0.08, y: ry + 0.08, w: colW[1] - 0.1, h: 1.12,
+      fontFace: BODY_FONT, fontSize: 11, color: idx === 2 ? VERDE : CINZA,
+      italic: idx < 2, valign: "top", wrap: true
+    });
+    // Lab
+    sl.addText(r.lab, {
+      x: colX[2] + 0.08, y: ry + 0.1, w: colW[2] - 0.1, h: 1.08,
+      fontFace: BODY_FONT, fontSize: 14, bold: true, color: r.cor, valign: "middle", align: "center"
+    });
+    // Campo
+    sl.addText(r.campo, {
+      x: colX[3] + 0.08, y: ry + 0.1, w: colW[3] - 0.1, h: 1.08,
+      fontFace: BODY_FONT, fontSize: 14, bold: idx === 2, color: idx === 2 ? VERDE : LARANJA,
+      valign: "middle", align: "center"
     });
   });
 
-  // Descoberta principal
-  sl.addShape(pptx.ShapeType.rect, {
-    x: 0.25, y: 4.12, w: 12.8, h: 0.65, fill: { color: "3E2000" }, line: { color: LARANJA, pt: 1.5 }, rectRadius: 0.07
+  sl.addText("* Campo = PlantDoc test (69 imgs, Exp D, métrica canônica do TCC). Exp E em dataset independente Tomato-Village: 27,65%.", {
+    x: 0.25, y: 5.68, w: 12.8, h: 0.3,
+    fontFace: BODY_FONT, fontSize: 11, color: CINZA, italic: true
   });
-  sl.addText("Descoberta: o gap não é de fundo — é geográfico e climático. O modelo melhorou no contexto do PlantDoc, não globalmente.",
-    { x: 0.45, y: 4.17, w: 12.4, h: 0.55, fontFace: BODY_FONT, fontSize: 13, color: LARANJA, bold: true, wrap: true }
-  );
 
-  // Achado positivo D05
-  sl.addShape(pptx.ShapeType.rect, {
-    x: 0.25, y: 4.9, w: 6.1, h: 1.45, fill: { color: "0A3D2E" }, line: { color: VERDE, pt: 1.5 }, rectRadius: 0.07
-  });
-  sl.addText("Outlier positivo — D05_mofo_foliar", {
-    x: 0.45, y: 4.97, w: 5.8, h: 0.38,
-    fontFace: TITLE_FONT, fontSize: 14, bold: true, color: VERDE
-  });
-  sl.addText(
-    "77,3% no Daffodil BD. Passalora fulva cria textura fúngica branco-acinzentada única, " +
-    "invariante geograficamente. A única classe que o modelo reconhece confiável em campo real.",
-    { x: 0.45, y: 5.38, w: 5.8, h: 0.92, fontFace: BODY_FONT, fontSize: 12, color: BRANCO, wrap: true }
-  );
-
-  // Colapso D02
-  sl.addShape(pptx.ShapeType.rect, {
-    x: 6.6, y: 4.9, w: 6.45, h: 1.45, fill: { color: CARD2_BG }, line: { color: CINZA, pt: 1 }, rectRadius: 0.07
-  });
-  sl.addText("Colapso para D02_septoriose", {
-    x: 6.75, y: 4.97, w: 6.15, h: 0.38,
-    fontFace: TITLE_FONT, fontSize: 14, bold: true, color: CINZA
-  });
-  sl.addText(
-    "Atrator universal: sob shift de domínio extremo, o modelo converge para 'septoriose' — " +
-    "manchas escuras irregulares são a representação genérica de doença foliar aprendida no treino.",
-    { x: 6.75, y: 5.38, w: 6.15, h: 0.92, fontFace: BODY_FONT, fontSize: 12, color: CINZA, wrap: true }
-  );
-
-  sl.addText("A validação que realmente importa: produtores de Sorriso-MT — fotos brasileiras reais (Sprint 3)", {
-    x: 0.25, y: 6.5, w: 12.8, h: 0.42,
-    fontFace: BODY_FONT, fontSize: 14, color: VERDE, bold: true, align: "center"
-  });
+  addHighlight(sl, 0.25, 6.08, 12.8, 0.85,
+    "Mohanty e Singh documentaram o gap lab-campo — o Ceres resolve: sistema embarcado completo em 638 KB, " +
+    "validado em 3 continentes. Howard et al. (2017): MobileNetV2 — única arquitetura que cabe no ESP32-S3.", VERDE);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// SLIDE 8 — COMPARAÇÃO COM LITERATURA
+// SLIDE 9 — CONCLUSÃO CIENTÍFICA: GAP MULTIFATORIAL
 // ═══════════════════════════════════════════════════════════════════════════
 {
-  const sl = newSlide("Nosso resultado não é anomalia — é o padrão da área");
-
-  const rows = [
-    { trab: "Mohanty et al.", ano: "2016", lab: "99,35%", campo: "~31%",  hw: "❌", sis: "❌ Só modelo" },
-    { trab: "Singh et al.",   ano: "2020", lab: "~95%",   campo: "~55%",  hw: "❌", sis: "❌ Só modelo" },
-    { trab: "Ceres (você)",   ano: "2026", lab: "97,55%", campo: "30,43%",hw: "✅", sis: "✅ ESP32-S3 + MQTT + App" },
-  ];
-
-  const headers = ["Trabalho", "Ano", "Laboratório", "Campo", "Hardware", "Sistema"];
-  const colX = [0.25, 3.4, 4.8, 6.35, 8.0, 9.4];
-  const colW = [2.9, 1.2, 1.35, 1.45, 1.2, 3.7];
-
-  sl.addShape(pptx.ShapeType.rect, {
-    x: 0.25, y: 1.12, w: 12.8, h: 0.48, fill: { color: "1A3A5C" }, line: { color: "1A3A5C" }
-  });
-  headers.forEach((h, i) => {
-    sl.addText(h, {
-      x: colX[i] + 0.05, y: 1.12, w: colW[i], h: 0.48,
-      fontFace: TITLE_FONT, fontSize: 13, bold: true, color: BRANCO, align: "left"
-    });
-  });
-
-  rows.forEach((r, idx) => {
-    const ry = 1.65 + idx * 0.95;
-    const isCeres = idx === 2;
-    const bg = isCeres ? "0A3D2E" : (idx % 2 === 0 ? CARD_BG : CARD2_BG);
-    sl.addShape(pptx.ShapeType.rect, {
-      x: 0.25, y: ry, w: 12.8, h: 0.88, fill: { color: bg }, line: { color: isCeres ? VERDE : bg }
-    });
-    [r.trab, r.ano, r.lab, r.campo, r.hw, r.sis].forEach((val, i) => {
-      sl.addText(val, {
-        x: colX[i] + 0.05, y: ry + 0.1, w: colW[i] - 0.05, h: 0.68,
-        fontFace: BODY_FONT, fontSize: 13, color: isCeres ? VERDE : BRANCO,
-        bold: isCeres, valign: "middle", wrap: true
-      });
-    });
-  });
-
-  // Destaque
-  addHighlight(sl, 0.25, 4.68, 12.8, 0.9,
-    "Diferencial do Ceres: sistema completo embarcado em 639 KB. " +
-    "Mohanty e Singh documentaram o problema — o Ceres implementa a solução em hardware real.", VERDE);
-
-  // Cards justificativa de escolha
-  sl.addShape(pptx.ShapeType.rect, {
-    x: 0.25, y: 5.75, w: 6.1, h: 0.95, fill: { color: CARD2_BG }, line: { color: CINZA, pt: 1 }, rectRadius: 0.07
-  });
-  sl.addText("Por que MobileNetV2 e não ResNet?", {
-    x: 0.4, y: 5.82, w: 5.8, h: 0.3,
-    fontFace: BODY_FONT, fontSize: 12, bold: true, color: CINZA
-  });
-  sl.addText("Howard et al. (2017): projetado para dispositivos com restrição de memória. ResNet-50 > 90 MB — incompatível com ESP32-S3.", {
-    x: 0.4, y: 6.15, w: 5.8, h: 0.48,
-    fontFace: BODY_FONT, fontSize: 11, color: BRANCO, wrap: true
-  });
-
-  sl.addShape(pptx.ShapeType.rect, {
-    x: 6.6, y: 5.75, w: 6.45, h: 0.95, fill: { color: CARD2_BG }, line: { color: CINZA, pt: 1 }, rectRadius: 0.07
-  });
-  sl.addText("Por que TFLite INT8 e não FP32?", {
-    x: 6.75, y: 5.82, w: 6.15, h: 0.3,
-    fontFace: BODY_FONT, fontSize: 12, bold: true, color: CINZA
-  });
-  sl.addText("Exp A: INT8 sem calibração = -30pp (62%). Exp B: INT8 com representative_dataset = 0pp de perda, 4x menor.", {
-    x: 6.75, y: 6.15, w: 6.15, h: 0.48,
-    fontFace: BODY_FONT, fontSize: 11, color: BRANCO, wrap: true
-  });
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// SLIDE 9 — FIRMWARE ESP32-S3
-// ═══════════════════════════════════════════════════════════════════════════
-{
-  const sl = newSlide("Sprint 1b — Pipeline IoT validado de ponta a ponta");
-
-  // Diagrama de fluxo
-  const nos = [
-    { label: "ESP32-S3\nWROOM-1\nN16R8", cor: VERDE },
-    { label: "WiFi\n2.4 GHz", cor: "1565C0" },
-    { label: "Mosquitto\nMQTT :1883", cor: "F57C00" },
-    { label: "Django\nmqtt_listener", cor: "6A1B9A" },
-    { label: "PostgreSQL", cor: "00838F" },
-    { label: "REST API\nJWT", cor: VERDE },
-  ];
-
-  nos.forEach((n, i) => {
-    const bx = 0.25 + i * 2.17;
-    sl.addShape(pptx.ShapeType.rect, {
-      x: bx, y: 1.25, w: 2.0, h: 1.0, fill: { color: n.cor }, line: { color: n.cor }, rectRadius: 0.1
-    });
-    sl.addText(n.label, {
-      x: bx, y: 1.25, w: 2.0, h: 1.0,
-      fontFace: BODY_FONT, fontSize: 11, bold: true, color: BG, align: "center", valign: "middle"
-    });
-    if (i < nos.length - 1) {
-      sl.addShape(pptx.ShapeType.rect, {
-        x: bx + 2.0, y: 1.68, w: 0.17, h: 0.15, fill: { color: BRANCO }, line: { color: BRANCO }
-      });
-    }
-  });
-
-  // Tópico MQTT
-  sl.addText("Tópico: ceres/sensor/001   |   JSON: device_id, temperatura, umidade_ar, umidade_solo, timestamp", {
-    x: 0.25, y: 2.38, w: 12.8, h: 0.4,
-    fontFace: "Consolas", fontSize: 12, color: VERDE, align: "center"
-  });
-
-  // Cards detalhes
-  const cards = [
-    { titulo: "Hardware", texto: "ESP32-S3-WROOM-1-N16R8 · 16MB Flash + 8MB PSRAM\nEspressif Datasheet (2022) — escolhido por ter PSRAM suficiente para TFLite Micro (modelo 639KB + buffers)" },
-    { titulo: "Firmware: PlatformIO + PubSubClient", texto: "PlatformIO: gerenciamento de libs + upload + monitor em um tool. Arduino IDE alternativa, menos robusta para múltiplos módulos.\nPubSubClient (Knolleary, 2023): cliente MQTT leve para Arduino — sem overhead de frameworks maiores." },
-    { titulo: "Por que MQTT e não HTTP?", texto: "Al-Fuqaha et al. (2015), IEEE — IoT Survey: MQTT tem overhead de 2 bytes vs ~820 bytes do HTTP. Projetado para redes instáveis e dispositivos com restrição de energia." },
-    { titulo: "Resultado validado", texto: "74 eventos persistidos no PostgreSQL\nAPI GET /historico/ retornando JSON paginado com JWT\nLatência média publish → DB: < 500ms" },
-  ];
-
-  cards.forEach((c, i) => {
-    const bx = 0.25 + (i % 2) * 6.55, by = 3.0 + Math.floor(i / 2) * 2.1;
-    sl.addShape(pptx.ShapeType.rect, {
-      x: bx, y: by, w: 6.3, h: 1.9, fill: { color: CARD_BG }, line: { color: CINZA, pt: 1 }, rectRadius: 0.08
-    });
-    sl.addText(c.titulo, {
-      x: bx + 0.15, y: by + 0.1, w: 5.9, h: 0.38,
-      fontFace: TITLE_FONT, fontSize: 14, bold: true, color: VERDE
-    });
-    sl.addText(c.texto, {
-      x: bx + 0.15, y: by + 0.5, w: 5.9, h: 1.3,
-      fontFace: BODY_FONT, fontSize: 13, color: BRANCO, wrap: true
-    });
-  });
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// SLIDE 10 — PROBLEMAS RESOLVIDOS
-// ═══════════════════════════════════════════════════════════════════════════
-{
-  const sl = newSlide("Dificuldades técnicas e soluções");
-
-  const problemas = [
-    {
-      titulo: "Firmware — Boot loop no ESP32-S3",
-      problema: "Flag board_build.arduino.memory_type=qio_opi incompatível com Arduino framework → reinício infinito.",
-      solucao: "Remover flags de memória customizadas. Arduino gerencia PSRAM internamente."
-    },
-    {
-      titulo: "Firmware — Serial Monitor silencioso",
-      problema: "ARDUINO_USB_CDC_ON_BOOT=1 redireciona Serial para USB nativa. Nada aparecia no monitor serial.",
-      solucao: "Remover flags USB CDC. Serial.begin(115200) volta para a porta CH343 padrão."
-    },
-    {
-      titulo: "Firmware — MQTT rc=-2 (conexão recusada)",
-      problema: "Mosquitto com 'bind_address localhost' rejeita conexões de outro IP. ESP32 conecta por IP da rede local.",
-      solucao: "mosquitto.conf: 'listener 1883' sem bind. Regra de firewall Windows liberando porta 1883."
-    },
-    {
-      titulo: "IA — Quantization loss -30pp no Exp A",
-      problema: "Edge Impulse quantizou INT8 sem representative_dataset → pesos calibrados com distribuição errada → 92,5% FP32 virou 62,0% INT8.",
-      solucao: "Exp B: quantização com 50 batches do val set como representative_dataset → 0pp de perda na quantização."
-    },
-    {
-      titulo: "IA — class_names perdido após .prefetch()",
-      problema: "TensorFlow perde o atributo class_names do dataset após aplicar .map().prefetch(). export_tflite.py travava com AttributeError.",
-      solucao: "Capturar ds_raw.class_names antes de aplicar transformações e passar como retorno da função."
-    },
-    {
-      titulo: "Git — Symlinks WSL2 quebrando git add",
-      problema: "processed_mixed/ criada com symlinks Linux no WSL2. Windows Git não indexa symlinks → 'fatal: unable to index'.",
-      solucao: "Adicionar datasets/processed_mixed/ ao .gitignore. Nunca commitar datasets locais."
-    },
-  ];
-
-  // 6 problemas em grid 2x3
-  problemas.forEach((p, i) => {
-    const col = i % 2, row = Math.floor(i / 2);
-    const bx = 0.25 + col * 6.55, by = 1.12 + row * 2.05;
-    const corTit = i < 3 ? LARANJA : "5C9BF5"; // laranja = firmware, azul = IA/git
-    sl.addShape(pptx.ShapeType.rect, {
-      x: bx, y: by, w: 6.3, h: 1.9, fill: { color: CARD_BG }, line: { color: corTit, pt: 1 }, rectRadius: 0.08
-    });
-    sl.addText(p.titulo, {
-      x: bx + 0.15, y: by + 0.08, w: 5.9, h: 0.4,
-      fontFace: TITLE_FONT, fontSize: 12, bold: true, color: corTit, wrap: true
-    });
-    sl.addText("↳ " + p.problema, {
-      x: bx + 0.15, y: by + 0.5, w: 5.9, h: 0.62,
-      fontFace: BODY_FONT, fontSize: 11, color: CINZA, wrap: true
-    });
-    sl.addText("✓ " + p.solucao, {
-      x: bx + 0.15, y: by + 1.14, w: 5.9, h: 0.65,
-      fontFace: BODY_FONT, fontSize: 11, color: VERDE, wrap: true
-    });
-  });
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// SLIDE 11 — CONCLUSÃO CIENTÍFICA
-// ═══════════════════════════════════════════════════════════════════════════
-{
-  const sl = newSlide("O gap lab-campo é multifatorial");
+  const sl = newSlide("Por que o gap lab-campo existe?", "Análise multifatorial dos experimentos A → E");
 
   const fatores = [
-    { num: "1", titulo: "Fundo da imagem",        desc: "PlantVillage: fundo cinza uniforme, controlado. Modelo aprende o fundo como feature discriminativa.", cor: LARANJA },
-    { num: "2", titulo: "Iluminação e câmera",    desc: "Luz solar direta, sombras, reflexos e câmeras de celular criam distribuição visual completamente diferente.", cor: LARANJA },
-    { num: "3", titulo: "Variedade geográfica",   desc: "Cultivares indianas (Rajasthan) diferem morfologicamente das cultivares americanas e brasileiras.", cor: LARANJA },
-    { num: "4", titulo: "Estágio fenológico",     desc: "Folhas em diferentes estágios de crescimento têm textura, cor e proporções distintas.", cor: LARANJA },
+    { num: "1", titulo: "Fundo da imagem",      desc: "PlantVillage: fundo cinza uniforme, controlado. Modelo aprende o fundo como feature discriminativa. Exp C tentou resolver com composições sintéticas (rembg) — 0pp de ganho.", cor: LARANJA },
+    { num: "2", titulo: "Iluminação e câmera",  desc: "Luz solar direta, sombras, reflexos e câmeras de celular criam distribuição visual completamente diferente do laboratório.", cor: LARANJA },
+    { num: "3", titulo: "Variedade geográfica", desc: "Cultivares de Rajasthan (Índia) e Bangladesh diferem morfologicamente das cultivares americanas usadas no PlantVillage.", cor: LARANJA },
+    { num: "4", titulo: "Estágio fenológico",   desc: "Folhas em diferentes estágios de crescimento têm textura, cor e proporções distintas — variável ausente no dataset de laboratório.", cor: LARANJA },
   ];
 
   fatores.forEach((f, i) => {
-    const by = 1.12 + i * 1.3;
+    const by = 1.1 + i * 1.28;
     sl.addShape(pptx.ShapeType.rect, {
-      x: 0.25, y: by, w: 12.8, h: 1.2, fill: { color: CARD_BG }, line: { color: CARD_BG }
+      x: 0.25, y: by, w: 12.8, h: 1.18, fill: { color: CARD_BG }, line: { color: CARD_BG }
     });
     sl.addShape(pptx.ShapeType.rect, {
-      x: 0.25, y: by, w: 0.55, h: 1.2, fill: { color: f.cor }, line: { color: f.cor }
+      x: 0.25, y: by, w: 0.55, h: 1.18, fill: { color: f.cor }, line: { color: f.cor }
     });
     sl.addText(f.num, {
-      x: 0.25, y: by, w: 0.55, h: 1.2,
+      x: 0.25, y: by, w: 0.55, h: 1.18,
       fontFace: TITLE_FONT, fontSize: 22, bold: true, color: BG, align: "center", valign: "middle"
     });
     sl.addText(f.titulo, {
-      x: 1.0, y: by + 0.1, w: 11.8, h: 0.38,
+      x: 1.0, y: by + 0.1, w: 11.8, h: 0.36,
       fontFace: TITLE_FONT, fontSize: 14, bold: true, color: BRANCO
     });
     sl.addText(f.desc, {
-      x: 1.0, y: by + 0.5, w: 11.8, h: 0.6,
+      x: 1.0, y: by + 0.48, w: 11.8, h: 0.62,
       fontFace: BODY_FONT, fontSize: 13, color: CINZA, wrap: true
     });
   });
 
-  addHighlight(sl, 0.25, 6.35, 12.8, 0.65,
-    "Resolver só o fundo (Exp C) = insuficiente  ·  Fine-tuning local (Exp D) = melhora, mas não generaliza globalmente  ·  Validação em Sorriso-MT = a métrica que importa",
+  addHighlight(sl, 0.25, 6.28, 12.8, 0.68,
+    "Resolver só o fundo (Exp C) = insuficiente  ·  Fine-tuning com dados reais (Exp D) = +10pp  ·  Focal Loss + aug de cor (Exp E) = +16pp Índia  ·  Validação definitiva: produtores de Sorriso-MT",
     VERDE);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// SLIDE 12 — PRÓXIMOS PASSOS
+// SLIDE 10 — PRÓXIMOS PASSOS
 // ═══════════════════════════════════════════════════════════════════════════
 {
   const sl = newSlide("O que vem a seguir");
@@ -781,7 +663,7 @@ function addHighlight(sl, x, y, w, h, text, color) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// SLIDE 13 — ENCERRAMENTO
+// SLIDE 11 — ENCERRAMENTO
 // ═══════════════════════════════════════════════════════════════════════════
 {
   const sl = pptx.addSlide();
@@ -799,12 +681,11 @@ function addHighlight(sl, x, y, w, h, text, color) {
   });
 
   const itens = [
-    { icon: "✅", texto: "4 experimentos de validação IA concluídos (Exp A, B, C, D)" },
-    { icon: "✅", texto: "Gap lab-campo documentado e analisado com base na literatura" },
-    { icon: "✅", texto: "Modelo final: Exp D · 639 KB · 97,55% lab / 30,43% campo" },
-    { icon: "✅", texto: "3 validações independentes: PlantDoc 30,43% · Tomato-Village 11,52% · Daffodil BD 9,59%" },
-    { icon: "✅", texto: "Achado: D05_mofo_foliar 77,3% — única classe robusta em campo real (distinção visual)" },
-    { icon: "✅", texto: "Firmware ESP32-S3 + MQTT: 74 eventos · pipeline completo validado" },
+    { icon: "✅", texto: "5 experimentos de IA concluídos (A, B, C, D, E) — metodologia científica completa" },
+    { icon: "✅", texto: "Modelo final: Exp E · 638 KB · 98,43% lab · Macro F1 0,979" },
+    { icon: "✅", texto: "3 validações independentes: +16pp Índia · +8,5pp Bangladesh com Exp E vs Exp D" },
+    { icon: "✅", texto: "Gap lab-campo multifatorial documentado: fundo + iluminação + geografia + variedade" },
+    { icon: "✅", texto: "Firmware ESP32-S3 + MQTT: 74 eventos · pipeline completo validado em hardware real" },
     { icon: "🎯", texto: "Próximo marco: TFLite Micro no ESP32-S3 com câmera OV5640 + validação Sorriso-MT" },
   ];
 
