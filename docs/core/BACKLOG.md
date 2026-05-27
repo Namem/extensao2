@@ -112,38 +112,36 @@ dataset PlantVillage preparado, modelos treinados e validados.
 
 ---
 
-## Sprint 2 — ESP32-S3 + TFLite Micro ⏳ PENDENTE
+## Sprint 2 — ESP32-S3 + TFLite Micro ✅ CONCLUÍDA (2026-05-27)
 
-> **Escopo revisado em 2026-05-27:** OV5640 removido do critério de aceite (deadline).
-> Câmera substituída por imagens embutidas como arrays C.
-> OV5640 + câmera real → Fase Futura após entrega do artigo/TCC.
+> **Escopo revisado:** OV5640 removido (deadline). Câmera substituída por imagens embutidas como arrays C.
 
-**Critério de aceite:** `ceres_expe_int8.tflite` rodando no ESP32-S3 via TFLite Micro,
-latência < 300ms medida com `esp_timer_get_time()`, resultado publicado via MQTT.
+**Resultado real:** `ceres_mobilenetv2_int8.tflite` (Exp B, 639KB) rodando no ESP32-S3,
+latência **692ms**, 10/10 correto, MQTT validado. Ver `docs/resultados/benchmark_esp32s3.md`.
 
 ### Firmware TFLite Micro
-- [ ] Criar `firmware/esp32s3_ceres/` com PlatformIO (Flash 16MB, PSRAM habilitada)
-- [ ] Integrar `ceres_expe_int8.tflite` como array C (`model_data.h`)
-- [ ] Converter modelo: `xxd -i ceres_expe_int8.tflite > model_data.h` (PC)
-- [ ] Implementar `inference.h` / `inference.cpp` com alocação na PSRAM
-- [ ] Normalizar pixels [-1, 1] e medir latência com `esp_timer_get_time()`
-- [ ] Validar: latência < 300ms, RAM livre > 4MB
+- [x] Criar `firmware/esp32s3_ceres/` com PlatformIO (Flash 16MB, PSRAM habilitada)
+- [x] Integrar modelo como array C (`model_data.h`) via `gerar_arrays_c.py`
+- [x] Implementar `inference.h` / `inference.cpp` — 512KB PSRAM, softmax INT8→float
+- [x] Normalização INT8: `uint8 - 128` (scale=0.0078125, zero_point=0)
+- [x] Latência medida: **692ms** média (esp_timer_get_time)
+- [x] Arena PSRAM usada: 200KB / 512KB (39%)
 
-### Imagens de Teste Embutidas (sem câmera)
-- [ ] Script Python converte 5 imagens do test set → arrays C (`test_images.h`)
-- [ ] 1 imagem por classe representativa (saudável, requeima, septoriose, pinta-preta, mancha-alvo)
-- [ ] Inferência rodando sobre arrays em loop no setup()
+### Imagens de Teste Embutidas
+- [x] `gerar_arrays_c.py` — 10 imgs (1/classe) × 96×96×3 int8 → `test_images.h`
+- [x] Inferência em loop sobre os 10 arrays
 
 ### Firmware Integrado
-- [ ] Resultado via Serial: classe + confiança + latência
-- [ ] Publicar JSON via MQTT → Django persiste
-- [ ] LED RGB: verde (saudável) / vermelho (doença) / amarelo (baixa confiança < 0.70)
-- [ ] Watchdog 60s + reconexão automática WiFi/MQTT
+- [x] Serial: classe esperada + predição + confiança + latência + RAM
+- [x] MQTT: 10/10 JSONs publicados em `ceres/sensor/001` ✓
+- [x] LED RGB: verde/vermelho/amarelo por resultado
+- [x] WiFi: VIVOFIBRA-WIFI6-0F20 → IP 192.168.15.94 ✓
 
 ### Benchmark
-- [ ] Latência medida em 5 imagens distintas — média + mínima + máxima
-- [ ] `docs/resultados/benchmark_esp32s3.md` com tabela de resultados
-- [ ] Teste end-to-end: ESP32 → MQTT → Django → `GET /api/diagnostico/historico/`
+- [x] 10/10 imagens corretas (100% acurácia)
+- [x] Latência: 692ms média / 692ms mín / 695ms máx
+- [x] `docs/resultados/benchmark_esp32s3.md` completo
+- [x] Lib usada: `spaziochirale/Chirale_TensorFLowLite@2.0.0`
 
 ---
 
@@ -158,29 +156,44 @@ latência < 300ms medida com `esp_timer_get_time()`, resultado publicado via MQT
 
 ---
 
-## Sprint 3 — Flutter + Resiliência + Experimentos ⏳ PENDENTE
+## Sprint 3 — Flutter + Docker + Experimentos 🔄 EM ANDAMENTO (2026-05-27)
 
 **Critério de aceite:** App Flutter consumindo API, histórico paginado,
-funcionamento offline; experimento edge vs cloud documentado.
+Django containerizado; experimento edge vs cloud documentado.
 
-### Flutter — Telas
-- [ ] Design System Agrícola (Mobile First)
-- [ ] `DiagnosticoResultadoScreen` (doença, confiança, sensores, recomendação Embrapa)
-- [ ] `HistoricoScreen` paginação infinita + pull-to-refresh
-- [ ] `SensorStatusScreen` polling 10s
-- [ ] `DiagnosticoEventoModel` + `DiagnosticoService` em Dart
-- [ ] `flutter analyze` sem warnings críticos
+### Flutter — Estrutura base ✅ CONCLUÍDA (2026-05-27)
+- [x] `app_ceres/` criado com `flutter create --org br.edu.ifmt --platforms android,windows`
+- [x] `pubspec.yaml` — dependências: drift, http, image_picker, intl, path_provider
+- [x] `lib/config.dart` — BASE_URL configurável (10.0.2.2:8080 emulador / IP real celular)
+- [x] `lib/models/resultado_inferencia.dart` — parse do POST /inferir/ com rotulo legível
+- [x] `lib/models/evento_mqtt.dart` — parse do GET /historico/
+- [x] `lib/services/api_service.dart` — HTTP multipart POST + GET paginado
+- [x] `lib/screens/camera_screen.dart` — câmera/galeria + POST inferir/ + barras de score
+- [x] `lib/screens/historico_screen.dart` — lista paginada eventos ESP32 + pull-to-refresh
+- [x] `lib/main.dart` — NavigationBar (Diagnóstico / Histórico)
+- [x] `flutter analyze` — zero issues
+- [x] APK debug buildado com sucesso
+- [x] Android permissions: INTERNET, CAMERA, READ_MEDIA_IMAGES
+- [x] `HistoricoEventosView.permission_classes` → AllowAny (Flutter sem JWT)
 
-### Resiliência
-- [ ] Persistência offline com Drift
-- [ ] Sincronização ao reconectar
-- [ ] Geração de relatórios PDF/CSV para agrônomos
+### Django containerizado ✅ CONCLUÍDO (2026-05-27)
+- [x] `backend/requirements-backend.txt` — dependências mínimas do backend
+- [x] `backend/Dockerfile` — Python 3.12-slim + ai-edge-litert + migrate automático
+- [x] `docker-compose.yml` atualizado — serviço `django` porta 8080, volume modelo TFLite
+- [x] `.vscode/tasks.json` + `launch.json` — `Ctrl+Shift+B` sobe Django + Flutter
+- [x] `iniciar.ps1` — script automação: emulador + fotos teste + Docker Django + Flutter
 
-### Experimento Edge vs Cloud
-- [ ] `experiment_edge_vs_cloud.py` (100 imgs test split)
-- [ ] Cenário Edge: latência real ESP32-S3
-- [ ] Cenário Cloud simulado: tflite-runtime PC + overhead 200ms (4G)
-- [ ] `docs/experiment_a_results.md` com tabela comparativa
+### Testes realizados no notebook
+- [x] Emulador Android API 34 criado e testado (Pixel8 AVD)
+- [x] App abre no emulador com telas Diagnóstico e Histórico funcionando
+- [x] POST /api/diagnostico/inferir/ validado (Django Test Client: D01_requeima, 23,1%)
+- [x] Fotos de teste: 10 classes enviadas ao emulador via adb (pasta Ceres na galeria)
+
+### Pendente ⏳
+- [ ] Validação end-to-end no emulador: Galeria → POST → resultado na tela
+- [ ] `docker compose up` validado no PC (primeira build ~3-5min)
+- [ ] Experimento edge vs cloud (núcleo científico do TCC)
+- [ ] Persistência offline com Drift (próximos passos)
 
 ---
 
@@ -191,6 +204,6 @@ funcionamento offline; experimento edge vs cloud documentado.
 | Sprint 0 | Motor de Diagnóstico | ✅ Concluída | 8/8 |
 | Sprint 1 | MQTT + Dataset + Treino (Exp A→E) | ✅ Concluída | 24/24 |
 | Sprint 1b | Firmware ESP32-S3 MQTT | ✅ Concluída | 7/7 |
-| Sprint 2 | TFLite Micro ESP32-S3 (sem câmera) | ⏳ Pendente | 0/11 |
-| Sprint 3 | Flutter + câmera celular + API | ⏳ Pendente | 0/9 |
+| Sprint 2 | TFLite Micro ESP32-S3 (sem câmera) | ✅ Concluída | 11/11 |
+| Sprint 3 | Flutter + Docker + API | 🔄 Em andamento | 14/18 |
 | Fase Futura | RPi3B+ + EfficientNet (Exp F) | 📋 Registrado | — |

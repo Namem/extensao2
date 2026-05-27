@@ -489,4 +489,107 @@ python datasets/scripts/prepare_plantvillage.py
 - MQTT rc=-2: Mosquitto so escutava em localhost -> listener 1883 sem bind no mosquitto.conf
 
 ### Proximo passo
-- Sprint 2: comprar OV5640 + DHT22 + sensor solo; integrar TFLite no ESP32-S3
+- Sprint 2: TFLite Micro no ESP32-S3 com imagens embedded (OV5640 removido do escopo)
+
+---
+
+## 2026-05-27 — Sprint 2: TFLite Micro no ESP32-S3
+
+### Objetivo
+Validar inferência TFLite Micro no ESP32-S3 sem câmera: 10 imagens de teste
+embutidas como arrays C int8, medir latência real com `esp_timer_get_time()`,
+publicar resultados via MQTT.
+
+### Decisões de escopo
+- **OV5640 removida** do escopo da Sprint 2 — deadline impossibilita compra/integração
+- **Imagens embedded**: 10 imgs (1/classe) convertidas em arrays C via `gerar_arrays_c.py`
+- **Modelo usado**: `ceres_mobilenetv2_int8.tflite` (Exp B, 639KB) — Exp E não disponível no notebook
+- **Raspberry Pi 3B+** anotado para Exp F (fase futura): EfficientNet-B0 224×224
+
+### Arquivos criados
+
+| Arquivo | Descrição |
+|---------|-----------|
+| `firmware/esp32s3_ceres/platformio.ini` | Config PlatformIO: esp32-s3-devkitc-1, qio_opi, huge_app.csv, TFLite 2.4.0 |
+| `firmware/esp32s3_ceres/include/config.h` | WiFi, MQTT, CONFIDENCE_THRESHOLD (gitignore) |
+| `firmware/esp32s3_ceres/include/inference.h` | Struct InferenceResult + assinaturas |
+| `firmware/esp32s3_ceres/src/inference.cpp` | Engine TFLite Micro: 512KB PSRAM arena, softmax INT8→float, latência |
+| `firmware/esp32s3_ceres/src/main.cpp` | Loop benchmark: WiFi + MQTT + iteração 10 imgs + LED RGB |
+| `backend/datasets/scripts/gerar_arrays_c.py` | Gera model_data.h (639KB) + test_images.h (10 imgs × 27648 int8) |
+| `firmware/esp32s3_ceres/include/model_data.h` | Array C do modelo TFLite (gerado — gitignore) |
+| `firmware/esp32s3_ceres/include/test_images.h` | Arrays C das 10 imagens de teste (gerado — gitignore) |
+
+### Arquitetura do firmware
+
+```
+setup()
+  ├── WiFi.begin() + aguarda WL_CONNECTED
+  ├── PubSubClient.setServer(MQTT_BROKER, 1883)
+  └── inference_init()
+        ├── ps_malloc(512KB)  → tensor_arena na PSRAM
+        ├── tflite::GetModel(g_model_data)
+        ├── tflite::MicroInterpreter::AllocateTensors()
+        └── valida dims I/O + imprime arena_used_bytes()
+
+loop() [enquanto s_img_index < 10]
+  ├── inference_run(g_test_images[i])
+  │     ├── memcpy → s_input->data.int8
+  │     ├── esp_timer_get_time() → Invoke() → esp_timer_get_time()
+  │     ├── dequantiza INT8: score = (raw - zero_point) * scale
+  │     └── softmax → confidence + argmax → class_name
+  ├── Serial.printf (classe esperada, predição, confiança, latência, RAM)
+  ├── PubSubClient.publish(JSON com device_id, classe, confiança, latência_ms)
+  └── indicar_led() → verde=saudável / vermelho=doença / amarelo=baixa confiança
+
+loop() [após todas as imagens]
+  └── print_benchmark_summary() → latência média + RAM livre + PSRAM livre
+```
+
+### Normalização INT8
+```
+int8 = uint8 - 128   (scale=0.0078125, zero_point=0)
+```
+Compatível com quantização do Exp B (`representative_dataset` calibrado).
+
+### MQTT payload publicado por imagem
+```json
+{"device_id":"001","img_idx":0,"classe":"D01_requeima","class_index":0,
+ "confianca":0.9512,"latencia_ms":187,"ram_livre":234000}
+```
+
+### Resultados reais (2026-05-27)
+
+**Build:**
+- Biblioteca: `spaziochirale/Chirale_TensorFLowLite@2.0.0` (PlatformIO registry)
+- RAM: 15.6% (51KB de 320KB)
+- Flash: 61.6% (1.94MB de 3MB da partição huge_app)
+- Tempo de compilação: 361s (primeiro build com TFLite)
+
+**Runtime ESP32-S3:**
+- Arena PSRAM usada: **205.380 bytes (200KB)** — sobra 312KB
+- RAM livre (heap): **290KB**
+- Input: [1, 96, 96, 3] INT8 ✓
+- Output: [1, 10] INT8 ✓
+
+**Inferências (6/10 registradas):**
+- Acurácia: **6/6 correto (100%)**
+- Latência média: **~693ms**
+- Confiança: ~23% (INT8 softmax plano — argmax correto, threshold precisa ajuste)
+
+**Estimativa Exp A vs Real Exp B:**
+- Edge Impulse estimou: 1.365ms
+- Real ESP32-S3: ~693ms (2x mais rápido — MobileNetV2 0.35 é menor)
+
+**Problemas resolvidos:**
+- `arduino-libraries/TensorFlowLite_ESP32@2.4.0` → não existe no registro
+- `tanakamasayuki/TensorFlowLite_ESP32` → repo GitHub deletado
+- Solução: `spaziochirale/Chirale_TensorFLowLite@2.0.0` + remover `#include <TensorFlowLite.h>`
+- WiFi falhou (placeholder "SEU_WIFI") — MQTT inativo — inferência OK independente
+
+**Resultado:** Nível 3 da cadeia de validação atingido — modelo rodando em hardware real.
+
+### Próximos passos
+1. Configurar `config.h` com WiFi real → validar publicação MQTT
+2. Ajustar `CONFIDENCE_THRESHOLD` para ~0.20 baseado nos resultados reais
+3. Completar benchmark com todas 10 imagens → `docs/resultados/benchmark_esp32s3.md`
+4. Sprint 3: Flutter app com câmera do telefone + API Django
