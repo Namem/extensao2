@@ -1,0 +1,8 @@
+.pio
+
+# Credenciais — nunca commitar
+include/config.h
+
+# Headers gerados automaticamente — regenerar com gerar_arrays_c.py
+include/model_data.h
+include/test_images.h
