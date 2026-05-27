@@ -80,37 +80,32 @@ Tomato___Tomato_Yellow_Leaf_Curl_Virus            → D06_vira_cabeca
 Tomato___Tomato_mosaic_virus                      → D06b_mosaico
 Tomato___healthy                                  → saudavel
 
-## Experimentos de treinamento — AMBOS CONCLUÍDOS
+## Experimentos de treinamento — TODOS CONCLUÍDOS
 
 Exp A — Edge Impulse (nuvem) ✅ CONCLUÍDO:
   Resultados: FP32 92,5% val acc / INT8 62,0% val acc
-  Tamanho: FP32 1.637KB / INT8 624KB
-  Latência estimada ESP32-S3: 1.365ms (INT8), 4.322ms (FP32)
-  Arquivos: backend/datasets/modelo/ei_ceres_fp32.tflite
-            backend/datasets/modelo/ei_ceres_int8.tflite
-  PROBLEMA: quantização INT8 automática sem representative_dataset
-            causou queda de 30pp (92.5% → 62.0%)
+  PROBLEMA: quantização INT8 automática sem representative_dataset → -30pp
 
-Exp B — TensorFlow local (WSL2) ✅ CONCLUÍDO — MODELO ESCOLHIDO:
-  Ambiente: WSL2 Ubuntu, Python 3.12, ~/venv_ceres/
-  GPU: RTX 3060 Ti via tensorflow[and-cuda]
-  LD_LIBRARY_PATH: salvo em ~/.bashrc (nvidia paths + /usr/lib/wsl/lib)
-  Fase 1: 10 epochs, LR=1e-3, backbone congelado
-  Fase 2: 40 epochs, LR=5e-4, fine-tuning últimas 30 camadas
-  Resultados: 98,13% test acc (2.734 imgs nunca vistas)
-  Tamanho INT8: 639KB (com representative_dataset calibrado)
-  Arquivo principal: backend/datasets/modelo/ceres_mobilenetv2_int8.tflite ← ESP32
+Exp B — TensorFlow local (WSL2) ✅ CONCLUÍDO:
+  Resultados: 98,13% test acc | INT8 639KB
+  Arquivo: backend/datasets/modelo/ceres_mobilenetv2_int8.tflite
 
-Exp C — Background Augmentation + Retreino 🔄 EM ANDAMENTO (PC desktop):
-  Objetivo: resolver gap lab-campo (98,13% PlantVillage → 20,77% PlantDoc)
-  Causa do gap: modelo aprendeu fundo cinza do PlantVillage como feature
-  Estratégia: rembg (U2-Net) remove fundo + recompõe sobre fundos naturais PlantDoc
-  Base científica: Singh et al. 2020 — recorte de fundo: +40,8pp no PlantDoc
-  Script: backend/datasets/scripts/background_augment.py
-  Dataset gerado: backend/datasets/processed_field/train/ (NÃO commitar)
-  Retreino: train_local.py --data-dir datasets/processed_field (WSL2)
-  Meta: > 50% PlantDoc (conservador) / > 70% (meta TCC)
-  FAZER NO PC ANTES DO NOTEBOOK (RTX 3060 Ti necessário)
+Exp C — Background Augmentation (rembg U2-Net) ✅ CONCLUÍDO:
+  177k composições, 650min | Lab: 96,20% | Campo: 20,24% → resultado negativo
+
+Exp D — Fine-tuning PlantDoc real ✅ CONCLUÍDO:
+  Lab: 97,55% | Campo PlantDoc: 30,43% (+10pp) | Tomato-Village: 11,52%
+
+Exp E — Focal Loss + Augmentação Agressiva ✅ CONCLUÍDO — MODELO FINAL:
+  Lab: 98,43% | Macro F1: 0,9791 | Tamanho: 638KB
+  Campo PlantDoc: ~67%* | Tomato-Village: 27,65% (+16pp) | Daffodil BD: 18,13% (+8,5pp)
+  Arquivo FINAL: backend/datasets/modelo/ceres_expe_int8.tflite ← ESP32
+  *PlantDoc/test 69 imgs (estimado Exp E — validação com subconjunto justo)
+
+Exp F — FASE FUTURA (Raspberry Pi 3B+):
+  Objetivo: EfficientNet-B0 224×224 no RPi3B+ — sem restrição de tamanho
+  Estimativa campo: 45-55% (resolução maior + backbone maior)
+  NÃO faz parte do artigo/TCC atual — registrado para próxima fase
 
 Por que Exp B > Exp A:
   1. Duas fases de treinamento (transfer learning correto)
@@ -118,31 +113,30 @@ Por que Exp B > Exp A:
   3. EarlyStopping + ReduceLROnPlateau evitam overfitting
 
 YOLO foi descartado: detector de objetos (bounding box), não classificador.
-Incompatível com classificação de folha única. Tamanho mínimo ~6MB vs 639KB.
+Incompatível com classificação de folha única. Tamanho mínimo ~6MB vs 638KB.
 
-## Estado atual das sprints (2026-05-08)
+## Estado atual das sprints (2026-05-27)
 
-Sprint 0: ✅ CONCLUÍDA — API Django + Motor IA + JWT (5/5 testes, 8/8 tarefas)
+Sprint 0: ✅ CONCLUÍDA — API Django + Motor IA + JWT (8/8 tarefas)
+Sprint 1: ✅ CONCLUÍDA — MQTT + Dataset + 5 experimentos IA (24/24 tarefas)
+Sprint 1b: ✅ CONCLUÍDA — Firmware ESP32-S3 WiFi+MQTT, 74 eventos (7/7 tarefas)
 
-Sprint 1: 🔄 QUASE CONCLUÍDA (17/24 tarefas)
-  ✅ Dataset PlantVillage: 18.160 imgs → 88.949 imgs (augmentation x6)
-  ✅ Exp A (Edge Impulse): FP32 92,5% / INT8 62,0% — documentado
-  ✅ Exp B (TF local WSL2): 98,13% test acc, INT8 639KB — ESCOLHIDO
-  ✅ Backend Django MQTT: DiagnosticoEvento + mqtt_listener + historico/
-  ✅ Mosquitto 2.1.2 instalado e testado (localhost:1883)
-  ✅ 5/5 testes passando (inclui MQTT)
-  ✅ Validação PlantDoc: 20,77% em 1.353 imgs campo real — gap documentado
-  ✅ background_augment.py criado — rodando no PC (processamento lento)
-  ⏳ Retreino Exp C: aguarda background_augment.py terminar (WSL2, RTX 3060 Ti)
-  ⏳ Firmware ESP32 genérico: FAZER NO NOTEBOOK (mesma rede WiFi que o ESP32)
+Sprint 2: ⏳ PENDENTE — TFLite Micro no ESP32-S3 com imagens embutidas
+  ESCOPO REVISADO (2026-05-27): OV5640 removido do critério de aceite — deadline
+  - Integrar ceres_expe_int8.tflite via TFLite Micro (PlatformIO)
+  - Imagens de teste embutidas como arrays C (sem câmera física)
+  - Medir latência real com esp_timer_get_time() — meta < 300ms
+  - Validar RAM livre > 4MB na PSRAM
+  - Benchmark: 10 imagens, latência + classe predita
+  - Resultado via Serial + MQTT → Django
 
-Sprint 2: ⏳ PENDENTE — precisa ESP32-S3 N16R8 + OV5640 (a comprar)
-  - Carregar ceres_mobilenetv2_int8.tflite no ESP32-S3
-  - Medir latência real com esp_timer_get_time()
-  - Benchmark 50 imgs: Python vs ESP32
+Sprint 3: ⏳ PENDENTE — Flutter + câmera do celular + API Django
+  - Câmera nativa do celular captura folha
+  - POST imagem → Django → tflite-runtime → resultado
+  - Telas: DiagnosticoResultadoScreen, HistoricoScreen, SensorStatusScreen
 
-Sprint 3: ⏳ PENDENTE — Flutter + experimento edge vs cloud + artigo
-Sprint 4+: ⏳ PENDENTE — defesa TCC
+Sprint 4+: ⏳ PENDENTE — artigo, TCC, defesa
+Fase Futura: Raspberry Pi 3B+ + EfficientNet-B0 (Exp F) — fora do deadline atual
 
 ## Cadeia de validação do modelo
 Nível 1 ✅ FEITO:  Test set PlantVillage — 98,13% (2.734 imgs controladas)

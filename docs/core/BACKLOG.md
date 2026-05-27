@@ -112,33 +112,49 @@ dataset PlantVillage preparado, modelos treinados e validados.
 
 ---
 
-## Sprint 2 — ESP32-S3 + TFLite + Integração Completa ⏳ PENDENTE
+## Sprint 2 — ESP32-S3 + TFLite Micro ⏳ PENDENTE
 
-**Pré-requisito:** ESP32-S3 N16R8 + OV5640 5MP (a comprar) + sensor solo resistivo
-**Critério de aceite:** Modelo TFLite rodando no ESP32-S3 com latência < 300ms;
-loop completo câmera → MQTT → Django → endpoint em menos de 5 segundos.
+> **Escopo revisado em 2026-05-27:** OV5640 removido do critério de aceite (deadline).
+> Câmera substituída por imagens embutidas como arrays C.
+> OV5640 + câmera real → Fase Futura após entrega do artigo/TCC.
 
-### Hardware
-- [ ] Comprar ESP32-S3 N16R8 + OV5640 + sensor solo resistivo
+**Critério de aceite:** `ceres_expe_int8.tflite` rodando no ESP32-S3 via TFLite Micro,
+latência < 300ms medida com `esp_timer_get_time()`, resultado publicado via MQTT.
+
+### Firmware TFLite Micro
 - [ ] Criar `firmware/esp32s3_ceres/` com PlatformIO (Flash 16MB, PSRAM habilitada)
-- [ ] Sketch de teste câmera OV5640 com pinout correto para N16R8
-
-### TFLite Micro no ESP32-S3
-- [ ] Integrar `ceres_mobilenetv2_int8.tflite` via TFLite Micro
+- [ ] Integrar `ceres_expe_int8.tflite` como array C (`model_data.h`)
+- [ ] Converter modelo: `xxd -i ceres_expe_int8.tflite > model_data.h` (PC)
 - [ ] Implementar `inference.h` / `inference.cpp` com alocação na PSRAM
 - [ ] Normalizar pixels [-1, 1] e medir latência com `esp_timer_get_time()`
 - [ ] Validar: latência < 300ms, RAM livre > 4MB
 
+### Imagens de Teste Embutidas (sem câmera)
+- [ ] Script Python converte 5 imagens do test set → arrays C (`test_images.h`)
+- [ ] 1 imagem por classe representativa (saudável, requeima, septoriose, pinta-preta, mancha-alvo)
+- [ ] Inferência rodando sobre arrays em loop no setup()
+
 ### Firmware Integrado
-- [ ] Ciclo: captura OV5640 → `run_inference()` → DHT22 + solo → MQTT
-- [ ] Threshold configurável (default 0.70) em `include/config.h`
-- [ ] LED vermelho 3x (anomalia) / verde 1x (saudável)
+- [ ] Resultado via Serial: classe + confiança + latência
+- [ ] Publicar JSON via MQTT → Django persiste
+- [ ] LED RGB: verde (saudável) / vermelho (doença) / amarelo (baixa confiança < 0.70)
 - [ ] Watchdog 60s + reconexão automática WiFi/MQTT
 
 ### Benchmark
-- [ ] `benchmark_esp32s3.py` — 50 imagens, latência + acurácia
-- [ ] `docs/benchmark_results.md` + `benchmark_raw.csv`
-- [ ] Teste end-to-end T0→T4 para 5 eventos, meta < 5s
+- [ ] Latência medida em 5 imagens distintas — média + mínima + máxima
+- [ ] `docs/resultados/benchmark_esp32s3.md` com tabela de resultados
+- [ ] Teste end-to-end: ESP32 → MQTT → Django → `GET /api/diagnostico/historico/`
+
+---
+
+## Fase Futura — Raspberry Pi 3B+ + EfficientNet (Exp F)
+
+> Fora do escopo do artigo/TCC atual. Registrado para próxima fase de pesquisa.
+
+- [ ] EfficientNet-B0 224×224 treinado no PC (RTX 3060 Ti)
+- [ ] tflite-runtime no RPi3B+ — estimativa campo: 45-55%
+- [ ] Câmera USB + DHT22 + sensor solo via GPIO Python
+- [ ] Comparativo: ESP32-S3 (TinyML 638KB) vs RPi3B+ (edge 5MB)
 
 ---
 
@@ -173,7 +189,8 @@ funcionamento offline; experimento edge vs cloud documentado.
 | Sprint | Tema | Status | Progresso |
 |--------|------|--------|-----------|
 | Sprint 0 | Motor de Diagnóstico | ✅ Concluída | 8/8 |
-| Sprint 1 | MQTT + Dataset + Treino | ✅ Concluída | 24/24 |
+| Sprint 1 | MQTT + Dataset + Treino (Exp A→E) | ✅ Concluída | 24/24 |
 | Sprint 1b | Firmware ESP32-S3 MQTT | ✅ Concluída | 7/7 |
-| Sprint 2 | ESP32-S3 + TFLite + Integração | ⏳ Pendente — aguardando hardware | 0/15 |
-| Sprint 3 | Flutter + Resiliência + Experimentos | ⏳ Pendente | 0/14 |
+| Sprint 2 | TFLite Micro ESP32-S3 (sem câmera) | ⏳ Pendente | 0/11 |
+| Sprint 3 | Flutter + câmera celular + API | ⏳ Pendente | 0/9 |
+| Fase Futura | RPi3B+ + EfficientNet (Exp F) | 📋 Registrado | — |
