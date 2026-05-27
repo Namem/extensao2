@@ -1,11 +1,15 @@
+import sys
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.parsers import MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
+from django.conf import settings
 from .models import Pergunta, Opcao, DiagnosticoEvento
 from .serializers import PerguntaSerializer, DiagnosticoSerializer, DiagnosticoEventoSerializer
+from .inference_service import inferencia_service
 
 class IniciarDiagnosticoView(APIView):
     permission_classes = [AllowAny] # Aberto para o produtor no campo
@@ -55,7 +59,7 @@ class HistoricoEventosView(APIView):
         Suporta ?page=2 para navegar nas páginas.
     """
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]  # Sprint 3: Flutter ainda sem JWT
 
     def get(self, request):
         """Lista os eventos mais recentes, do mais novo para o mais antigo."""
@@ -64,3 +68,75 @@ class HistoricoEventosView(APIView):
         pagina = paginator.paginate_queryset(eventos, request)
         serializer = DiagnosticoEventoSerializer(pagina, many=True)
         return paginator.get_paginated_response(serializer.data)
+
+
+class InferirImagemView(APIView):
+    """
+    POST /api/diagnostico/inferir/
+    Recebe imagem de folha de tomate e retorna diagnóstico via TFLite.
+
+    Body: multipart/form-data com campo 'imagem' (JPEG/PNG)
+    Resposta: {"classe": "D01_requeima", "confianca": 0.87, "latencia_ms": 45, ...}
+
+    Permissão: AllowAny — produtor no campo não precisa de login.
+
+    Implementação: delega ao inferir_worker.py via subprocess para garantir
+    execução no main thread (necessário para XNNPACK delegate no Windows).
+    """
+
+    permission_classes = [AllowAny]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request):
+        import subprocess
+        import base64
+        import json as json_mod
+        from pathlib import Path
+
+        imagem = request.FILES.get('imagem')
+        if not imagem:
+            return Response(
+                {"erro": "Envie a imagem no campo 'imagem' (multipart/form-data)."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        modelo_path = getattr(settings, 'TFLITE_MODEL_PATH', None)
+        if not modelo_path or not Path(modelo_path).exists():
+            return Response(
+                {"erro": "Modelo TFLite nao encontrado. Verifique TFLITE_MODEL_PATH."},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+
+        img_bytes = imagem.read()
+        img_b64 = base64.b64encode(img_bytes).decode()
+
+        try:
+            worker = Path(__file__).resolve().parent.parent / "inferir_worker.py"
+            proc = subprocess.run(
+                [sys.executable, str(worker), str(modelo_path)],
+                input=img_b64,
+                capture_output=True,
+                text=True,
+                timeout=30,
+            )
+            if proc.returncode != 0:
+                raise RuntimeError(proc.stderr or "worker falhou")
+
+            # Pega a última linha (ignora logs do TFLite no stdout)
+            output = [l for l in proc.stdout.strip().splitlines() if l.startswith('{')]
+            if not output:
+                raise RuntimeError(f"Sem JSON na saída: {proc.stdout}")
+
+            resultado = json_mod.loads(output[-1])
+            return Response(resultado, status=status.HTTP_200_OK)
+
+        except subprocess.TimeoutExpired:
+            return Response(
+                {"erro": "Timeout na inferência (>30s)"},
+                status=status.HTTP_504_GATEWAY_TIMEOUT,
+            )
+        except Exception as e:
+            return Response(
+                {"erro": f"Falha na inferencia: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )

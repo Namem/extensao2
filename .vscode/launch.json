@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Flutter (emulador)",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/app_ceres/lib/main.dart",
+      "cwd": "${workspaceFolder}/app_ceres",
+      "preLaunchTask": "Django: subir servidor (notebook)"
+    }
+  ]
+}
