@@ -14,8 +14,6 @@ class HistoricoLocalScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Diagnósticos Salvos'),
-        backgroundColor: Colors.green[700],
-        foregroundColor: Colors.white,
         actions: [
           IconButton(
             icon: const Icon(Icons.delete_sweep_outlined),
@@ -60,10 +58,12 @@ class HistoricoLocalScreen extends StatelessWidget {
 
   Widget _cartao(DiagnosticoLocal d) {
     final isSaudavel = d.classe == 'saudavel';
-    final cor = isSaudavel ? Colors.green : Colors.red;
+    final baixaConfianca = d.confianca < 0.40;
+    final Color cor = isSaudavel
+        ? const Color(0xFF2E7D32)
+        : (baixaConfianca ? const Color(0xFFE65100) : const Color(0xFFC62828));
     final rotulo = ResultadoInferencia.rotuloDeClasse(d.classe);
     final ts = DateFormat('dd/MM/yyyy HH:mm').format(d.timestamp.toLocal());
-    final baixaConfianca = d.confianca < 0.40;
 
     // Decodifica scores para mostrar a barra principal
     Map<String, double> scores = {};
@@ -134,9 +134,14 @@ class HistoricoLocalScreen extends StatelessWidget {
             Expanded(
               child: LinearProgressIndicator(
                 value: e.value.clamp(0.0, 1.0),
-                backgroundColor: Colors.grey[200],
-                color: Colors.green[600],
+                backgroundColor: const Color(0xFFF0EDE9),
+                color: e.value > 0.5
+                    ? (e.key == 'saudavel'
+                        ? const Color(0xFF2E7D32)
+                        : const Color(0xFFC62828))
+                    : const Color(0xFFBDBDBD),
                 minHeight: 6,
+                borderRadius: BorderRadius.circular(4),
               ),
             ),
             const SizedBox(width: 4),

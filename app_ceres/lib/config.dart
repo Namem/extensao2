@@ -1,9 +1,16 @@
 /// Configurações globais do app Ceres Diagnóstico.
-/// Altere BASE_URL conforme o IP do notebook na rede local.
 class Config {
-  // localhost = PC com Windows desktop
-  // 10.0.2.2 = host machine no emulador Android
-  // Trocar para o IP real do PC ao usar celular físico na rede
+  // ── Ambientes ──────────────────────────────────────────────────────────────
+  // PC Windows desktop (flutter run -d windows):
+  //   static const String baseUrl = 'http://localhost:8080';
+  //
+  // Notebook / APK na mesma rede WiFi:
+  //   static const String baseUrl = 'http://192.168.X.X:8080';
+  //   (descubra o IP com: ipconfig | grep IPv4)
+  //
+  // APK via ngrok (demo sem rede local):
+  //   static const String baseUrl = 'https://xxxx.ngrok-free.app';
+  // ──────────────────────────────────────────────────────────────────────────
   static const String baseUrl = 'http://localhost:8080';
 
   static const String inferirEndpoint = '$baseUrl/api/diagnostico/inferir/';

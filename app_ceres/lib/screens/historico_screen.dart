@@ -48,9 +48,7 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Histórico ESP32 ($_total eventos)'),
-        backgroundColor: Colors.green[700],
-        foregroundColor: Colors.white,
+        title: Text('ESP32 · $_total eventos'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -114,34 +112,38 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
 
   Widget _cartaoEvento(EventoMqtt e) {
     final isSaudavel = e.classe == 'saudavel';
-    final cor = isSaudavel ? Colors.green : Colors.red;
+    final baixaConfianca = e.confianca < 0.40;
+    final Color cor = isSaudavel
+        ? const Color(0xFF2E7D32)
+        : (baixaConfianca ? const Color(0xFFE65100) : const Color(0xFFC62828));
     String tsFormatado = e.timestamp;
     try {
       final dt = DateTime.parse(e.timestamp).toLocal();
-      tsFormatado = DateFormat('dd/MM/yyyy HH:mm:ss').format(dt);
+      tsFormatado = DateFormat('dd/MM/yyyy HH:mm').format(dt);
     } catch (e) {
-      // timestamp fora do formato ISO — mantém string original
       debugPrint('Timestamp inválido: $e');
     }
 
     return Card(
-      elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: ListTile(
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         leading: CircleAvatar(
-          backgroundColor: cor.withValues(alpha: 0.15),
+          backgroundColor: cor.withValues(alpha: 0.12),
           child: Icon(
-            isSaudavel ? Icons.check : Icons.warning_amber,
+            isSaudavel ? Icons.check : Icons.warning_amber_rounded,
             color: cor,
+            size: 20,
           ),
         ),
         title: Text(
           e.rotulo,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style:
+              TextStyle(fontWeight: FontWeight.w600, color: cor, fontSize: 14),
         ),
         subtitle: Text(
-          'Dispositivo: ${e.deviceId}  •  $tsFormatado',
-          style: const TextStyle(fontSize: 12),
+          'dev: ${e.deviceId}  ·  $tsFormatado',
+          style: const TextStyle(fontSize: 11, color: Color(0xFF888880)),
         ),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -150,10 +152,11 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
             Text(
               '${(e.confianca * 100).toStringAsFixed(0)}%',
               style: TextStyle(
-                  fontWeight: FontWeight.bold, color: cor, fontSize: 16),
+                  fontWeight: FontWeight.w700, color: cor, fontSize: 16),
             ),
             Text('${e.latenciaMs} ms',
-                style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                style: const TextStyle(
+                    fontSize: 11, color: Color(0xFFAAAAAA))),
           ],
         ),
       ),
@@ -163,7 +166,7 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
   Widget? _paginacao() {
     if (_eventos.isEmpty && _erro == null && !_carregando) return null;
     return Container(
-      color: Colors.grey[100],
+      color: Colors.white,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
