@@ -1,6 +1,5 @@
-# iniciar.ps1 — Sobe Django (venv) + Flutter Windows desktop
-# PC sem Docker, sem emulador Android
-# Uso: .\iniciar.ps1   ou   Ctrl+Shift+B no VS Code
+# iniciar.ps1 - Sobe Django (venv) + Flutter Windows desktop
+# Uso: .\iniciar.ps1
 
 $root     = Split-Path -Parent $MyInvocation.MyCommand.Path
 $appCeres = "$root\app_ceres"
@@ -9,7 +8,7 @@ $flutter  = "C:\Users\Namem\flutter\bin\flutter.bat"
 $settings = "ceres_core.settings_notebook"
 
 Write-Host ""
-Write-Host "=== Ceres Diagnostico — PC (sem Docker) ===" -ForegroundColor Green
+Write-Host "=== Ceres Diagnostico - PC (sem Docker) ===" -ForegroundColor Green
 Write-Host ""
 
 # 1. Verificar modelo TFLite
@@ -19,7 +18,7 @@ if (-not (Test-Path $modelo)) {
     exit 1
 }
 $tamanhoKB = [int]((Get-Item $modelo).Length / 1KB)
-Write-Host "[1/3] Modelo TFLite OK ($tamanhoKB KB) — ceres_expe_int8.tflite" -ForegroundColor Green
+Write-Host "[1/3] Modelo TFLite OK ($tamanhoKB KB) - ceres_expe_int8.tflite" -ForegroundColor Green
 
 # 2. Django via venv (nova janela PowerShell)
 Write-Host "[2/3] Iniciando Django na porta 8080..." -ForegroundColor Cyan
@@ -39,12 +38,12 @@ for ($i = 0; $i -lt 15; $i++) {
 if ($djangoOk) {
     Write-Host "      Django OK! http://localhost:8080" -ForegroundColor Green
 } else {
-    Write-Host "      Django ainda iniciando — verifique a janela de Django." -ForegroundColor Yellow
+    Write-Host "      Django ainda iniciando - verifique a janela de Django." -ForegroundColor Yellow
 }
 
 # 3. Flutter Windows desktop
 Write-Host "[3/3] Iniciando Flutter (Windows desktop)..." -ForegroundColor Cyan
-Write-Host "      Pressione 'q' para encerrar o Flutter." -ForegroundColor Gray
+Write-Host "      Pressione q para encerrar o Flutter." -ForegroundColor Gray
 Write-Host ""
 
 Set-Location $appCeres
