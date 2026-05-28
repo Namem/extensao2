@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Ceres: iniciar tudo",
+      "label": "Ceres: iniciar tudo (PC)",
       "type": "shell",
       "command": "powershell -ExecutionPolicy Bypass -File ${workspaceFolder}\\iniciar.ps1",
       "presentation": {
@@ -13,6 +13,19 @@
       "group": {
         "kind": "build",
         "isDefault": true
+      }
+    },
+    {
+      "label": "Django: servidor PC (venv)",
+      "type": "shell",
+      "command": ".\\venv\\Scripts\\python.exe manage.py runserver 0.0.0.0:8080 --settings=ceres_core.settings_notebook --noreload",
+      "options": {
+        "cwd": "${workspaceFolder}\\backend"
+      },
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "label": "Django"
       }
     }
   ]

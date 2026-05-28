@@ -588,8 +588,70 @@ Compatível com quantização do Exp B (`representative_dataset` calibrado).
 
 **Resultado:** Nível 3 da cadeia de validação atingido — modelo rodando em hardware real.
 
+### Próximos passos (Sprint 2 — resolvidos na Sprint 3)
+1. ✅ Sprint 3: Flutter app Windows desktop + API Django funcionando
+2. Configurar `config.h` com WiFi real → validar publicação MQTT
+3. Ajustar `CONFIDENCE_THRESHOLD` para ~0.20 baseado nos resultados reais
+
+---
+
+## Sprint 3 — Flutter + Django PC (sem Docker) — 2026-05-27
+
+### Contexto
+Após concluir Sprint 2 (TFLite Micro ESP32-S3), iniciada Sprint 3 com foco em
+Flutter + API Django. Descobriu-se que Docker não está disponível no PC desktop
+(apenas no notebook). Decisão: rodar Django diretamente via venv Python 3.13 +
+`settings_notebook.py` (SQLite), sem Docker.
+
+### Ambiente configurado no PC desktop
+
+| Componente | Versão / Detalhe |
+|---|---|
+| Flutter SDK | 3.44.0 (estável) — `C:\Users\Namem\flutter\bin` |
+| Visual Studio Build Tools | 2026 18.6.2 + workload "Desktop C++" |
+| Python venv backend | Python 3.13.13 — `backend/venv/` |
+| Django settings | `settings_notebook.py` — SQLite + CORS aberto |
+| Modelo TFLite | `ceres_expe_int8.tflite` — 638KB (Exp E, modelo final) |
+| Plataforma teste | Windows desktop (Flutter `-d windows`) |
+
+### Pacotes instalados no venv
+- `ai-edge-litert==2.1.5` — inferência TFLite (não estava instalado)
+- `django-cors-headers==4.9.0` — CORS para Flutter (não estava instalado)
+
+### Correções aplicadas
+
+| Arquivo | Problema | Correção |
+|---|---|---|
+| `app_ceres/lib/config.dart` | `10.0.2.2` (só emulador) | → `localhost:8080` |
+| `backend/ceres_core/settings_notebook.py` | modelo Exp B (antigo) | → `ceres_expe_int8.tflite` |
+| `backend/diagnostico/views.py` | latência 0ms (sub-ms arredondado) | → medir tempo total subprocess |
+| `app_ceres/lib/screens/camera_screen.dart` | `ImageSource.camera` crasha no Windows | → desabilitado via `Platform.isWindows` |
+| `app_ceres/test/widget_test.dart` | referenciava `MyApp` (inexistente) | → `CeresApp` |
+| `iniciar.ps1` | path errado (`Rachid`), Docker, emulador | → reescrito para PC sem Docker |
+| `.vscode/launch.json` | task inexistente (`notebook`) | → `Flutter (Windows desktop)` |
+| `.vscode/tasks.json` | só `iniciar.ps1` | → adicionado task Django via venv |
+
+### Validação end-to-end (2026-05-27)
+
+Testado com imagens de campo real selecionadas pela galeria do Windows:
+
+| Imagem | Resultado | Confiança | Latência API |
+|---|---|---|---|
+| Folha com manchas amarelas/marrons | Septoriose | 14,3% | 0ms (bug) |
+| Folha com manchas verdes/textura | Mosaico | 12,6% | 279ms |
+
+**Latência 279ms** = startup subprocess Python + carregamento modelo + inferência TFLite no PC.  
+**Confiança baixa (~10-14%)** = comportamento esperado para imagens de campo real (gap lab-campo
+documentado: Exp E ~67% PlantDoc). Distribuição uniforme indica imagem fora da distribuição
+do PlantVillage (fundos, iluminação, ângulo).
+
+### Resultado
+- Pipeline end-to-end validado: Galeria → POST multipart → TFLite → JSON → Flutter ✅
+- `flutter analyze` → zero issues ✅
+- `django migrate --settings=settings_notebook` → todas migrations OK ✅
+- Nível 4 da cadeia de validação iniciado (interface produtores)
+
 ### Próximos passos
-1. Configurar `config.h` com WiFi real → validar publicação MQTT
-2. Ajustar `CONFIDENCE_THRESHOLD` para ~0.20 baseado nos resultados reais
-3. Completar benchmark com todas 10 imagens → `docs/resultados/benchmark_esp32s3.md`
-4. Sprint 3: Flutter app com câmera do telefone + API Django
+- Experimento edge vs cloud (núcleo científico do TCC)
+- Persistência offline com Drift
+- Layout final no Claude Design

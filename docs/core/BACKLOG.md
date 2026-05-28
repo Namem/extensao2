@@ -189,11 +189,43 @@ Django containerizado; experimento edge vs cloud documentado.
 - [x] POST /api/diagnostico/inferir/ validado (Django Test Client: D01_requeima, 23,1%)
 - [x] Fotos de teste: 10 classes enviadas ao emulador via adb (pasta Ceres na galeria)
 
+### Configuração PC desktop (sem Docker) ✅ CONCLUÍDA (2026-05-27)
+- [x] `ai-edge-litert==2.1.5` + `django-cors-headers` instalados no venv Python 3.13
+- [x] `settings_notebook.py` → `ceres_expe_int8.tflite` (modelo Exp E, final)
+- [x] `config.dart` → `localhost:8080` (Windows desktop)
+- [x] `views.py` → latência real via subprocess (279ms medido)
+- [x] `camera_screen.dart` → botão câmera desabilitado no Windows (`Platform.isWindows`)
+- [x] `iniciar.ps1` reescrito para PC sem Docker (Django via venv + Flutter `-d windows`)
+- [x] Visual Studio Build Tools + workload C++ instalados
+- [x] `flutter analyze` → zero issues
+
+### Validação end-to-end PC desktop ✅ CONCLUÍDA (2026-05-27)
+- [x] Galeria → POST multipart → TFLite → resultado na tela (Windows desktop)
+- [x] Latência API real: ~279ms (subprocess Python no PC)
+- [x] Testado: Septoriose (14,3%) e Mosaico (12,6%) — confiança baixa esperada para campo real
+- [N/A] `docker compose up` — Docker não disponível no PC desktop; Django roda via venv
+
+### Experimento Edge vs Cloud ✅ CONCLUÍDO (2026-05-28)
+- [x] `benchmark_api.py` — 10 classes × 5 repetições, latência + acurácia
+- [x] Warm-up automático (evita outlier de primeira carga)
+- [x] `docs/resultados/experimento_edge_vs_cloud.md` — análise completa
+- [x] `docs/resultados/benchmark_api.json` — dados brutos salvos
+- **Resultado:** 9/10 (90%) | 306ms subprocess | 2333ms HTTP (dev server)
+- **Comparativo:** ESP32 692ms offline vs Cloud 306ms (infra necessária)
+
+### Drift — Persistência offline ✅ CONCLUÍDA (2026-05-28)
+- [x] `lib/database/database.dart` — tabela `DiagnosticosLocais` + AppDatabase singleton
+- [x] `database.g.dart` gerado via build_runner (Drift code gen)
+- [x] `camera_screen.dart` — salva automaticamente após cada inferência bem-sucedida
+- [x] Badge "✅ Salvo localmente" exibido na tela de diagnóstico
+- [x] `lib/screens/historico_local_screen.dart` — lista expansível com scores, timestamp e latência
+- [x] `main.dart` — 3º tab "Salvo" adicionado à NavigationBar
+- [x] `ResultadoInferencia.rotuloDeClasse()` — método estático compartilhado com o banco
+- [x] `flutter analyze` → zero issues
+- [x] `pubspec.yaml` — `path: ^1.9.1` adicionado
+
 ### Pendente ⏳
-- [ ] Validação end-to-end no emulador: Galeria → POST → resultado na tela
-- [ ] `docker compose up` validado no PC (primeira build ~3-5min)
-- [ ] Experimento edge vs cloud (núcleo científico do TCC)
-- [ ] Persistência offline com Drift (próximos passos)
+- [ ] Layout final (Claude Design)
 
 ---
 
@@ -205,5 +237,5 @@ Django containerizado; experimento edge vs cloud documentado.
 | Sprint 1 | MQTT + Dataset + Treino (Exp A→E) | ✅ Concluída | 24/24 |
 | Sprint 1b | Firmware ESP32-S3 MQTT | ✅ Concluída | 7/7 |
 | Sprint 2 | TFLite Micro ESP32-S3 (sem câmera) | ✅ Concluída | 11/11 |
-| Sprint 3 | Flutter + Docker + API | 🔄 Em andamento | 14/18 |
+| Sprint 3 | Flutter + Django PC + API | ✅ Concluída | 19/19 |
 | Fase Futura | RPi3B+ + EfficientNet (Exp F) | 📋 Registrado | — |

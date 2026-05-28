@@ -52,7 +52,8 @@
       "WebSearch",
       "PowerShell(wsl -d Ubuntu -- bash -c \"source ~/venv_ceres/bin/activate 2>/dev/null || \\(python3 -m venv ~/venv_ceres && source ~/venv_ceres/bin/activate\\) && pip install --upgrade pip && pip install tensorflow[and-cuda] pillow tqdm 2>&1 | tail -5\")",
       "Bash(venvScriptspython.exe -c ' *)",
-      "Bash(ls \"C:\\\\Users\\\\Namem\\\\Desktop\\\\PlantDoc-Dataset-master\" 2>/dev/null || echo \"not found\")"
+      "Bash(ls \"C:\\\\Users\\\\Namem\\\\Desktop\\\\PlantDoc-Dataset-master\" 2>/dev/null || echo \"not found\")",
+      "PowerShell(& \"C:\\\\Users\\\\Namem\\\\flutter\\\\bin\\\\flutter.bat\" doctor 2>&1)"
     ]
   }
 }

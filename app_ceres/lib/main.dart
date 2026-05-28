@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'screens/camera_screen.dart';
 import 'screens/historico_screen.dart';
+import 'screens/historico_local_screen.dart';
 
 void main() {
   runApp(const CeresApp());
@@ -37,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
   static const _telas = [
     CameraScreen(),
     HistoricoScreen(),
+    HistoricoLocalScreen(),
   ];
 
   @override
@@ -58,7 +60,12 @@ class _HomeScreenState extends State<HomeScreen> {
           NavigationDestination(
             icon: Icon(Icons.history_outlined),
             selectedIcon: Icon(Icons.history),
-            label: 'Histórico',
+            label: 'ESP32',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.save_outlined),
+            selectedIcon: Icon(Icons.save),
+            label: 'Salvo',
           ),
         ],
       ),

@@ -37,4 +37,4 @@ MIDDLEWARE.insert(1, 'corsheaders.middleware.CorsMiddleware')
 CORS_ALLOW_ALL_ORIGINS = True
 
 # Caminho do modelo TFLite
-TFLITE_MODEL_PATH = BASE_DIR / 'datasets' / 'modelo' / 'ceres_mobilenetv2_int8.tflite'
+TFLITE_MODEL_PATH = BASE_DIR / 'datasets' / 'modelo' / 'ceres_expe_int8.tflite'

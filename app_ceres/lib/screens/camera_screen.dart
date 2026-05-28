@@ -1,7 +1,13 @@
+import 'dart:convert';
 import 'dart:io';
+
+import 'package:drift/drift.dart' show Value;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+
 import '../config.dart';
+import '../database/database.dart';
 import '../models/resultado_inferencia.dart';
 import '../services/api_service.dart';
 
@@ -17,6 +23,7 @@ class _CameraScreenState extends State<CameraScreen> {
   ResultadoInferencia? _resultado;
   bool _carregando = false;
   String? _erro;
+  bool _salvo = false;
 
   final _picker = ImagePicker();
 
@@ -32,6 +39,7 @@ class _CameraScreenState extends State<CameraScreen> {
       _imagem = File(picked.path);
       _resultado = null;
       _erro = null;
+      _salvo = false;
     });
     await _inferir();
   }
@@ -45,6 +53,16 @@ class _CameraScreenState extends State<CameraScreen> {
     try {
       final res = await ApiService.instance.inferir(_imagem!);
       setState(() => _resultado = res);
+      // Salvar automaticamente no banco local (offline)
+      await appDb.salvar(DiagnosticosLocaisCompanion(
+        timestamp: Value(DateTime.now()),
+        classe: Value(res.classe),
+        confianca: Value(res.confianca),
+        latenciaMs: Value(res.latenciaMs),
+        scoresJson: Value(jsonEncode(res.scores)),
+        imagemPath: Value(_imagem!.path),
+      ));
+      setState(() => _salvo = true);
     } catch (e) {
       setState(() => _erro = e.toString());
     } finally {
@@ -72,6 +90,20 @@ class _CameraScreenState extends State<CameraScreen> {
             if (_carregando) const Center(child: CircularProgressIndicator()),
             if (_erro != null) _painelErro(),
             if (_resultado != null) _painelResultado(),
+            if (_salvo)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.check_circle, size: 14, color: Colors.green[700]),
+                    const SizedBox(width: 4),
+                    Text('Salvo localmente',
+                        style: TextStyle(
+                            fontSize: 12, color: Colors.green[700])),
+                  ],
+                ),
+              ),
           ],
         ),
       ),
@@ -105,6 +137,8 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 
   Widget _botoesFonte() {
+    // camera não é suportada no Windows desktop via image_picker
+    final temCamera = !kIsWeb && !Platform.isWindows;
     return Row(
       children: [
         Expanded(
@@ -116,7 +150,7 @@ class _CameraScreenState extends State<CameraScreen> {
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
             ),
-            onPressed: _carregando ? null : () => _capturar(ImageSource.camera),
+            onPressed: (temCamera && !_carregando) ? () => _capturar(ImageSource.camera) : null,
           ),
         ),
         const SizedBox(width: 12),

@@ -22,22 +22,25 @@ class ResultadoInferencia {
     );
   }
 
+  /// Mapa estático de classe → rótulo legível (compartilhado com o banco local).
+  static const Map<String, String> _rotulos = {
+    'D01_requeima': 'Requeima (Mela)',
+    'D02_septoriose': 'Septoriose',
+    'D03_pinta_preta': 'Pinta Preta',
+    'D03b_mancha_alvo': 'Mancha Alvo',
+    'D05_mofo_foliar': 'Mofo Foliar',
+    'D06_vira_cabeca': 'Vira-cabeça',
+    'D06b_mosaico': 'Mosaico',
+    'D07_acaro_bronzeamento': 'Ácaro Bronzeamento',
+    'D09_mancha_bacteriana': 'Mancha Bacteriana',
+    'saudavel': 'Saudável',
+  };
+
   /// Rótulo legível para exibição ao produtor.
-  String get rotulo {
-    const map = {
-      'D01_requeima': 'Requeima (Mela)',
-      'D02_septoriose': 'Septoriose',
-      'D03_pinta_preta': 'Pinta Preta',
-      'D03b_mancha_alvo': 'Mancha Alvo',
-      'D05_mofo_foliar': 'Mofo Foliar',
-      'D06_vira_cabeca': 'Vira-cabeça',
-      'D06b_mosaico': 'Mosaico',
-      'D07_acaro_bronzeamento': 'Ácaro Bronzeamento',
-      'D09_mancha_bacteriana': 'Mancha Bacteriana',
-      'saudavel': 'Saudável',
-    };
-    return map[classe] ?? classe;
-  }
+  String get rotulo => rotuloDeClasse(classe);
+
+  /// Converte código de classe em rótulo legível (uso estático — ex: banco local).
+  static String rotuloDeClasse(String classe) => _rotulos[classe] ?? classe;
 
   bool get isSaudavel => classe == 'saudavel';
 }

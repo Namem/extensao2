@@ -42,6 +42,8 @@ dependencies:
   image_picker: ^1.1.2
   # Formatação de datas
   intl: ^0.20.2
+  # Manipulação de caminhos (necessário para Drift NativeDatabase)
+  path: ^1.9.1
 
 dev_dependencies:
   flutter_test:

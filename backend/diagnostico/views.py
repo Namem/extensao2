@@ -110,8 +110,10 @@ class InferirImagemView(APIView):
         img_bytes = imagem.read()
         img_b64 = base64.b64encode(img_bytes).decode()
 
+        import time as _time
         try:
             worker = Path(__file__).resolve().parent.parent / "inferir_worker.py"
+            t0 = _time.perf_counter()
             proc = subprocess.run(
                 [sys.executable, str(worker), str(modelo_path)],
                 input=img_b64,
@@ -119,6 +121,8 @@ class InferirImagemView(APIView):
                 text=True,
                 timeout=30,
             )
+            latencia_api_ms = max(1, round(((_time.perf_counter() - t0) * 1000)))
+
             if proc.returncode != 0:
                 raise RuntimeError(proc.stderr or "worker falhou")
 
@@ -128,6 +132,8 @@ class InferirImagemView(APIView):
                 raise RuntimeError(f"Sem JSON na saída: {proc.stdout}")
 
             resultado = json_mod.loads(output[-1])
+            # Sobrescreve com a latência real percebida pela API (inclui subprocess)
+            resultado['latencia_ms'] = latencia_api_ms
             return Response(resultado, status=status.HTTP_200_OK)
 
         except subprocess.TimeoutExpired:

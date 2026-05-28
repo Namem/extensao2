@@ -1,10 +1,10 @@
 /// Configurações globais do app Ceres Diagnóstico.
 /// Altere BASE_URL conforme o IP do notebook na rede local.
 class Config {
-  // IP do notebook com Django rodando na porta 8080
+  // localhost = PC com Windows desktop
   // 10.0.2.2 = host machine no emulador Android
-  // Trocar para o IP real do notebook ao usar celular físico
-  static const String baseUrl = 'http://10.0.2.2:8080';
+  // Trocar para o IP real do PC ao usar celular físico na rede
+  static const String baseUrl = 'http://localhost:8080';
 
   static const String inferirEndpoint = '$baseUrl/api/diagnostico/inferir/';
   static const String historicoEndpoint = '$baseUrl/api/diagnostico/historico/';

@@ -1,0 +1,161 @@
+{
+  "experimento": "edge_vs_cloud",
+  "data": "2026-05-28",
+  "config": {
+    "url": "http://localhost:8080",
+    "n_repeticoes": 5,
+    "seed": 42,
+    "modelo": "ceres_expe_int8.tflite (Exp E, 638KB)"
+  },
+  "cloud_api": {
+    "acuracia": "9/10",
+    "acuracia_pct": 90.0,
+    "latencia_api_media_ms": 306,
+    "latencia_api_min_ms": 239,
+    "latencia_api_max_ms": 3071,
+    "latencia_api_std_ms": 399.1,
+    "latencia_http_media_ms": 2333,
+    "plataforma": "Windows PC (Python 3.13 subprocess + ai-edge-litert)"
+  },
+  "edge_esp32": {
+    "acuracia": "10/10 (100%)",
+    "latencia_media_ms": 692,
+    "latencia_min_ms": 692,
+    "latencia_max_ms": 695,
+    "modelo_kb": 638,
+    "plataforma": "ESP32-S3 240MHz + Chirale_TensorFLowLite 2.0.0",
+    "requer_conectividade": false
+  },
+  "por_classe": [
+    {
+      "classe_esperada": "D01_requeima",
+      "classe_predita": "D01_requeima",
+      "confianca": 0.1908,
+      "correto": true,
+      "latencia_api_media_ms": 257,
+      "latencia_api_min_ms": 254,
+      "latencia_api_max_ms": 261,
+      "latencia_api_std_ms": 2.6,
+      "latencia_http_media_ms": 2265,
+      "latencia_http_min_ms": 2261,
+      "latencia_http_max_ms": 2268
+    },
+    {
+      "classe_esperada": "D02_septoriose",
+      "classe_predita": "D02_septoriose",
+      "confianca": 0.1393,
+      "correto": true,
+      "latencia_api_media_ms": 260,
+      "latencia_api_min_ms": 252,
+      "latencia_api_max_ms": 264,
+      "latencia_api_std_ms": 4.9,
+      "latencia_http_media_ms": 2267,
+      "latencia_http_min_ms": 2259,
+      "latencia_http_max_ms": 2273
+    },
+    {
+      "classe_esperada": "D03_pinta_preta",
+      "classe_predita": "D03_pinta_preta",
+      "confianca": 0.1816,
+      "correto": true,
+      "latencia_api_media_ms": 257,
+      "latencia_api_min_ms": 254,
+      "latencia_api_max_ms": 263,
+      "latencia_api_std_ms": 4.0,
+      "latencia_http_media_ms": 2266,
+      "latencia_http_min_ms": 2261,
+      "latencia_http_max_ms": 2274
+    },
+    {
+      "classe_esperada": "D03b_mancha_alvo",
+      "classe_predita": "D03b_mancha_alvo",
+      "confianca": 0.179,
+      "correto": true,
+      "latencia_api_media_ms": 822,
+      "latencia_api_min_ms": 252,
+      "latencia_api_max_ms": 3071,
+      "latencia_api_std_ms": 1257.0,
+      "latencia_http_media_ms": 2847,
+      "latencia_http_min_ms": 2271,
+      "latencia_http_max_ms": 5101
+    },
+    {
+      "classe_esperada": "D05_mofo_foliar",
+      "classe_predita": "D05_mofo_foliar",
+      "confianca": 0.1922,
+      "correto": true,
+      "latencia_api_media_ms": 245,
+      "latencia_api_min_ms": 240,
+      "latencia_api_max_ms": 250,
+      "latencia_api_std_ms": 4.0,
+      "latencia_http_media_ms": 2279,
+      "latencia_http_min_ms": 2269,
+      "latencia_http_max_ms": 2290
+    },
+    {
+      "classe_esperada": "D06_vira_cabeca",
+      "classe_predita": "D06_vira_cabeca",
+      "confianca": 0.1684,
+      "correto": true,
+      "latencia_api_media_ms": 245,
+      "latencia_api_min_ms": 241,
+      "latencia_api_max_ms": 249,
+      "latencia_api_std_ms": 2.9,
+      "latencia_http_media_ms": 2278,
+      "latencia_http_min_ms": 2268,
+      "latencia_http_max_ms": 2287
+    },
+    {
+      "classe_esperada": "D06b_mosaico",
+      "classe_predita": "D05_mofo_foliar",
+      "confianca": 0.133,
+      "correto": false,
+      "latencia_api_media_ms": 243,
+      "latencia_api_min_ms": 240,
+      "latencia_api_max_ms": 247,
+      "latencia_api_std_ms": 2.9,
+      "latencia_http_media_ms": 2287,
+      "latencia_http_min_ms": 2280,
+      "latencia_http_max_ms": 2306
+    },
+    {
+      "classe_esperada": "D07_acaro_bronzeamento",
+      "classe_predita": "D07_acaro_bronzeamento",
+      "confianca": 0.1895,
+      "correto": true,
+      "latencia_api_media_ms": 246,
+      "latencia_api_min_ms": 243,
+      "latencia_api_max_ms": 250,
+      "latencia_api_std_ms": 2.7,
+      "latencia_http_media_ms": 2285,
+      "latencia_http_min_ms": 2273,
+      "latencia_http_max_ms": 2304
+    },
+    {
+      "classe_esperada": "D09_mancha_bacteriana",
+      "classe_predita": "D09_mancha_bacteriana",
+      "confianca": 0.2025,
+      "correto": true,
+      "latencia_api_media_ms": 242,
+      "latencia_api_min_ms": 239,
+      "latencia_api_max_ms": 245,
+      "latencia_api_std_ms": 2.6,
+      "latencia_http_media_ms": 2277,
+      "latencia_http_min_ms": 2266,
+      "latencia_http_max_ms": 2285
+    },
+    {
+      "classe_esperada": "saudavel",
+      "classe_predita": "saudavel",
+      "confianca": 0.1318,
+      "correto": true,
+      "latencia_api_media_ms": 245,
+      "latencia_api_min_ms": 241,
+      "latencia_api_max_ms": 254,
+      "latencia_api_std_ms": 5.3,
+      "latencia_http_media_ms": 2281,
+      "latencia_http_min_ms": 2266,
+      "latencia_http_max_ms": 2294
+    }
+  ]
+}
