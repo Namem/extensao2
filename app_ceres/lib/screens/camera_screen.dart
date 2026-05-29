@@ -8,11 +8,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../config.dart' as app_config;
+import '../data/doencas_data.dart';
 import '../database/database.dart';
 import '../models/resultado_inferencia.dart';
 import '../services/api_service.dart';
 import '../theme/ceres_theme.dart';
 import '../widgets/ceres_app_bar.dart';
+import '../widgets/ceres_icons.dart';
 
 class CameraScreen extends StatefulWidget {
   const CameraScreen({super.key});
@@ -74,12 +76,13 @@ class _CameraScreenState extends State<CameraScreen> {
     final temCamera = !kIsWeb && !Platform.isWindows;
     return Scaffold(
       appBar: CeresAppBar(
-        pageTitle: 'Diagnóstico',
+        pageTitleItalic: 'Diagnóstico',
+        pageTitle: '',
         actions: [
           CeresIconButton(
-            icon: Icons.info_outline,
-            tooltip: 'Sobre o sistema',
-            onPressed: () {},
+            svgString: CeresIconsSvg.tabEnciclopedia,
+            tooltip: 'Diagnósticos salvos',
+            onPressed: () => Navigator.pushNamed(context, '/salvos'),
           ),
         ],
       ),
@@ -316,7 +319,7 @@ class _CameraScreenState extends State<CameraScreen> {
                           ),
                         ),
                         Text(
-                          _agenteLatin(r.classe),
+                          infoDoenca(r.classe).nomeLatim,
                           style: GoogleFonts.newsreader(
                             fontSize: 12,
                             fontStyle: FontStyle.italic,
@@ -711,120 +714,8 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 
   // ── Dados estáticos das doenças ───────────────────────────────────────────
-  _DadosDoenca _infoDoenca(String classe) {
-    const map = <String, _DadosDoenca>{
-      'D01_requeima': _DadosDoenca(
-        tipoAgente: 'Oomiceto',
-        corAgente: CeresColors.blight,
-        descricao: 'Causada por Phytophthora infestans. Destrói folhas, caules e frutos em poucos dias sob alta umidade.',
-        acao: 'Aplicar fungicida cúprico imediatamente. Remover e queimar folhas afetadas. Evitar irrigação noturna.',
-        urgencia: 'URGENTE',
-      ),
-      'D02_septoriose': _DadosDoenca(
-        tipoAgente: 'Fungo',
-        corAgente: CeresColors.dryGrass,
-        descricao: 'Septoria lycopersici causa manchas circulares com centro claro e bordas escuras nas folhas mais velhas.',
-        acao: 'Aplicar fungicida preventivo. Remover folhas infectadas. Aumentar espaçamento entre plantas.',
-        urgencia: 'MODERADO',
-      ),
-      'D03_pinta_preta': _DadosDoenca(
-        tipoAgente: 'Fungo',
-        corAgente: CeresColors.dryGrass,
-        descricao: 'Alternaria solani forma lesões necróticas com anéis concêntricos. Favorecida por temperaturas altas.',
-        acao: 'Fungicida à base de mancozebe. Eliminação de restos culturais. Rotação de cultura.',
-        urgencia: 'MODERADO',
-      ),
-      'D03b_mancha_alvo': _DadosDoenca(
-        tipoAgente: 'Fungo',
-        corAgente: CeresColors.dryGrass,
-        descricao: 'Corynespora cassiicola causa lesões com padrão de alvo. Comum em ambientes quentes e úmidos.',
-        acao: 'Fungicida sistêmico. Reduzir umidade. Evitar molhamento foliar.',
-        urgencia: 'MODERADO',
-      ),
-      'D05_mofo_foliar': _DadosDoenca(
-        tipoAgente: 'Fungo',
-        corAgente: CeresColors.dryGrass,
-        descricao: 'Passalora fulva. Manchas amarelas na face superior e mofo oliváceo na face inferior da folha.',
-        acao: 'Melhorar ventilação. Fungicida à base de trifloxistrobina. Reduzir umidade relativa.',
-        urgencia: 'MODERADO',
-      ),
-      'D06_vira_cabeca': _DadosDoenca(
-        tipoAgente: 'Vírus',
-        corAgente: CeresColors.blight,
-        descricao: 'TSWV transmitido por tripes. Causa bronzeamento e enrolamento das folhas. Sem cura após infecção.',
-        acao: 'Erradicar plantas doentes. Controlar tripes com inseticida. Usar variedades resistentes.',
-        urgencia: 'URGENTE',
-      ),
-      'D06b_mosaico': _DadosDoenca(
-        tipoAgente: 'Vírus',
-        corAgente: CeresColors.blight,
-        descricao: 'ToMV causa mosaico claro-escuro nas folhas e redução de produtividade. Transmitido por contato.',
-        acao: 'Erradicar plantas sintomáticas. Desinfetar ferramentas. Usar sementes certificadas.',
-        urgencia: 'URGENTE',
-      ),
-      'D07_acaro_bronzeamento': _DadosDoenca(
-        tipoAgente: 'Ácaro',
-        corAgente: CeresColors.dryGrass,
-        descricao: 'Aculops lycopersici causa bronzeamento e endurecimento da epiderme. Prolifera em tempo seco.',
-        acao: 'Acaricida à base de enxofre. Monitorar semanalmente. Aumentar umidade relativa.',
-        urgencia: 'MODERADO',
-      ),
-      'D09_mancha_bacteriana': _DadosDoenca(
-        tipoAgente: 'Bactéria',
-        corAgente: CeresColors.blight,
-        descricao: 'Xanthomonas vesicatoria causa manchas encharcadas que evoluem para lesões necróticas escuras.',
-        acao: 'Calda bordalesa preventiva. Evitar irrigação por aspersão. Usar sementes tratadas.',
-        urgencia: 'URGENTE',
-      ),
-      'saudavel': _DadosDoenca(
-        tipoAgente: 'Normal',
-        corAgente: CeresColors.leafLive,
-        descricao: 'Folha sem sinais de doença detectados. Manter monitoramento periódico e boas práticas culturais.',
-        acao: 'Manter monitoramento semanal. Adubação equilibrada. Irrigação adequada.',
-        urgencia: 'NORMAL',
-      ),
-    };
-    return map[classe] ??
-        const _DadosDoenca(
-          tipoAgente: 'Desconhecido',
-          corAgente: CeresColors.ink3,
-          descricao: 'Informações não disponíveis para esta classe.',
-          acao: 'Consultar agrônomo para avaliação presencial.',
-          urgencia: 'A VERIFICAR',
-        );
-  }
+  DoencaInfo _infoDoenca(String classe) => infoDoenca(classe);
 
-  String _agenteLatin(String classe) {
-    const map = {
-      'D01_requeima': 'Phytophthora infestans',
-      'D02_septoriose': 'Septoria lycopersici',
-      'D03_pinta_preta': 'Alternaria solani',
-      'D03b_mancha_alvo': 'Corynespora cassiicola',
-      'D05_mofo_foliar': 'Passalora fulva',
-      'D06_vira_cabeca': 'TSWV — tripes',
-      'D06b_mosaico': 'Tomato mosaic virus',
-      'D07_acaro_bronzeamento': 'Aculops lycopersici',
-      'D09_mancha_bacteriana': 'Xanthomonas vesicatoria',
-      'saudavel': 'Solanum lycopersicum — sem patógeno',
-    };
-    return map[classe] ?? '';
-  }
-}
-
-// ── Dados estáticos ──────────────────────────────────────────────────────────
-class _DadosDoenca {
-  final String tipoAgente;
-  final Color corAgente;
-  final String descricao;
-  final String acao;
-  final String urgencia;
-  const _DadosDoenca({
-    required this.tipoAgente,
-    required this.corAgente,
-    required this.descricao,
-    required this.acao,
-    required this.urgencia,
-  });
 }
 
 // ── Widgets auxiliares ───────────────────────────────────────────────────────

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../theme/ceres_theme.dart';
+import '../widgets/ceres_icons.dart';
 
 class SplashScreen extends StatefulWidget {
   final Widget destino;
@@ -100,27 +101,11 @@ class _SplashScreenState extends State<SplashScreen>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Marca "C"
-                  Container(
-                    width: 96,
-                    height: 96,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                          color: const Color(0x33FAF2E4), width: 1),
-                      color: CeresColors.leafDark.withValues(alpha: 0.6),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'C',
-                      style: GoogleFonts.newsreader(
-                        fontSize: 54,
-                        fontStyle: FontStyle.italic,
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xFFFAF2E4),
-                        height: 1,
-                      ),
-                    ),
+                  // Marca botânica SVG — lente foliar em branco/cream
+                  const CeresSvgIcon(
+                    svgString: CeresIconsSvg.mark,
+                    color: Color(0xFFFAF2E4),
+                    size: 96,
                   ),
                   const SizedBox(height: 26),
                   // Wordmark

@@ -2,7 +2,7 @@
 **TCC Engenharia da Computação — IFMT Cuiabá**
 **Autor:** Namem Rachid Jaudy Neto
 **Orientador:** (a preencher)
-**Última atualização:** 2026-04-28
+**Última atualização:** 2026-05-28
 
 > Este documento registra cronologicamente tudo que foi implementado,
 > as decisões tomadas, os resultados obtidos e os problemas resolvidos.
@@ -655,3 +655,106 @@ do PlantVillage (fundos, iluminação, ângulo).
 - Experimento edge vs cloud (núcleo científico do TCC)
 - Persistência offline com Drift
 - Layout final no Claude Design
+
+---
+
+## Sprint 3.5 — Design System Taxonomia Viva + Telas Completas — 2026-05-28
+
+### Contexto
+Após validação end-to-end da Sprint 3 (pipeline Flutter→Django→TFLite funcionando),
+implementado design system completo baseado no mockup "Taxonomia Viva" criado no
+Claude Design. Paleta derivada do cerrado mato-grossense (OKLCH→sRGB). Todas as telas
+redesenhadas do zero para corresponder ao HTML de referência.
+
+### Design System — CeresTheme
+
+| Token | Hex | Semântica |
+|---|---|---|
+| bone | #F1ECE5 | Fundo — terra seca |
+| paper | #FAF4EB | Cards — caderno botânico |
+| leafDeep | #1A2D1D | AppBar splash |
+| leafDark | #2B412B | Botões primários |
+| leafLive | #5D8650 | Saudável |
+| blight | #A64636 | Doença — ferrugem |
+| dryGrass | #C69245 | Alerta moderado |
+| ink | #261E19 | Texto — nanquim |
+
+**Fontes:**
+- Newsreader (serif display) — nomes de doenças, títulos, valores de sensor
+- IBM Plex Sans (sans body) — rótulos, botões, metadados
+- IBM Plex Mono (monospace) — dados técnicos, timestamps, porcentagens
+
+### Telas implementadas
+
+| Tela | Arquivo | Componentes chave |
+|---|---|---|
+| Splash | `splash_screen.dart` | Animação fade, brackets botânicos, barra progresso, crédito "Namem Rachid" |
+| Login | `login_screen.dart` | Campos underline, checkbox, JWT, "Continuar sem conta" |
+| Diagnóstico | `camera_screen.dart` | Viewfinder brackets+reticle, result card, barra confiança com ticks 25%/50%, score bars 3px, action box |
+| IoT/Histórico | `historico_screen.dart` | Sensor card 3-col, IoT summary 2-col, MQTT strip, event icon anel+dot |
+| Salvos | `historico_local_screen.dart` | Offline banner, faixa vertical 3px, scores expansíveis |
+| Enciclopédia | `enciclopedia_screen.dart` | Lista 10 doenças, stat card urgentes/moderadas, expansível com ação recomendada |
+
+### Arquitetura de dados centralizada
+
+`lib/data/doencas_data.dart` — `DoencaInfo` com 10 doenças compartilhada entre
+`CameraScreen` e `EnciclopediaScreen`. Elimina duplicação de código.
+
+### Correções de bugs
+
+| Bug | Arquivo | Correção |
+|---|---|---|
+| Porta 8080 (errada) | `config.dart` | → 8000 (padrão Django) |
+| URL JWT errada (`/api/token/`) | `config.dart` + `api_service.dart` | → `/api/auth/token/` |
+| `ALLOWED_HOSTS = []` bloqueava PC | `settings.py` | → `['localhost', '127.0.0.1']` |
+| `TFLITE_MODEL_PATH` ausente em settings.py | `settings.py` | → adicionado (Exp E) |
+| Campos sensor NOT NULL | `diagnostico/models.py` | → `null=True, blank=True` |
+| JWT retornado mas não persistido | `login_screen.dart` | Documentado como trabalho futuro |
+
+### Navegação
+
+NavigationBar Material 3 substituída por widget custom com **linha indicadora no topo**
+da aba ativa (equivalente ao `::before { top: 0 }` do HTML de referência).
+5 abas: Diagnóstico / IoT / Salvo / Mapa / Guia.
+
+### Resultado
+- `flutter analyze` → zero issues ✅
+- Backend com `TFLITE_MODEL_PATH` → inferência funcional ✅
+- Pipeline completo: Splash→Login→Diagnóstico→Resultado→Salvo ✅
+
+---
+
+## Sprint 3.6 — Fidelidade pixel-perfect HTML → Flutter — 2026-05-28
+
+### Problema identificado
+
+Usuário reportou que os ícones e cores do app não correspondiam ao HTML de design.
+Diagnóstico: Material Icons (estilo preenchido/arredondado) vs. custom thin-stroke SVG
+do HTML (stroke-width="1.6", viewBox="0 0 24 24"). Ordem das abas também divergia.
+
+### Solução
+
+**Dependência adicionada:** `flutter_svg: ^2.0.10` — renderiza SVG nativamente no Flutter,
+suportando `currentColor` via `SvgTheme(currentColor: cor)`.
+
+**`lib/widgets/ceres_icons.dart`** (NOVO):
+- `CeresIconsSvg` — constantes com as strings SVG exatas do HTML
+- `CeresSvgIcon` — widget wrapper: `SvgPicture.string(svgString, theme: SvgTheme(currentColor: color))`
+- `CeresMark` — marca botânica (lente/folha rotacionada) em Container circular
+
+**`lib/widgets/ceres_app_bar.dart`** (REFATORADO):
+- Marca "C" sólido → lente botânica SVG (bg transparente, borda hairline, leafDeep)
+- `CeresIconButton` → aceita `svgString` + `SvgPicture`; `.material()` para fallback
+- `CeresAppBar` → page-bar com título dois-segmentos: `pageTitleItalic` (leafDeep italic) + `pageTitle` (ink normal)
+
+**Tab bar corrigida:**
+- Material Icons removidos; substituídos por `CeresSvgIcon` com paths do HTML
+- Ordem: Diagnóstico (câmera) / Mapa (pin) / IoT (ECG) / Enciclopédia (caderno) / Perfil (pessoa)
+- "Salvos" removido da tab bar → acessível via botão no appbar da tela Diagnóstico
+
+**Splash + Login:** marca botânica SVG substitui "C" em ambas as telas.
+
+### Resultado
+- `flutter analyze` → zero issues ✅
+- Ícones thin-stroke SVG idênticos ao HTML ✅
+- Ordem das abas corrigida para HTML de referência ✅

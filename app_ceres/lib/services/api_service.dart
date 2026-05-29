@@ -30,7 +30,7 @@ class ApiService {
     required String email,
     required String senha,
   }) async {
-    final uri = Uri.parse('${Config.baseUrl}/api/token/');
+    final uri = Uri.parse(Config.tokenEndpoint);
     final resp = await http.post(
       uri,
       headers: {'Content-Type': 'application/json'},

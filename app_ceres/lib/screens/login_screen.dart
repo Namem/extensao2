@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/api_service.dart';
 import '../theme/ceres_theme.dart';
+import '../widgets/ceres_icons.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -58,25 +59,12 @@ class _LoginScreenState extends State<LoginScreen> {
             padding: EdgeInsets.fromLTRB(24, top + 10, 24, 0),
             child: Row(
               children: [
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: CeresColors.leafDark,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: CeresColors.hairline, width: 0.8),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    'C',
-                    style: GoogleFonts.newsreader(
-                      fontSize: 18,
-                      fontStyle: FontStyle.italic,
-                      fontWeight: FontWeight.w500,
-                      color: CeresColors.paper,
-                      height: 1,
-                    ),
-                  ),
+                // Marca botânica SVG em leafDeep (design HTML: login-mark-row svg)
+                CeresMark(
+                  size: 32,
+                  color: CeresColors.leafDeep,
+                  borderColor: CeresColors.hairline,
+                  bgColor: Colors.transparent,
                 ),
                 const SizedBox(width: 12),
                 Column(

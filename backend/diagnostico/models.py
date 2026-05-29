@@ -86,9 +86,21 @@ class DiagnosticoEvento(models.Model):
         verbose_name="Confiança (%)",
         help_text="Probabilidade retornada pelo modelo (0.0 a 1.0)."
     )
-    temperatura = models.FloatField(verbose_name="Temperatura (°C)")
-    umidade_ar = models.IntegerField(verbose_name="Umidade do Ar (%)")
-    umidade_solo = models.IntegerField(verbose_name="Umidade do Solo (%)")
+    temperatura = models.FloatField(
+        null=True, blank=True,
+        verbose_name="Temperatura (°C)",
+        help_text="Leitura do sensor DHT22. Nulo se sensor não conectado."
+    )
+    umidade_ar = models.FloatField(
+        null=True, blank=True,
+        verbose_name="Umidade do Ar (%)",
+        help_text="Leitura do sensor DHT22. Nulo se sensor não conectado."
+    )
+    umidade_solo = models.FloatField(
+        null=True, blank=True,
+        verbose_name="Umidade do Solo (%)",
+        help_text="Leitura do sensor capacitivo. Nulo se sensor não conectado."
+    )
     timestamp = models.DateTimeField(
         verbose_name="Timestamp do Dispositivo",
         help_text="Momento da captura no ESP32 (ISO8601)."

@@ -224,8 +224,52 @@ Django containerizado; experimento edge vs cloud documentado.
 - [x] `flutter analyze` → zero issues
 - [x] `pubspec.yaml` — `path: ^1.9.1` adicionado
 
-### Pendente ⏳
-- [ ] Layout final (Claude Design)
+### Sprint 3.6 — Fidelidade pixel-perfect ao HTML design ✅ CONCLUÍDA (2026-05-28)
+
+- [x] `flutter_svg: ^2.0.10` adicionado ao pubspec — renderização SVG nativa
+- [x] `lib/widgets/ceres_icons.dart` — SVG strings exatos do HTML (câmera, pin, ECG, caderno, pessoa, filtro, mapa, busca, exportar, mark botânica)
+- [x] `CeresSvgIcon` + `CeresMark` — widgets helpers para ícones thin-stroke (stroke-width="1.6")
+- [x] Tab bar: Material Icons → custom SVG thin-stroke idênticos ao HTML
+- [x] Tab order corrigido para HTML: Diagnóstico, Mapa, IoT, Enciclopédia, Perfil
+- [x] Appbar: mark "C" sólido → lente botânica SVG (transparente + borda hairline + leafDeep)
+- [x] `CeresAppBar` refatorado: page-bar com título itálico+leafDeep (ex: *Histórico* IoT)
+- [x] Appbar actions atualizadas para SVG em todos os screens
+- [x] Splash e Login: marca botânica SVG substituindo "C"
+- [x] "Salvos" removido da tab bar → acessível via ícone na tela Diagnóstico
+
+---
+
+### Sprint 3.5 — Design System + Telas Completas ✅ CONCLUÍDA (2026-05-28)
+
+#### Design System — Taxonomia Viva
+- [x] `lib/theme/ceres_theme.dart` — paleta cerrado (OKLCH→hex), Material 3 ThemeData
+- [x] `lib/widgets/ceres_app_bar.dart` — CeresAppBar (paper claro) + CeresIconButton
+- [x] `lib/data/doencas_data.dart` — dados centralizados das 10 doenças (compartilhado)
+- [x] Fontes: Newsreader (display serif) + IBM Plex Sans (corpo) + IBM Plex Mono (dados)
+- [x] `assets/icon.png` + `assets/splash.png` — ícone e splash nativo (1024×1024)
+
+#### Telas implementadas
+- [x] `SplashScreen` — fundo leafDeep, brackets botânicos, barra de progresso, crédito "Namem Rachid Jaudy Neto"
+- [x] `LoginScreen` — campos e-mail/senha, JWT, checkbox lembrar, "Continuar sem conta"
+- [x] `CameraScreen` — viewfinder brackets+reticle, result card Newsreader, barra confiança com ticks, score bars 3px, "Sobre a Doença" + caixa de ação
+- [x] `HistoricoScreen` (IoT) — sensor card 3-col (temp/umid_ar/umid_solo), IoT summary 2-col, MQTT strip, event icon anel+dot, day separators
+- [x] `HistoricoLocalScreen` — offline banner, faixa vertical 3px, ExpansionTile estilizado
+- [x] `EnciclopediaScreen` — lista 10 doenças, expansível, caixa ação com urgência colorida
+- [x] Placeholders: Mapa (aba 4)
+- [x] Navegação 5 abas com linha indicadora no topo (estilo HTML design)
+
+#### Correções de arquitetura
+- [x] `config.dart` — porta 8080→8000, `tokenEndpoint` correto (`/api/auth/token/`)
+- [x] `api_service.dart` — login usa `Config.tokenEndpoint`
+- [x] `settings.py` — `ALLOWED_HOSTS` com localhost + `TFLITE_MODEL_PATH` adicionado
+- [x] `diagnostico/models.py` — campos sensor `null=True, blank=True` (temperatura, umidade_ar, umidade_solo)
+- [x] `evento_mqtt.dart` — campos opcionais temperatura/umidadeAr/umidadeSolo adicionados
+
+#### Pendente (trabalho futuro)
+- [ ] `connectivity_plus` — banner offline honesto (detectar conectividade real)
+- [ ] `flutter_secure_storage` — persistência JWT no KeyStore/Keychain
+- [ ] `shared_preferences` — "lembrar acesso" persistente
+- [ ] Tela Mapa (placeholder) — requer `geolocator` + backend com coordenadas GPS
 
 ---
 
@@ -238,4 +282,6 @@ Django containerizado; experimento edge vs cloud documentado.
 | Sprint 1b | Firmware ESP32-S3 MQTT | ✅ Concluída | 7/7 |
 | Sprint 2 | TFLite Micro ESP32-S3 (sem câmera) | ✅ Concluída | 11/11 |
 | Sprint 3 | Flutter + Django PC + API | ✅ Concluída | 19/19 |
+| Sprint 3.5 | Design System + Telas Completas | ✅ Concluída | 20/20 |
+| Sprint 3.6 | Fidelidade pixel-perfect HTML → Flutter | ✅ Concluída | 11/11 |
 | Fase Futura | RPi3B+ + EfficientNet (Exp F) | 📋 Registrado | — |

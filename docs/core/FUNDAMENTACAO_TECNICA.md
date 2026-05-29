@@ -310,6 +310,49 @@ Usar **Flutter (Dart)** com **Drift** para cache SQLite local.
   que o app funcione **offline** e sincronize ao reconectar — requisito do
   Ceres para uso em áreas rurais sem conectividade constante
 
+### 7.1 Design System — Taxonomia Viva (Sprint 3.5)
+
+#### Material 3
+
+O Ceres utiliza **Flutter Material 3** como sistema de componentes base.
+A escolha de M3 sobre M2 se justifica pela:
+- Suporte nativo a `NavigationBar`, `ColorScheme` semântico e `DynamicColor`
+- API de temas unificada (`ThemeData`) com `useMaterial3: true`
+- Compatibilidade com `NavigationBar` customizada (linha indicadora no topo
+  em vez do indicador pill padrão do M3 — mais próximo da linguagem visual do projeto)
+
+#### Paleta Cerrado (OKLCH → sRGB)
+
+As cores foram derivadas do cerrado mato-grossense usando o espaço de cor
+**OKLCH** (perceptualmente uniforme) e convertidas para hex sRGB para uso no Flutter.
+A escolha de OKLCH garante que incrementos idênticos em luminância (`L`) produzam
+diferenças perceptuais iguais — relevante para os tokens de urgência
+(blight/dryGrass/leafLive) usados como indicadores clínicos de severidade.
+
+Referência: BJÖRN Ottosson, "A perceptually uniform color space for image processing",
+2020. Disponível em: https://bottosson.github.io/posts/oklab/
+
+#### Tipografia
+
+| Família | Uso no app | Justificativa |
+|---|---|---|
+| **Newsreader** (Google Fonts) | Nomes de doenças, valores sensor, títulos | Serifa de texto com boa legibilidade em telas pequenas; remete ao caderno botânico |
+| **IBM Plex Sans** | Corpo de texto, botões, rótulos | Família técnica humanista, legível em tamanhos pequenos (8-13px) |
+| **IBM Plex Mono** | Timestamps, porcentagens, dados técnicos | Alinhamento tabular de dados numéricos sem font-feature-settings manual |
+
+A combinação Newsreader + IBM Plex é documentada na literatura de design editorial
+como eficaz para interfaces que combinam conteúdo científico e leitura rápida
+(LUPTON, Ellen. *Thinking with Type*. 2ª ed. Princeton Architectural Press, 2010).
+
+#### Bibliotecas de UI adicionadas
+
+| Pacote | Versão | Justificativa |
+|---|---|---|
+| `google_fonts` | ^6.2.1 | Acesso às fontes Newsreader e IBM Plex via CDN/cache local. Alternativa (bundled fonts) descartada por tamanho do APK |
+| `flutter_native_splash` | ^2.4.6 | Gera splash screen nativo Android/iOS a partir de um PNG, evitando flash branco no carregamento. Padrão recomendado pela documentação Flutter |
+| `flutter_launcher_icons` | ^0.14.3 | Gera todos os tamanhos de ícone Android/iOS a partir de um único PNG 1024×1024 |
+| `flutter_svg` | ^2.0.10 | Renderização nativa de SVG no Flutter — necessário para fidelidade pixel-perfect com os ícones thin-stroke do design HTML (stroke-width 1.6). A alternativa (Material Icons) usa iconografia preenchida/arredondada incompatível com o design system Taxonomia Viva. `SvgTheme.currentColor` permite colorização dinâmica sem manipulação de string |
+
 ---
 
 ## 8. Gap Laboratorio-Campo e Background Augmentation

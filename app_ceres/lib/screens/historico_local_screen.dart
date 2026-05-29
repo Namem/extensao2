@@ -8,6 +8,7 @@ import '../database/database.dart';
 import '../models/resultado_inferencia.dart';
 import '../theme/ceres_theme.dart';
 import '../widgets/ceres_app_bar.dart';
+import '../widgets/ceres_icons.dart';
 
 class HistoricoLocalScreen extends StatelessWidget {
   const HistoricoLocalScreen({super.key});
@@ -17,12 +18,18 @@ class HistoricoLocalScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: CeresColors.bone,
       appBar: CeresAppBar(
-        pageTitle: 'Diagnósticos Salvos',
+        pageTitleItalic: 'Salvos',
+        pageTitle: 'offline',
         actions: [
           CeresIconButton(
-            icon: Icons.delete_sweep_outlined,
-            tooltip: 'Limpar histórico',
-            onPressed: () => _confirmarLimpeza(context),
+            svgString: CeresIconsSvg.iconSearch,
+            tooltip: 'Buscar',
+            onPressed: () {},
+          ),
+          CeresIconButton(
+            svgString: CeresIconsSvg.iconExport,
+            tooltip: 'Exportar',
+            onPressed: () {},
           ),
         ],
       ),
@@ -343,7 +350,8 @@ class HistoricoLocalScreen extends StatelessWidget {
     );
   }
 
-  // ── Confirmar limpeza ────────────────────────────────────────────────────────
+  // ── Confirmar limpeza (acessível via long-press no rodapé em sprints futuras) ──
+  // ignore: unused_element
   Future<void> _confirmarLimpeza(BuildContext context) async {
     final ok = await showDialog<bool>(
       context: context,

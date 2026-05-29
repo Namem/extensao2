@@ -21,7 +21,7 @@ load_dotenv(BASE_DIR / '.env')
 SECRET_KEY = os.environ['SECRET_KEY']
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
 
 
 # Application definition
@@ -144,3 +144,6 @@ SIMPLE_JWT = {
 
 # Define o nosso modelo de usuário customizado (que vamos criar na próxima task)
 AUTH_USER_MODEL = 'accounts.CustomUser'
+
+# Caminho do modelo TFLite — Exp E (modelo final, 638KB INT8)
+TFLITE_MODEL_PATH = BASE_DIR / 'datasets' / 'modelo' / 'ceres_expe_int8.tflite'

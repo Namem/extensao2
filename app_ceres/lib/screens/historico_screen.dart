@@ -5,6 +5,7 @@ import '../models/evento_mqtt.dart';
 import '../services/api_service.dart';
 import '../theme/ceres_theme.dart';
 import '../widgets/ceres_app_bar.dart';
+import '../widgets/ceres_icons.dart';
 
 class HistoricoScreen extends StatefulWidget {
   const HistoricoScreen({super.key});
@@ -56,13 +57,19 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
     return Scaffold(
       backgroundColor: CeresColors.bone,
       appBar: CeresAppBar(
-        pageTitle: 'IoT · ESP32',
-        pageCount: '$_total eventos',
+        pageTitleItalic: 'Histórico',
+        pageTitle: 'IoT',
+        pageCount: '$_total · últ. 24h',
         actions: [
           CeresIconButton(
-            icon: Icons.refresh,
+            svgString: CeresIconsSvg.iconFilter,
+            tooltip: 'Filtrar',
             onPressed: _carregando ? null : () => _carregar(),
-            tooltip: 'Atualizar',
+          ),
+          CeresIconButton(
+            svgString: CeresIconsSvg.iconMapGrid,
+            tooltip: 'Mapa',
+            onPressed: () {},
           ),
         ],
       ),

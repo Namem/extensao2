@@ -4,9 +4,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'screens/camera_screen.dart';
 import 'screens/historico_screen.dart';
 import 'screens/historico_local_screen.dart';
+import 'screens/enciclopedia_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/splash_screen.dart';
 import 'theme/ceres_theme.dart';
+import 'widgets/ceres_icons.dart';
 
 void main() {
   final binding = WidgetsFlutterBinding.ensureInitialized();
@@ -27,6 +29,7 @@ class CeresApp extends StatelessWidget {
       routes: {
         '/home': (_) => const HomeScreen(),
         '/login': (_) => const LoginScreen(),
+        '/salvos': (_) => const HistoricoLocalScreen(),
       },
       home: SplashScreen(destino: const LoginScreen()),
     );
@@ -43,27 +46,22 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _abaSelecionada = 0;
 
-  static const _telas = [
-    CameraScreen(),
-    HistoricoScreen(),
-    HistoricoLocalScreen(),
-    _PlaceholderScreen(
-      icon: Icons.map_outlined,
+  // Ordem exata do HTML: Diagnóstico, Mapa, IoT, Enciclopédia, Perfil
+  static final _telas = [
+    const CameraScreen(),
+    const _PlaceholderScreen(
+      svgIcon: CeresIconsSvg.tabMapa,
       titulo: 'Mapa de Ocorrências',
       subtitulo: 'em desenvolvimento',
     ),
-    _PlaceholderScreen(
-      icon: Icons.menu_book_outlined,
-      titulo: 'Enciclopédia',
-      subtitulo: '10 doenças catalogadas',
+    const HistoricoScreen(),
+    const EnciclopediaScreen(),
+    const _PlaceholderScreen(
+      svgIcon: CeresIconsSvg.tabPerfil,
+      titulo: 'Perfil',
+      subtitulo: 'em desenvolvimento',
     ),
   ];
-
-  @override
-  void initState() {
-    super.initState();
-    // Native splash já foi removido no main()
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,17 +75,18 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _navBar() {
-    const items = [
-      _NavItem(icon: Icons.camera_alt_outlined, selIcon: Icons.camera_alt,    label: 'Diagnóstico'),
-      _NavItem(icon: Icons.sensors_outlined,    selIcon: Icons.sensors,        label: 'IoT'),
-      _NavItem(icon: Icons.save_outlined,       selIcon: Icons.save,           label: 'Salvo'),
-      _NavItem(icon: Icons.map_outlined,        selIcon: Icons.map,            label: 'Mapa'),
-      _NavItem(icon: Icons.menu_book_outlined,  selIcon: Icons.menu_book,      label: 'Guia'),
+    // Tab order e ícones exatos do HTML de design
+    const tabs = [
+      _NavItem(svg: CeresIconsSvg.tabDiagnostico, label: 'Diagnóstico'),
+      _NavItem(svg: CeresIconsSvg.tabMapa,        label: 'Mapa'),
+      _NavItem(svg: CeresIconsSvg.tabIot,         label: 'IoT'),
+      _NavItem(svg: CeresIconsSvg.tabEnciclopedia, label: 'Enciclopédia'),
+      _NavItem(svg: CeresIconsSvg.tabPerfil,      label: 'Perfil'),
     ];
 
     return Container(
       decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: CeresColors.hairline, width: 0.8)),
+        border: Border(top: BorderSide(color: CeresColors.hairline, width: 1)),
         color: CeresColors.paper2,
       ),
       child: SafeArea(
@@ -95,37 +94,43 @@ class _HomeScreenState extends State<HomeScreen> {
         child: SizedBox(
           height: 60,
           child: Row(
-            children: List.generate(items.length, (i) {
+            children: List.generate(tabs.length, (i) {
               final sel = _abaSelecionada == i;
+              final color = sel ? CeresColors.leafDeep : CeresColors.ink3;
               return Expanded(
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: () => setState(() => _abaSelecionada = i),
                   child: Column(
                     children: [
-                      // Linha indicadora no topo (igual HTML)
+                      // Linha indicadora no topo (2px leafDeep quando ativo)
                       Container(
                         height: 2,
+                        width: 18,
                         color: sel ? CeresColors.leafDeep : Colors.transparent,
                       ),
                       Expanded(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              sel ? items[i].selIcon : items[i].icon,
+                            CeresSvgIcon(
+                              svgString: tabs[i].svg,
+                              color: color,
                               size: 17,
-                              color: sel ? CeresColors.leafDeep : CeresColors.ink3,
                             ),
                             const SizedBox(height: 3),
                             Text(
-                              items[i].label,
+                              tabs[i].label,
                               style: GoogleFonts.ibmPlexSans(
                                 fontSize: 8.5,
                                 letterSpacing: 0.04,
-                                color: sel ? CeresColors.leafDeep : CeresColors.ink3,
-                                fontWeight: sel ? FontWeight.w500 : FontWeight.w400,
+                                color: color,
+                                fontWeight: sel
+                                    ? FontWeight.w500
+                                    : FontWeight.w400,
                               ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
                             ),
                           ],
                         ),
@@ -143,20 +148,19 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class _NavItem {
-  final IconData icon;
-  final IconData selIcon;
+  final String svg;
   final String label;
-  const _NavItem({required this.icon, required this.selIcon, required this.label});
+  const _NavItem({required this.svg, required this.label});
 }
 
 /// Placeholder para telas ainda não implementadas
 class _PlaceholderScreen extends StatelessWidget {
-  final IconData icon;
+  final String svgIcon;
   final String titulo;
   final String subtitulo;
 
   const _PlaceholderScreen({
-    required this.icon,
+    required this.svgIcon,
     required this.titulo,
     required this.subtitulo,
   });
@@ -169,10 +173,10 @@ class _PlaceholderScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 52,
+            CeresSvgIcon(
+              svgString: svgIcon,
               color: CeresColors.ink3.withValues(alpha: 0.35),
+              size: 48,
             ),
             const SizedBox(height: 16),
             Text(
@@ -192,7 +196,8 @@ class _PlaceholderScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
               decoration: BoxDecoration(
                 border: Border.all(
                     color: CeresColors.hairline.withValues(alpha: 0.6)),
