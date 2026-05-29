@@ -4,12 +4,15 @@ import 'package:google_fonts/google_fonts.dart';
 import 'screens/camera_screen.dart';
 import 'screens/historico_screen.dart';
 import 'screens/historico_local_screen.dart';
+import 'screens/login_screen.dart';
+import 'screens/splash_screen.dart';
 import 'theme/ceres_theme.dart';
 
 void main() {
   final binding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: binding);
   runApp(const CeresApp());
+  FlutterNativeSplash.remove();
 }
 
 class CeresApp extends StatelessWidget {
@@ -21,7 +24,11 @@ class CeresApp extends StatelessWidget {
       title: 'Ceres Diagnóstico',
       debugShowCheckedModeBanner: false,
       theme: CeresTheme.theme,
-      home: const HomeScreen(),
+      routes: {
+        '/home': (_) => const HomeScreen(),
+        '/login': (_) => const LoginScreen(),
+      },
+      home: SplashScreen(destino: const LoginScreen()),
     );
   }
 }
@@ -55,9 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      FlutterNativeSplash.remove();
-    });
+    // Native splash já foi removido no main()
   }
 
   @override
@@ -72,61 +77,76 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _navBar() {
+    const items = [
+      _NavItem(icon: Icons.camera_alt_outlined, selIcon: Icons.camera_alt,    label: 'Diagnóstico'),
+      _NavItem(icon: Icons.sensors_outlined,    selIcon: Icons.sensors,        label: 'IoT'),
+      _NavItem(icon: Icons.save_outlined,       selIcon: Icons.save,           label: 'Salvo'),
+      _NavItem(icon: Icons.map_outlined,        selIcon: Icons.map,            label: 'Mapa'),
+      _NavItem(icon: Icons.menu_book_outlined,  selIcon: Icons.menu_book,      label: 'Guia'),
+    ];
+
     return Container(
       decoration: const BoxDecoration(
-        border: Border(
-          top: BorderSide(color: CeresColors.hairline, width: 0.8),
+        border: Border(top: BorderSide(color: CeresColors.hairline, width: 0.8)),
+        color: CeresColors.paper2,
+      ),
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          height: 60,
+          child: Row(
+            children: List.generate(items.length, (i) {
+              final sel = _abaSelecionada == i;
+              return Expanded(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => setState(() => _abaSelecionada = i),
+                  child: Column(
+                    children: [
+                      // Linha indicadora no topo (igual HTML)
+                      Container(
+                        height: 2,
+                        color: sel ? CeresColors.leafDeep : Colors.transparent,
+                      ),
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              sel ? items[i].selIcon : items[i].icon,
+                              size: 17,
+                              color: sel ? CeresColors.leafDeep : CeresColors.ink3,
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              items[i].label,
+                              style: GoogleFonts.ibmPlexSans(
+                                fontSize: 8.5,
+                                letterSpacing: 0.04,
+                                color: sel ? CeresColors.leafDeep : CeresColors.ink3,
+                                fontWeight: sel ? FontWeight.w500 : FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+          ),
         ),
-        color: CeresColors.paper,
-      ),
-      child: NavigationBar(
-        selectedIndex: _abaSelecionada,
-        onDestinationSelected: (i) => setState(() => _abaSelecionada = i),
-        backgroundColor: CeresColors.paper,
-        indicatorColor: CeresColors.leafDeep.withValues(alpha: 0.12),
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-        destinations: [
-          _dest(
-            icon: Icons.camera_alt_outlined,
-            selIcon: Icons.camera_alt,
-            label: 'Diagnóstico',
-          ),
-          _dest(
-            icon: Icons.sensors_outlined,
-            selIcon: Icons.sensors,
-            label: 'IoT',
-          ),
-          _dest(
-            icon: Icons.save_outlined,
-            selIcon: Icons.save,
-            label: 'Salvo',
-          ),
-          _dest(
-            icon: Icons.map_outlined,
-            selIcon: Icons.map,
-            label: 'Mapa',
-          ),
-          _dest(
-            icon: Icons.menu_book_outlined,
-            selIcon: Icons.menu_book,
-            label: 'Guia',
-          ),
-        ],
       ),
     );
   }
+}
 
-  NavigationDestination _dest({
-    required IconData icon,
-    required IconData selIcon,
-    required String label,
-  }) {
-    return NavigationDestination(
-      icon: Icon(icon),
-      selectedIcon: Icon(selIcon),
-      label: label,
-    );
-  }
+class _NavItem {
+  final IconData icon;
+  final IconData selIcon;
+  final String label;
+  const _NavItem({required this.icon, required this.selIcon, required this.label});
 }
 
 /// Placeholder para telas ainda não implementadas

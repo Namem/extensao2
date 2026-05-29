@@ -25,6 +25,28 @@ class ApiService {
     throw Exception('Servidor retornou ${streamed.statusCode}: $body');
   }
 
+  /// Login com e-mail e senha — retorna tokens JWT ou lança Exception.
+  Future<Map<String, String>> login({
+    required String email,
+    required String senha,
+  }) async {
+    final uri = Uri.parse('${Config.baseUrl}/api/token/');
+    final resp = await http.post(
+      uri,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'username': email, 'password': senha}),
+    ).timeout(const Duration(seconds: 20));
+
+    if (resp.statusCode == 200) {
+      final data = jsonDecode(resp.body) as Map<String, dynamic>;
+      return {
+        'access': data['access'] as String,
+        'refresh': data['refresh'] as String,
+      };
+    }
+    throw Exception('Login falhou: ${resp.statusCode}');
+  }
+
   /// Busca página [page] do histórico de eventos MQTT.
   /// Retorna mapa com count, next, previous e results (lista de EventoMqtt).
   Future<Map<String, dynamic>> historico({int page = 1}) async {

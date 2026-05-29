@@ -22,7 +22,7 @@ class CeresAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final top = MediaQuery.of(context).padding.top;
     return Container(
-      color: CeresColors.leafDeep,
+      color: CeresColors.paper,
       padding: EdgeInsets.fromLTRB(20, top + 10, 16, 12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -35,7 +35,7 @@ class CeresAppBar extends StatelessWidget implements PreferredSizeWidget {
               color: CeresColors.leafDark,
               shape: BoxShape.circle,
               border: Border.all(
-                  color: CeresColors.leafLive.withValues(alpha: 0.3), width: 1),
+                  color: CeresColors.hairline.withValues(alpha: 0.5), width: 1),
             ),
             alignment: Alignment.center,
             child: Text(
@@ -60,7 +60,7 @@ class CeresAppBar extends StatelessWidget implements PreferredSizeWidget {
                 style: GoogleFonts.newsreader(
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
-                  color: CeresColors.paper,
+                  color: CeresColors.ink,
                   letterSpacing: -0.3,
                   height: 1.1,
                 ),
@@ -81,13 +81,13 @@ class CeresAppBar extends StatelessWidget implements PreferredSizeWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
               decoration: BoxDecoration(
-                color: CeresColors.leafDark,
+                color: CeresColors.dust,
                 borderRadius: BorderRadius.circular(3),
               ),
               child: Text(
                 pageCount!,
                 style: GoogleFonts.ibmPlexMono(
-                    fontSize: 9, color: CeresColors.leafSoft, letterSpacing: 0.08),
+                    fontSize: 9, color: CeresColors.ink3, letterSpacing: 0.08),
               ),
             ),
           ],
@@ -124,10 +124,10 @@ class CeresIconButton extends StatelessWidget {
           margin: const EdgeInsets.only(left: 6),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(color: CeresColors.hairline.withValues(alpha: 0.4)),
-            color: CeresColors.leafDark,
+            border: Border.all(color: CeresColors.hairline),
+            color: CeresColors.paper2,
           ),
-          child: Icon(icon, size: 17, color: CeresColors.paper),
+          child: Icon(icon, size: 17, color: CeresColors.ink2),
         ),
       ),
     );

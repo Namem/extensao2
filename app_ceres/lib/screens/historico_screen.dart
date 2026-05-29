@@ -321,6 +321,8 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
       color: CeresColors.leafLive,
       child: CustomScrollView(
         slivers: [
+          SliverToBoxAdapter(child: _iotSummary()),
+          const SliverToBoxAdapter(child: SizedBox(height: 10)),
           SliverToBoxAdapter(child: _liveMqttStrip()),
           const SliverToBoxAdapter(child: SizedBox(height: 14)),
           for (final grupo in agrupado) ...[
@@ -361,7 +363,94 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
     );
   }
 
-  // ── Event item ──────────────────────────────────────────────────────────────
+  // ── IoT summary (2-col: total eventos / % doentes) ─────────────────────────
+  Widget _iotSummary() {
+    final total = _total;
+    final doentes = _eventos.where((e) => e.classe != 'saudavel').length;
+    final pctDoentes = total > 0
+        ? (doentes / _eventos.length * 100).toStringAsFixed(0)
+        : '--';
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+      decoration: BoxDecoration(
+        color: CeresColors.paper2,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: CeresColors.hairline, width: 0.8),
+      ),
+      child: IntrinsicHeight(
+        child: Row(
+          children: [
+            _summaryCol(
+              label: 'TOTAL EVENTOS',
+              value: '$total',
+              unit: 'registros',
+              valueColor: CeresColors.ink,
+            ),
+            Container(
+              width: 0.8,
+              margin: const EdgeInsets.symmetric(vertical: 2),
+              color: CeresColors.hairline,
+            ),
+            _summaryCol(
+              label: '% DOENTES',
+              value: pctDoentes,
+              unit: 'desta página',
+              valueColor: doentes > 0 ? CeresColors.blight : CeresColors.leafLive,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _summaryCol({
+    required String label,
+    required String value,
+    required String unit,
+    required Color valueColor,
+  }) {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.ibmPlexMono(
+                fontSize: 8,
+                letterSpacing: 0.16,
+                color: CeresColors.ink3,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              value,
+              style: GoogleFonts.newsreader(
+                fontSize: 24,
+                fontWeight: FontWeight.w500,
+                color: valueColor,
+                height: 1,
+              ),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              unit,
+              style: GoogleFonts.ibmPlexMono(
+                fontSize: 8,
+                color: CeresColors.ink3,
+                letterSpacing: 0.04,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ── Event item — flat grid, status icon anel+dot ────────────────────────────
   Widget _itemEvento(EventoMqtt e) {
     final Color cor = CeresColors.statusColor(e.classe, e.confianca);
     String hora = '';
@@ -370,108 +459,108 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
       hora = DateFormat('HH:mm').format(dt);
     } catch (_) {}
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 7, 16, 7),
+      decoration: const BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: Color(0xFFEBE7E1), width: 0.8),
+        ),
+      ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Dot + vertical line
-          Column(
-            children: [
-              const SizedBox(height: 14),
-              Container(
+          // Status icon: anel externo semitransparente + dot central
+          Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                  color: cor.withValues(alpha: 0.25), width: 1),
+            ),
+            child: Center(
+              child: Container(
                 width: 8,
                 height: 8,
                 decoration: BoxDecoration(
-                  color: cor,
                   shape: BoxShape.circle,
+                  color: cor,
                 ),
               ),
-              Expanded(
-                child: Container(
-                  width: 0.5,
-                  color: CeresColors.hairline,
-                  margin: const EdgeInsets.symmetric(vertical: 2),
+            ),
+          ),
+          const SizedBox(width: 10),
+          // Conteúdo central
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  e.rotulo,
+                  style: GoogleFonts.newsreader(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: CeresColors.ink,
+                    letterSpacing: -0.005,
+                    height: 1.15,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Row(
+                  children: [
+                    Text(
+                      e.deviceId,
+                      style: GoogleFonts.ibmPlexMono(
+                        fontSize: 9,
+                        color: CeresColors.ink2,
+                        letterSpacing: 0.04,
+                      ),
+                    ),
+                    Container(
+                      width: 2,
+                      height: 2,
+                      margin: const EdgeInsets.symmetric(horizontal: 5),
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: CeresColors.ink3,
+                      ),
+                    ),
+                    Text(
+                      '${e.latenciaMs} ms',
+                      style: GoogleFonts.ibmPlexMono(
+                        fontSize: 9,
+                        color: CeresColors.ink3,
+                        letterSpacing: 0.04,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          // Direita: %  + hora
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '${(e.confianca * 100).toStringAsFixed(0)}%',
+                style: GoogleFonts.ibmPlexMono(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: cor,
+                  letterSpacing: 0.02,
+                  height: 1,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                hora,
+                style: GoogleFonts.ibmPlexMono(
+                  fontSize: 9,
+                  color: CeresColors.ink3,
+                  letterSpacing: 0.04,
                 ),
               ),
             ],
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Container(
-              margin: const EdgeInsets.only(bottom: 1),
-              padding: const EdgeInsets.fromLTRB(0, 10, 12, 12),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          e.rotulo,
-                          style: GoogleFonts.ibmPlexSans(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: cor,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'dev: ${e.deviceId}  ·  ${e.latenciaMs} ms',
-                          style: GoogleFonts.ibmPlexMono(
-                            fontSize: 9,
-                            color: CeresColors.ink3,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        hora,
-                        style: GoogleFonts.ibmPlexMono(
-                          fontSize: 10,
-                          color: CeresColors.ink3,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${(e.confianca * 100).toStringAsFixed(0)}%',
-                        style: GoogleFonts.newsreader(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: cor,
-                          height: 1,
-                        ),
-                      ),
-                      // Minibar
-                      const SizedBox(height: 3),
-                      Container(
-                        width: 48,
-                        height: 2,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(2),
-                          color: CeresColors.dust,
-                        ),
-                        alignment: Alignment.centerLeft,
-                        child: FractionallySizedBox(
-                          widthFactor: e.confianca.clamp(0.0, 1.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: cor,
-                              borderRadius: BorderRadius.circular(2),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
           ),
         ],
       ),
