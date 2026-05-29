@@ -267,9 +267,79 @@ Django containerizado; experimento edge vs cloud documentado.
 
 #### Pendente (trabalho futuro)
 - [ ] `connectivity_plus` — banner offline honesto (detectar conectividade real)
-- [ ] `flutter_secure_storage` — persistência JWT no KeyStore/Keychain
-- [ ] `shared_preferences` — "lembrar acesso" persistente
-- [ ] Tela Mapa (placeholder) — requer `geolocator` + backend com coordenadas GPS
+- [x] `connectivity_plus` — banner offline honesto (detectar conectividade real) → Sprint 4A
+- [ ] `flutter_secure_storage` — persistência JWT no KeyStore/Keychain → Sprint 4A
+- [ ] `shared_preferences` — "lembrar acesso" persistente → Sprint 4A
+- [ ] Tela Mapa (placeholder) — requer `geolocator` + backend com coordenadas GPS → Sprint 4B
+
+---
+
+## Sprint 4A — Navegação + Persistência UX ✅ CONCLUÍDA (2026-05-29)
+
+### 4A.1 — Navegação com back button ✅
+- [x] `CeresAppBar` — parâmetro `showBack: bool` + `onBack: VoidCallback?`
+- [x] Botão voltar: círculo hairline 32px, ícone `arrow_back_ios_new_rounded` ink2
+- [x] `HistoricoLocalScreen` — `showBack: true`
+- [x] `flutter analyze` → zero issues
+
+### 4A.2 — Persistência de sessão ✅
+- [x] `pubspec.yaml` — `shared_preferences: ^2.3.2` (flutter_secure_storage removido — exige ATL no Windows)
+- [x] `lib/services/auth_storage.dart` — salvar/ler access + refresh token + e-mail
+- [x] `LoginScreen` — `initState` carrega e-mail salvo; ao logar persiste se checkbox ativo
+- [x] `main.dart` — `_BootScreen` checa token no boot → pula login se válido
+- [x] `api_service.dart` — auto-refresh com refresh token quando 401
+
+### 4A.3 — Banner de conectividade ✅
+- [x] `pubspec.yaml` — `connectivity_plus: ^6.1.1`
+- [x] `lib/widgets/offline_banner.dart` — faixa âmbar animada, stream-based
+- [x] Banner integrado em `CameraScreen`, `HistoricoScreen`, `HistoricoLocalScreen`, `MapaScreen`, `PerfilScreen`
+- [x] `CameraScreen` — botões câmera/galeria desabilitados offline + toast "Sem conexão"
+
+---
+
+## Sprint 4B — Tela Mapa + GPS ✅ CONCLUÍDA (2026-05-29)
+
+### 4B.1 — Backend GPS ✅
+- [x] `diagnostico/models.py` — campos `latitude` e `longitude` (FloatField, null=True)
+- [x] `0004_add_gps_fields.py` — migration aplicada com sucesso
+- [x] `diagnostico/serializers.py` — lat/lon incluídos no DiagnosticoEventoSerializer
+
+### 4B.2 — Flutter Mapa ✅
+- [x] `pubspec.yaml` — `flutter_map: ^7.0.2` + `geolocator: ^13.0.1` + `latlong2: ^0.9.1`
+- [x] `AndroidManifest.xml` — `ACCESS_FINE_LOCATION` + `ACCESS_COARSE_LOCATION`
+- [x] `lib/screens/mapa_screen.dart` — mapa OpenStreetMap, marcadores por urgência
+- [x] Bottom sheet ao clicar marcador: nome, data, confiança, GPS
+- [x] Fallback Windows/Web: centro em Sorriso-MT (GPS não suportado no desktop)
+- [x] `EventoMqtt` — campos `latitude`, `longitude`, `classeDetectada`; `timestamp` → `DateTime`
+- [ ] `CameraScreen` — capturar GPS antes do diagnóstico e enviar no POST *(próximo)*
+
+---
+
+## Sprint 5 — Tela Perfil + Backend Usuário ✅ CONCLUÍDA (2026-05-29)
+
+### 5.1 — Backend ✅
+- [x] `accounts/views.py` — `GET /api/auth/me/` com nome, email, stats (total/doenças/saudável/último acesso)
+- [x] `accounts/urls.py` — rota `me/` criada
+- [x] `ceres_core/urls.py` — `api/auth/` inclui `accounts.urls`
+
+### 5.2 — Flutter Perfil ✅
+- [x] `lib/screens/perfil_screen.dart` — avatar inicial, nome, e-mail, stats, logout, exportar CSV
+- [x] `share_plus: ^10.1.3` — compartilhar CSV via app nativo
+- [x] Logout: limpa tokens → `pushNamedAndRemoveUntil('/login')`
+- [x] Offline: exibe aviso "Estatísticas indisponíveis" sem quebrar a tela
+- [x] `main.dart` — placeholder Perfil substituído por `PerfilScreen`; `_PlaceholderScreen` removido
+
+---
+
+## Sprint 6 — TCC Final + Defesa ⏳ PENDENTE
+
+- [ ] `docs/core/TCC_CERES.md` — preencher todas as seções [PENDENTE]
+- [ ] Seção Metodologia: descrever pipeline completo (ESP32 → MQTT → Django → Flutter)
+- [ ] Seção Resultados: tabela Exp A→E, PlantDoc gap, comparativo Edge vs Cloud
+- [ ] Seção Discussão: limitações (campo real 67%, câmera esp32 pendente)
+- [ ] Seção Conclusão: contribuições, trabalhos futuros (Exp F RPi)
+- [ ] Slides Sprint Review final
+- [ ] Vídeo demonstração: folha real → diagnóstico → histórico → enciclopédia
 
 ---
 
@@ -284,4 +354,8 @@ Django containerizado; experimento edge vs cloud documentado.
 | Sprint 3 | Flutter + Django PC + API | ✅ Concluída | 19/19 |
 | Sprint 3.5 | Design System + Telas Completas | ✅ Concluída | 20/20 |
 | Sprint 3.6 | Fidelidade pixel-perfect HTML → Flutter | ✅ Concluída | 11/11 |
+| Sprint 4A | Navegação + Persistência UX | ✅ Concluída | 11/11 |
+| Sprint 4B | Mapa + GPS | ✅ Concluída | 9/10 |
+| Sprint 5 | Perfil + Backend Usuário | ✅ Concluída | 8/8 |
+| Sprint 6 | TCC Final + Defesa | ⏳ Pendente | 0/7 |
 | Fase Futura | RPi3B+ + EfficientNet (Exp F) | 📋 Registrado | — |

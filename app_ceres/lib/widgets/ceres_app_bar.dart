@@ -6,11 +6,16 @@ import 'ceres_icons.dart';
 
 /// AppBar com marca botânica SVG + wordmark + subtítulo mono
 /// Fidelidade pixel-perfect ao design HTML (paleta Taxonomia Viva)
+///
+/// [showBack] — exibe seta de voltar no lugar da marca (para telas pushadas)
+/// [onBack]  — callback do back; se null usa Navigator.pop
 class CeresAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String pageTitle;    // ex: "Histórico" (parte após o italic)
   final String? pageTitleItalic; // parte em itálico antes do título
   final String? pageCount;   // ex: "74 eventos"
   final List<Widget>? actions;
+  final bool showBack;
+  final VoidCallback? onBack;
 
   const CeresAppBar({
     super.key,
@@ -18,6 +23,8 @@ class CeresAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.pageTitleItalic,
     this.pageCount,
     this.actions,
+    this.showBack = false,
+    this.onBack,
   });
 
   @override
@@ -33,18 +40,40 @@ class CeresAppBar extends StatelessWidget implements PreferredSizeWidget {
         children: [
           // Brand row
           Padding(
-            padding: EdgeInsets.fromLTRB(22, top + 8, 16, 0),
+            padding: EdgeInsets.fromLTRB(showBack ? 8 : 22, top + 8, 16, 0),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Marca botânica SVG (círculo com hairline border + lente leafDeep)
-                CeresMark(
-                  size: 28,
-                  color: CeresColors.leafDeep,
-                  borderColor: CeresColors.hairline,
-                  bgColor: Colors.transparent,
-                ),
-                const SizedBox(width: 10),
+                if (showBack) ...[
+                  // Botão de voltar estilo Ceres
+                  GestureDetector(
+                    onTap: onBack ?? () => Navigator.of(context).pop(),
+                    child: Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: CeresColors.hairline),
+                        color: CeresColors.paper2,
+                      ),
+                      child: const Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        size: 13,
+                        color: CeresColors.ink2,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                ] else ...[
+                  // Marca botânica SVG (círculo com hairline border + lente leafDeep)
+                  CeresMark(
+                    size: 28,
+                    color: CeresColors.leafDeep,
+                    borderColor: CeresColors.hairline,
+                    bgColor: Colors.transparent,
+                  ),
+                  const SizedBox(width: 10),
+                ],
                 // Wordmark: "Ceres" Newsreader 17px + subtítulo mono 9px
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

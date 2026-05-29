@@ -14,9 +14,11 @@ class Config {
   // ──────────────────────────────────────────────────────────────────────────
 
   // Endpoints da API Django
-  static const String tokenEndpoint    = '$baseUrl/api/auth/token/';
-  static const String inferirEndpoint  = '$baseUrl/api/diagnostico/inferir/';
-  static const String historicoEndpoint= '$baseUrl/api/diagnostico/historico/';
+  static const String tokenEndpoint        = '$baseUrl/api/auth/token/';
+  static const String tokenRefreshEndpoint = '$baseUrl/api/auth/token/refresh/';
+  static const String meEndpoint           = '$baseUrl/api/auth/me/';
+  static const String inferirEndpoint      = '$baseUrl/api/diagnostico/inferir/';
+  static const String historicoEndpoint    = '$baseUrl/api/diagnostico/historico/';
 
   // Limiar mínimo de confiança para exibir resultado como confiável
   static const double confiancaMinima = 0.40;

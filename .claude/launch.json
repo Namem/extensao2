@@ -15,8 +15,8 @@
     },
     {
       "name": "Flutter Web",
-      "runtimeExecutable": "flutter",
-      "runtimeArgs": ["run", "-d", "web-server", "--web-port", "3000", "--web-hostname", "localhost"],
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "cd app_ceres && flutter run -d web-server --web-port 3000 --web-hostname localhost"],
       "port": 3000
     }
   ]

@@ -50,6 +50,19 @@ dependencies:
   google_fonts: ^6.2.1
   # Ícones SVG customizados (fidelidade ao design HTML)
   flutter_svg: ^2.0.10
+  # Mapa OpenStreetMap (sem API key)
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
+  # GPS — posição do dispositivo
+  geolocator: ^13.0.1
+  # Monitoramento de conectividade (stream de mudanças de rede)
+  connectivity_plus: ^6.1.1
+  # Compartilhar arquivos (exportar CSV de diagnósticos)
+  share_plus: ^10.1.3
+  # Persistência de sessão (tokens JWT + preferências do usuário)
+  # Nota: flutter_secure_storage removido — exige ATL no Windows (dev).
+  # Para produção Android/iOS adicionar de volta quando build for mobile-only.
+  shared_preferences: ^2.3.2
 
 dev_dependencies:
   flutter_test:

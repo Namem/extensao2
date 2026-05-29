@@ -101,6 +101,16 @@ class DiagnosticoEvento(models.Model):
         verbose_name="Umidade do Solo (%)",
         help_text="Leitura do sensor capacitivo. Nulo se sensor não conectado."
     )
+    latitude = models.FloatField(
+        null=True, blank=True,
+        verbose_name="Latitude",
+        help_text="Coordenada GPS capturada pelo celular no momento do diagnóstico."
+    )
+    longitude = models.FloatField(
+        null=True, blank=True,
+        verbose_name="Longitude",
+        help_text="Coordenada GPS capturada pelo celular no momento do diagnóstico."
+    )
     timestamp = models.DateTimeField(
         verbose_name="Timestamp do Dispositivo",
         help_text="Momento da captura no ESP32 (ISO8601)."

@@ -758,3 +758,81 @@ suportando `currentColor` via `SvgTheme(currentColor: cor)`.
 - `flutter analyze` → zero issues ✅
 - Ícones thin-stroke SVG idênticos ao HTML ✅
 - Ordem das abas corrigida para HTML de referência ✅
+
+---
+
+## Sprint 4A.1 — Back button + Planejamento 4B→6 — 2026-05-28
+
+### Problema identificado
+`CeresAppBar` não exibia seta de voltar em telas pushadas (ex: `HistoricoLocalScreen`).
+O usuário solicitou planejamento completo de tudo que falta para concluir o app.
+
+### Solução — Back button
+
+**`lib/widgets/ceres_app_bar.dart`** (MODIFICADO):
+- Parâmetros adicionados: `showBack: bool = false`, `onBack: VoidCallback?`
+- Quando `showBack: true`: substitui a marca botânica por botão circular 32px (hairline border, bg paper2) com `Icons.arrow_back_ios_new_rounded` 13px ink2
+- `onBack ?? Navigator.of(context).pop()` — callback opcional, fallback automático
+- `padding-left`: 8px quando showBack, 22px quando brand mark (alinhamento correto)
+
+**`lib/screens/historico_local_screen.dart`** (MODIFICADO):
+- `CeresAppBar(showBack: true)` ativado
+
+### Resultado
+- `flutter analyze` → zero issues ✅
+- Back button visível e funcional em `HistoricoLocalScreen` ✅
+- Extensível: qualquer tela pushada pode usar `showBack: true` ✅
+
+### Planejamento registrado
+
+**Sprint 4A.2 — Persistência de sessão** (próxima):
+- `flutter_secure_storage: ^9.2.2` — JWT no Keystore/Keychain
+- `shared_preferences: ^2.3.2` — e-mail + checkbox lembrar
+- Auto-refresh token quando 401
+
+**Sprint 4A.3 — Banner conectividade**:
+- `connectivity_plus: ^6.1.1` — faixa âmbar offline
+- Bloquear POST diagnóstico quando offline
+
+**Sprint 4B — Mapa + GPS**:
+- Backend: `latitude`/`longitude` em DiagnosticoEvento
+- Flutter: `flutter_map: ^7.0.2` + OpenStreetMap, marcadores por urgência
+
+**Sprint 5 — Perfil**:
+- `GET /api/auth/me/` com stats
+- Tela Perfil: avatar, total diagnósticos, % doenças, logout, exportar CSV
+
+**Sprint 6 — TCC**:
+- Preencher seções [PENDENTE] em TCC_CERES.md
+- Slides Sprint Review final + vídeo demonstração
+
+---
+
+## Sprints 4A, 4B e 5 — UX Completo — 2026-05-29
+
+### Sprint 4A — Navegação + Persistência UX
+
+**4A.1 Back button**: `CeresAppBar` recebeu `showBack: bool` + `onBack: VoidCallback?`. No Windows/Android substitui a marca botânica por botão circular 32px ink2. `HistoricoLocalScreen` ativado com `showBack: true`.
+
+**4A.2 Persistência de sessão**: `shared_preferences: ^2.3.2` adicionado. `flutter_secure_storage` descartado — exige ATL (Active Template Library) do Visual Studio no Windows, quebrando o build de dev. `AuthStorage` (novo) centraliza read/write de access token, refresh token e e-mail. `LoginScreen` pré-preenche e-mail salvo via `initState`. `_BootScreen` em `main.dart` checa token no boot e pula `LoginScreen` se válido. `ApiService` faz auto-refresh em 401 antes de rejeitar.
+
+**4A.3 Banner de conectividade**: `connectivity_plus: ^6.1.1`. `OfflineBanner` widget (novo) usa `Stream<List<ConnectivityResult>>` — sem polling. Faixa âmbar animada (`AnimatedSize`) integrada em todas as 5 telas. `CameraScreen` desabilita botões câmera/galeria quando `_offline: true` + `SnackBar` âmbar.
+
+### Sprint 4B — Mapa + GPS
+
+**Backend**: `DiagnosticoEvento` recebeu `latitude` e `longitude` (FloatField, null=True). Migration `0004_add_gps_fields` aplicada. Serializer atualizado.
+
+**Flutter**: `flutter_map: ^7.0.2` + `latlong2: ^0.9.1` + `geolocator: ^13.0.1`. `MapaScreen` (novo) renderiza tiles OpenStreetMap sem API key. Marcadores circulares coloridos por urgência (blight/dryGrass/leafLive). Tap no marcador → `ModalBottomSheet` com nome da doença, data, confiança e GPS. Fallback: Sorriso-MT quando GPS indisponível (Windows/Web). `EventoMqtt` refatorado: `timestamp: DateTime`, `confianca: double?`, `classeDetectada` getter, `latitude`/`longitude` adicionados.
+
+### Sprint 5 — Perfil + Backend Usuário
+
+**Backend**: `GET /api/auth/me/` (novo) retorna `{ nome, email, total_diagnosticos, total_doencas, total_saudavel, membro_desde, ultimo_acesso }`. Rota wired em `ceres_core/urls.py` via `accounts.urls`.
+
+**Flutter**: `PerfilScreen` (novo) — card de identidade com avatar inicial leafDeep, stats row (total/doenças/saudável), último acesso, botão exportar CSV (`share_plus: ^10.1.3`) e botão Sair com `pushNamedAndRemoveUntil`. Offline: aviso âmbar sem quebrar a tela. `_PlaceholderScreen` removido de `main.dart` — todas as 5 abas implementadas.
+
+### Resultado
+- `flutter analyze` → zero issues ✅
+- 5 abas completas: Diagnóstico / Mapa / IoT / Enciclopédia / Perfil ✅
+- Persistência de sessão (boot sem login) ✅
+- Banner offline em todas as telas ✅
+- Exportar CSV + logout ✅

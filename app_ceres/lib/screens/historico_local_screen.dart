@@ -9,6 +9,7 @@ import '../models/resultado_inferencia.dart';
 import '../theme/ceres_theme.dart';
 import '../widgets/ceres_app_bar.dart';
 import '../widgets/ceres_icons.dart';
+import '../widgets/offline_banner.dart';
 
 class HistoricoLocalScreen extends StatelessWidget {
   const HistoricoLocalScreen({super.key});
@@ -20,6 +21,7 @@ class HistoricoLocalScreen extends StatelessWidget {
       appBar: CeresAppBar(
         pageTitleItalic: 'Salvos',
         pageTitle: 'offline',
+        showBack: true,
         actions: [
           CeresIconButton(
             svgString: CeresIconsSvg.iconSearch,
@@ -33,7 +35,7 @@ class HistoricoLocalScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: StreamBuilder<List<DiagnosticoLocal>>(
+      body: OfflineBanner(child: StreamBuilder<List<DiagnosticoLocal>>(
         stream: appDb.historicoStream(),
         builder: (context, snap) {
           if (snap.connectionState == ConnectionState.waiting) {
@@ -62,7 +64,7 @@ class HistoricoLocalScreen extends StatelessWidget {
             ],
           );
         },
-      ),
+      )),
     );
   }
 

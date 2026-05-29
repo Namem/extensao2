@@ -6,7 +6,10 @@ import 'screens/historico_screen.dart';
 import 'screens/historico_local_screen.dart';
 import 'screens/enciclopedia_screen.dart';
 import 'screens/login_screen.dart';
+import 'screens/mapa_screen.dart';
+import 'screens/perfil_screen.dart';
 import 'screens/splash_screen.dart';
+import 'services/auth_storage.dart';
 import 'theme/ceres_theme.dart';
 import 'widgets/ceres_icons.dart';
 
@@ -31,7 +34,30 @@ class CeresApp extends StatelessWidget {
         '/login': (_) => const LoginScreen(),
         '/salvos': (_) => const HistoricoLocalScreen(),
       },
-      home: SplashScreen(destino: const LoginScreen()),
+      home: const _BootScreen(),
+    );
+  }
+}
+
+/// Decide o destino da splash conforme token salvo:
+/// - Token presente → HomeScreen (pula login)
+/// - Token ausente  → LoginScreen
+class _BootScreen extends StatelessWidget {
+  const _BootScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    return SplashScreen(
+      destino: FutureBuilder<String?>(
+        future: AuthStorage.instance.lerAccessToken(),
+        builder: (context, snap) {
+          if (snap.connectionState != ConnectionState.done) {
+            return const SizedBox.shrink();
+          }
+          final temToken = snap.data != null && snap.data!.isNotEmpty;
+          return temToken ? const HomeScreen() : const LoginScreen();
+        },
+      ),
     );
   }
 }
@@ -49,18 +75,10 @@ class _HomeScreenState extends State<HomeScreen> {
   // Ordem exata do HTML: Diagnóstico, Mapa, IoT, Enciclopédia, Perfil
   static final _telas = [
     const CameraScreen(),
-    const _PlaceholderScreen(
-      svgIcon: CeresIconsSvg.tabMapa,
-      titulo: 'Mapa de Ocorrências',
-      subtitulo: 'em desenvolvimento',
-    ),
+    const MapaScreen(),
     const HistoricoScreen(),
     const EnciclopediaScreen(),
-    const _PlaceholderScreen(
-      svgIcon: CeresIconsSvg.tabPerfil,
-      titulo: 'Perfil',
-      subtitulo: 'em desenvolvimento',
-    ),
+    const PerfilScreen(),
   ];
 
   @override
@@ -153,68 +171,3 @@ class _NavItem {
   const _NavItem({required this.svg, required this.label});
 }
 
-/// Placeholder para telas ainda não implementadas
-class _PlaceholderScreen extends StatelessWidget {
-  final String svgIcon;
-  final String titulo;
-  final String subtitulo;
-
-  const _PlaceholderScreen({
-    required this.svgIcon,
-    required this.titulo,
-    required this.subtitulo,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: CeresColors.bone,
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CeresSvgIcon(
-              svgString: svgIcon,
-              color: CeresColors.ink3.withValues(alpha: 0.35),
-              size: 48,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              titulo,
-              style: GoogleFonts.newsreader(
-                fontSize: 20,
-                color: CeresColors.ink2,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              subtitulo,
-              style: GoogleFonts.ibmPlexMono(
-                fontSize: 10,
-                color: CeresColors.ink3,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-              decoration: BoxDecoration(
-                border: Border.all(
-                    color: CeresColors.hairline.withValues(alpha: 0.6)),
-                borderRadius: BorderRadius.circular(3),
-              ),
-              child: Text(
-                'em breve',
-                style: GoogleFonts.ibmPlexMono(
-                  fontSize: 10,
-                  color: CeresColors.ink3,
-                  letterSpacing: 0.5,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

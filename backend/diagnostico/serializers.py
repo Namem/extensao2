@@ -34,6 +34,8 @@ class DiagnosticoEventoSerializer(serializers.ModelSerializer):
             'temperatura',
             'umidade_ar',
             'umidade_solo',
+            'latitude',
+            'longitude',
             'timestamp',
             'diagnostico',
             'criado_em',

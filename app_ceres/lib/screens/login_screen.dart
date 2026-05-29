@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/api_service.dart';
+import '../services/auth_storage.dart';
 import '../theme/ceres_theme.dart';
 import '../widgets/ceres_icons.dart';
 
@@ -20,6 +21,20 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _erro;
 
   @override
+  void initState() {
+    super.initState();
+    _carregarEmailSalvo();
+  }
+
+  /// Pré-preenche o campo de e-mail se "lembrar acesso" estava ativo.
+  Future<void> _carregarEmailSalvo() async {
+    final email = await AuthStorage.instance.lerEmail();
+    if (email.isNotEmpty && mounted) {
+      setState(() => _emailCtrl.text = email);
+    }
+  }
+
+  @override
   void dispose() {
     _emailCtrl.dispose();
     _senhaCtrl.dispose();
@@ -37,6 +52,12 @@ class _LoginScreenState extends State<LoginScreen> {
         email: _emailCtrl.text.trim(),
         senha: _senhaCtrl.text,
       );
+      // Persistir ou limpar e-mail conforme checkbox
+      if (_lembrar) {
+        await AuthStorage.instance.salvarEmail(_emailCtrl.text.trim());
+      } else {
+        await AuthStorage.instance.limparEmail();
+      }
       if (!mounted) return;
       Navigator.of(context).pushReplacementNamed('/home');
     } catch (e) {

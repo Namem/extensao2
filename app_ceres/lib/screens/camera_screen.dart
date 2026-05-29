@@ -11,10 +11,12 @@ import '../config.dart' as app_config;
 import '../data/doencas_data.dart';
 import '../database/database.dart';
 import '../models/resultado_inferencia.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import '../services/api_service.dart';
 import '../theme/ceres_theme.dart';
 import '../widgets/ceres_app_bar.dart';
 import '../widgets/ceres_icons.dart';
+import '../widgets/offline_banner.dart';
 
 class CameraScreen extends StatefulWidget {
   const CameraScreen({super.key});
@@ -29,8 +31,38 @@ class _CameraScreenState extends State<CameraScreen> {
   bool _carregando = false;
   String? _erro;
   bool _salvo = false;
+  bool _offline = false;
 
   final _picker = ImagePicker();
+
+  @override
+  void initState() {
+    super.initState();
+    Connectivity().checkConnectivity().then(_atualizarConectividade);
+    Connectivity().onConnectivityChanged.listen(_atualizarConectividade);
+  }
+
+  void _atualizarConectividade(List<ConnectivityResult> results) {
+    final semConexao = results.isEmpty ||
+        (results.length == 1 && results.first == ConnectivityResult.none);
+    if (mounted && semConexao != _offline) {
+      setState(() => _offline = semConexao);
+    }
+  }
+
+  void _avisoOffline() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Sem conexão com o servidor.',
+          style: GoogleFonts.ibmPlexSans(fontSize: 13, color: CeresColors.paper),
+        ),
+        backgroundColor: CeresColors.dryGrass,
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
 
   Future<void> _capturar(ImageSource fonte) async {
     final picked = await _picker.pickImage(
@@ -87,7 +119,7 @@ class _CameraScreenState extends State<CameraScreen> {
         ],
       ),
       backgroundColor: CeresColors.bone,
-      body: SingleChildScrollView(
+      body: OfflineBanner(child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -109,7 +141,7 @@ class _CameraScreenState extends State<CameraScreen> {
             const SizedBox(height: 24),
           ],
         ),
-      ),
+      )),
     );
   }
 
@@ -674,8 +706,8 @@ class _CameraScreenState extends State<CameraScreen> {
               label: 'Câmera',
               icon: Icons.camera_alt_outlined,
               primary: true,
-              enabled: temCamera && !_carregando,
-              onTap: () => _capturar(ImageSource.camera),
+              enabled: temCamera && !_carregando && !_offline,
+              onTap: () => _offline ? _avisoOffline() : _capturar(ImageSource.camera),
             ),
           ),
           const SizedBox(width: 8),
@@ -684,8 +716,8 @@ class _CameraScreenState extends State<CameraScreen> {
               label: 'Galeria',
               icon: Icons.photo_library_outlined,
               primary: false,
-              enabled: !_carregando,
-              onTap: () => _capturar(ImageSource.gallery),
+              enabled: !_carregando && !_offline,
+              onTap: () => _offline ? _avisoOffline() : _capturar(ImageSource.gallery),
             ),
           ),
         ],

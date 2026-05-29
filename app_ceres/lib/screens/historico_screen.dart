@@ -6,6 +6,7 @@ import '../services/api_service.dart';
 import '../theme/ceres_theme.dart';
 import '../widgets/ceres_app_bar.dart';
 import '../widgets/ceres_icons.dart';
+import '../widgets/offline_banner.dart';
 
 class HistoricoScreen extends StatefulWidget {
   const HistoricoScreen({super.key});
@@ -73,13 +74,15 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          _sensorCard(),
-          Expanded(child: _body()),
-          if (_eventos.isNotEmpty || _erro != null || _carregando)
-            _rodapePaginacao(),
-        ],
+      body: OfflineBanner(
+        child: Column(
+          children: [
+            _sensorCard(),
+            Expanded(child: _body()),
+            if (_eventos.isNotEmpty || _erro != null || _carregando)
+              _rodapePaginacao(),
+          ],
+        ),
       ),
     );
   }
@@ -459,12 +462,8 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
 
   // ── Event item — flat grid, status icon anel+dot ────────────────────────────
   Widget _itemEvento(EventoMqtt e) {
-    final Color cor = CeresColors.statusColor(e.classe, e.confianca);
-    String hora = '';
-    try {
-      final dt = DateTime.parse(e.timestamp).toLocal();
-      hora = DateFormat('HH:mm').format(dt);
-    } catch (_) {}
+    final Color cor = CeresColors.statusColor(e.classe, e.confianca ?? 0.0);
+    final hora = DateFormat('HH:mm').format(e.timestamp.toLocal());
 
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 7, 16, 7),
@@ -549,7 +548,7 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '${(e.confianca * 100).toStringAsFixed(0)}%',
+                '${((e.confianca ?? 0) * 100).toStringAsFixed(0)}%',
                 style: GoogleFonts.ibmPlexMono(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
@@ -607,23 +606,14 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
   }
 
   // ── Helpers ─────────────────────────────────────────────────────────────────
-  String _formatTimestampShort(String ts) {
-    try {
-      final dt = DateTime.parse(ts).toLocal();
-      return DateFormat('dd/MM HH:mm').format(dt);
-    } catch (_) {
-      return ts;
-    }
+  String _formatTimestampShort(DateTime ts) {
+    return DateFormat('dd/MM HH:mm').format(ts.toLocal());
   }
 
   List<_GrupoDia> _agruparPorDia(List<EventoMqtt> eventos) {
     final map = <String, List<EventoMqtt>>{};
     for (final e in eventos) {
-      String dia = e.timestamp;
-      try {
-        final dt = DateTime.parse(e.timestamp).toLocal();
-        dia = DateFormat('dd/MM/yyyy').format(dt);
-      } catch (_) {}
+      final dia = DateFormat('dd/MM/yyyy').format(e.timestamp.toLocal());
       map.putIfAbsent(dia, () => []).add(e);
     }
     return map.entries.map((e) => _GrupoDia(e.key, e.value)).toList();
