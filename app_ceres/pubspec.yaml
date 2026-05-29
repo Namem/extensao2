@@ -46,6 +46,8 @@ dependencies:
   path: ^1.9.1
   # Splash screen nativa
   flutter_native_splash: ^2.4.6
+  # Fontes do design system (Newsreader + IBM Plex Sans + IBM Plex Mono)
+  google_fonts: ^6.2.1
 
 dev_dependencies:
   flutter_test:

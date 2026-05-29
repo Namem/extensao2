@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'screens/camera_screen.dart';
 import 'screens/historico_screen.dart';
 import 'screens/historico_local_screen.dart';
+import 'theme/ceres_theme.dart';
 
 void main() {
   final binding = WidgetsFlutterBinding.ensureInitialized();
@@ -18,68 +20,7 @@ class CeresApp extends StatelessWidget {
     return MaterialApp(
       title: 'Ceres Diagnóstico',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF2E7D32),
-          brightness: Brightness.light,
-        ).copyWith(
-          surface: const Color(0xFFF5F2EE),
-          onSurface: const Color(0xFF1A1A1A),
-          error: const Color(0xFFC62828),
-        ),
-        scaffoldBackgroundColor: const Color(0xFFF5F2EE),
-        useMaterial3: true,
-        fontFamily: 'Roboto',
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF2E7D32),
-          foregroundColor: Colors.white,
-          elevation: 0,
-          titleTextStyle: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            fontFamily: 'Roboto',
-          ),
-        ),
-        cardTheme: CardThemeData(
-          elevation: 1,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          color: Colors.white,
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF2E7D32),
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 14),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-        ),
-        outlinedButtonTheme: OutlinedButtonThemeData(
-          style: OutlinedButton.styleFrom(
-            foregroundColor: const Color(0xFF2E7D32),
-            side: const BorderSide(color: Color(0xFF2E7D32)),
-            padding: const EdgeInsets.symmetric(vertical: 14),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-        ),
-        navigationBarTheme: NavigationBarThemeData(
-          backgroundColor: Colors.white,
-          indicatorColor: const Color(0xFFE8F5E9),
-          labelTextStyle: WidgetStateProperty.all(
-            const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-          ),
-        ),
-        dividerTheme: const DividerThemeData(color: Color(0xFFE0DDD9)),
-        progressIndicatorTheme: const ProgressIndicatorThemeData(
-          color: Color(0xFF2E7D32),
-        ),
-      ),
+      theme: CeresTheme.theme,
       home: const HomeScreen(),
     );
   }
@@ -99,12 +40,21 @@ class _HomeScreenState extends State<HomeScreen> {
     CameraScreen(),
     HistoricoScreen(),
     HistoricoLocalScreen(),
+    _PlaceholderScreen(
+      icon: Icons.map_outlined,
+      titulo: 'Mapa de Ocorrências',
+      subtitulo: 'em desenvolvimento',
+    ),
+    _PlaceholderScreen(
+      icon: Icons.menu_book_outlined,
+      titulo: 'Enciclopédia',
+      subtitulo: '10 doenças catalogadas',
+    ),
   ];
 
   @override
   void initState() {
     super.initState();
-    // Remove splash assim que o primeiro frame é renderizado
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FlutterNativeSplash.remove();
     });
@@ -117,26 +67,128 @@ class _HomeScreenState extends State<HomeScreen> {
         index: _abaSelecionada,
         children: _telas,
       ),
-      bottomNavigationBar: NavigationBar(
+      bottomNavigationBar: _navBar(),
+    );
+  }
+
+  Widget _navBar() {
+    return Container(
+      decoration: const BoxDecoration(
+        border: Border(
+          top: BorderSide(color: CeresColors.hairline, width: 0.8),
+        ),
+        color: CeresColors.paper,
+      ),
+      child: NavigationBar(
         selectedIndex: _abaSelecionada,
         onDestinationSelected: (i) => setState(() => _abaSelecionada = i),
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.camera_alt_outlined),
-            selectedIcon: Icon(Icons.camera_alt),
+        backgroundColor: CeresColors.paper,
+        indicatorColor: CeresColors.leafDeep.withValues(alpha: 0.12),
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        destinations: [
+          _dest(
+            icon: Icons.camera_alt_outlined,
+            selIcon: Icons.camera_alt,
             label: 'Diagnóstico',
           ),
-          NavigationDestination(
-            icon: Icon(Icons.history_outlined),
-            selectedIcon: Icon(Icons.history),
-            label: 'ESP32',
+          _dest(
+            icon: Icons.sensors_outlined,
+            selIcon: Icons.sensors,
+            label: 'IoT',
           ),
-          NavigationDestination(
-            icon: Icon(Icons.save_outlined),
-            selectedIcon: Icon(Icons.save),
+          _dest(
+            icon: Icons.save_outlined,
+            selIcon: Icons.save,
             label: 'Salvo',
           ),
+          _dest(
+            icon: Icons.map_outlined,
+            selIcon: Icons.map,
+            label: 'Mapa',
+          ),
+          _dest(
+            icon: Icons.menu_book_outlined,
+            selIcon: Icons.menu_book,
+            label: 'Guia',
+          ),
         ],
+      ),
+    );
+  }
+
+  NavigationDestination _dest({
+    required IconData icon,
+    required IconData selIcon,
+    required String label,
+  }) {
+    return NavigationDestination(
+      icon: Icon(icon),
+      selectedIcon: Icon(selIcon),
+      label: label,
+    );
+  }
+}
+
+/// Placeholder para telas ainda não implementadas
+class _PlaceholderScreen extends StatelessWidget {
+  final IconData icon;
+  final String titulo;
+  final String subtitulo;
+
+  const _PlaceholderScreen({
+    required this.icon,
+    required this.titulo,
+    required this.subtitulo,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: CeresColors.bone,
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 52,
+              color: CeresColors.ink3.withValues(alpha: 0.35),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              titulo,
+              style: GoogleFonts.newsreader(
+                fontSize: 20,
+                color: CeresColors.ink2,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              subtitulo,
+              style: GoogleFonts.ibmPlexMono(
+                fontSize: 10,
+                color: CeresColors.ink3,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              decoration: BoxDecoration(
+                border: Border.all(
+                    color: CeresColors.hairline.withValues(alpha: 0.6)),
+                borderRadius: BorderRadius.circular(3),
+              ),
+              child: Text(
+                'em breve',
+                style: GoogleFonts.ibmPlexMono(
+                  fontSize: 10,
+                  color: CeresColors.ink3,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

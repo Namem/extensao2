@@ -191,6 +191,12 @@ backend/datasets/scripts/
   background_augment.py     → remove fundo + recompõe sobre fundos naturais
 verificar_ambiente.py       → checklist de ambiente com apito sonoro
 
+## Modelo a usar por tarefa
+Sempre especificar qual modelo usar ao sugerir qualquer ação:
+- **claude-opus-4-5**    → design system, prompts criativos, decisões arquiteturais, TCC/artigo
+- **claude-sonnet-4-5**  → código Flutter/Django/Python/C++, implementação, análise técnica, debug
+- **claude-haiku-3-5**   → buscas rápidas, resumos, verificações, tarefas simples
+
 ## Regras Comportamentais (Token & Time Saving)
 - NUNCA usar `read` em arquivos de log grandes. Usar `bash` com
   `tail -n 50` ou `grep` para extrair apenas a parte relevante

@@ -7,6 +7,11 @@ class EventoMqtt {
   final int latenciaMs;
   final String timestamp;
 
+  // Sensores ambientais (opcionais — backend pode não enviar)
+  final double? temperatura;
+  final double? umidadeAr;
+  final double? umidadeSolo;
+
   EventoMqtt({
     required this.id,
     required this.deviceId,
@@ -14,6 +19,9 @@ class EventoMqtt {
     required this.confianca,
     required this.latenciaMs,
     required this.timestamp,
+    this.temperatura,
+    this.umidadeAr,
+    this.umidadeSolo,
   });
 
   factory EventoMqtt.fromJson(Map<String, dynamic> json) {
@@ -24,6 +32,9 @@ class EventoMqtt {
       confianca: (json['confianca'] as num?)?.toDouble() ?? 0.0,
       latenciaMs: (json['latencia_ms'] as num?)?.toInt() ?? 0,
       timestamp: json['timestamp'] as String? ?? '',
+      temperatura: (json['temperatura'] as num?)?.toDouble(),
+      umidadeAr: (json['umidade_ar'] as num?)?.toDouble(),
+      umidadeSolo: (json['umidade_solo'] as num?)?.toDouble(),
     );
   }
 
