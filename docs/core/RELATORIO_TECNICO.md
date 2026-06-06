@@ -962,3 +962,110 @@ Flutter app → GET /api/diagnostico/historico/ → 200 OK (6 eventos)
 ```
 
 **Dados reais do ESP32:** Temp 32.7°C, Umidade Ar 41.4–41.8%, Umidade Solo 0% (sem sensor submerso)
+
+---
+
+### 2026-06-06 (noite) — Temperature Scaling INT8 + Matriz de Confusão + GPS Fix
+
+**Problema 1 — Confiança achatada (22.8% em todas as imagens)**
+
+O modelo INT8 retorna outputs na faixa [-128, 127]. Após dequantização
+(`(valor - zero_point) × scale`, com scale=0.00390625 e zp=-128), os logits
+ficam no range [0, 0.996] — muito estreito para o softmax produzir
+probabilidades discriminativas. Resultado: todas as imagens davam ~23% de
+confiança no top class e ~8.5% nas demais, independente do acerto.
+
+**Solução — Temperature Scaling (T=0.25)**
+
+Dividir os logits por T < 1.0 antes do softmax "aguça" a distribuição:
+```
+logits / T  →  softmax  →  probabilidades mais discriminativas
+```
+
+Calibração em 300 imagens do PlantVillage test set (30 por classe):
+
+| Temperature | Acurácia | Confiança média |
+|---|---|---|
+| Sem scaling | 96.0% | 22.8% (achatado) |
+| T=0.50 | 96.0% | 44.0% |
+| T=0.30 | 96.0% | 74.1% |
+| **T=0.25** | **96.0%** | **84.4%** ← escolhido |
+| T=0.20 | 96.0% | 93.2% |
+
+T=0.25 escolhido por dar confiança realista (~84%) sem ser overconfident.
+A acurácia não muda em nenhuma temperatura — apenas a exibição da confiança.
+
+Nota: como o output INT8 satura (classe certa → 127, todas outras → -128),
+a confiança exibida fica fixa em 85.7% para a maioria das imagens. Isso é
+uma limitação inerente da quantização INT8 de 8 bits — não há gradação
+intermediária nos logits de saída.
+
+Aplicado em:
+- `backend/diagnostico/inference_service.py` (Django API)
+- `app_ceres/lib/services/inference_local_service.dart` (TFLite on-device)
+
+**Problema 2 — Mapa sem pins de diagnóstico**
+
+Duas causas identificadas:
+
+1. `InferirImagemView` não salvava o resultado da inferência no banco.
+   Diagnósticos do app ficavam apenas no SQLite local (Drift) e nunca
+   geravam `DiagnosticoEvento` no backend.
+   Fix: `DiagnosticoEvento.objects.create()` após inferência com lat/lon/classe.
+
+2. Race condition no GPS: `Future.wait([_capturarGps(), _inferir()])` rodava
+   GPS e inferência em paralelo, mas `_inferir()` lia `_latitude`/`_longitude`
+   antes do GPS terminar → valores null → POST sem coordenadas.
+   Fix: capturar GPS sequencialmente antes da inferência + timeout 5s→10s.
+
+Confirmado via curl que o backend salva corretamente:
+```json
+{"id": 127, "device_id": "app_flutter", "classe_detectada": "D06_vira_cabeca",
+ "confianca": 0.8564, "latitude": -15.6014, "longitude": -56.0979}
+```
+
+**Problema 3 — Resize inconsistente local vs cloud**
+
+O TFLite local usava `img.copyResize()` com interpolação bilinear (padrão do
+package `image`), enquanto o backend usa PIL LANCZOS. Alterado para
+`Interpolation.cubic` (mais fiel ao LANCZOS do treino).
+
+**Matriz de Confusão — Modelo INT8 (2.734 imagens PlantVillage test set)**
+
+Acurácia global: **95.76%** (2.618/2.734 acertos)
+
+| Classe | Acurácia | Principais confusões |
+|---|---|---|
+| Mancha Bacteriana | 100% | — |
+| Vira-cabeça | 99% | → Mancha Bact. (0.6%) |
+| Saudável | 99% | → Mofo Foliar (0.8%) |
+| Mosaico | 96% | — |
+| Ácaro | 96% | → Mancha Alvo (2.0%) |
+| Requeima | 94% | → Mancha Bact. (2.1%) |
+| Septoriose | 93% | → Mancha Bact. (3.4%) |
+| Mancha Alvo | 92% | → Pinta Preta (2.8%), Mancha Bact. (2.4%) |
+| Mofo Foliar | 89% | → Septoriose (3.5%), Vira-cabeça (2.8%) |
+| **Pinta Preta** | **83%** | → Septoriose (6.0%), Requeima (4.7%), Mancha Bact. (4.0%) |
+
+Pinta Preta (D03) é a classe mais fraca — confunde com Septoriose e Mancha
+Bacteriana por similaridade visual (lesões necróticas escuras circulares).
+Documentado como limitação e sugestão de trabalho futuro.
+
+Gráficos gerados:
+- `docs/resultados/matriz_confusao_int8.png` (heatmap 10×10)
+- `docs/resultados/acuracia_por_classe_int8.png` (barras horizontais)
+- `docs/resultados/matriz_confusao_int8.json` (dados brutos)
+
+**Teste no celular (APK release) — 5 diagnósticos validados:**
+
+| Imagem | Modo | Resultado | Confiança | Latência | ✓/✗ |
+|---|---|---|---|---|---|
+| saudavel | Cloud | Saudável | 85.7% | 330ms | ✅ |
+| D01_requeima | Cloud | Requeima | 85.7% | 358ms | ✅ |
+| D09_mancha_bacteriana | Cloud | Mancha Bact. | 85.7% | 264ms | ✅ |
+| saudavel | Local | Saudável | 85.7% | 63ms | ✅ |
+| D09_mancha_bacteriana | Local | Mancha Bact. | 67.4% | 58ms | ✅ |
+
+Latência local (~60ms) é 5× mais rápida que Cloud (~300ms).
+
+Esqueci a senha (reset direto sem e-mail): ✅ funcional no celular.

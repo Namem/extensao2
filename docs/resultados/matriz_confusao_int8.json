@@ -1,0 +1,293 @@
+{
+  "modelo": "ceres_mobilenetv2_int8.tflite",
+  "dataset": "PlantVillage test set",
+  "total_imagens": 2734,
+  "acertos": 2618,
+  "acuracia": 95.76,
+  "classes": [
+    "D01_requeima",
+    "D02_septoriose",
+    "D03_pinta_preta",
+    "D03b_mancha_alvo",
+    "D05_mofo_foliar",
+    "D06_vira_cabeca",
+    "D06b_mosaico",
+    "D07_acaro_bronzeamento",
+    "D09_mancha_bacteriana",
+    "saudavel"
+  ],
+  "labels": [
+    "Requeima",
+    "Septoriose",
+    "Pinta Preta",
+    "Mancha Alvo",
+    "Mofo Foliar",
+    "Vira-cabeça",
+    "Mosaico",
+    "Ácaro",
+    "Mancha Bact.",
+    "Saudável"
+  ],
+  "matriz_confusao": [
+    [
+      270,
+      4,
+      4,
+      1,
+      1,
+      0,
+      0,
+      0,
+      6,
+      1
+    ],
+    [
+      2,
+      248,
+      4,
+      1,
+      1,
+      0,
+      0,
+      2,
+      9,
+      0
+    ],
+    [
+      7,
+      9,
+      125,
+      2,
+      0,
+      0,
+      0,
+      1,
+      6,
+      0
+    ],
+    [
+      0,
+      3,
+      6,
+      195,
+      1,
+      0,
+      0,
+      1,
+      5,
+      1
+    ],
+    [
+      1,
+      5,
+      0,
+      1,
+      128,
+      4,
+      0,
+      3,
+      2,
+      0
+    ],
+    [
+      0,
+      2,
+      0,
+      0,
+      0,
+      798,
+      0,
+      0,
+      5,
+      0
+    ],
+    [
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      55,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      0,
+      1,
+      5,
+      0,
+      2,
+      0,
+      243,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      319,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      2,
+      1,
+      0,
+      0,
+      0,
+      237
+    ]
+  ],
+  "confusoes_notaveis": [
+    {
+      "real": "D01_requeima",
+      "predito": "D02_septoriose",
+      "quantidade": 4,
+      "percentual": 1.4
+    },
+    {
+      "real": "D01_requeima",
+      "predito": "D03_pinta_preta",
+      "quantidade": 4,
+      "percentual": 1.4
+    },
+    {
+      "real": "D01_requeima",
+      "predito": "D09_mancha_bacteriana",
+      "quantidade": 6,
+      "percentual": 2.1
+    },
+    {
+      "real": "D02_septoriose",
+      "predito": "D01_requeima",
+      "quantidade": 2,
+      "percentual": 0.7
+    },
+    {
+      "real": "D02_septoriose",
+      "predito": "D03_pinta_preta",
+      "quantidade": 4,
+      "percentual": 1.5
+    },
+    {
+      "real": "D02_septoriose",
+      "predito": "D07_acaro_bronzeamento",
+      "quantidade": 2,
+      "percentual": 0.7
+    },
+    {
+      "real": "D02_septoriose",
+      "predito": "D09_mancha_bacteriana",
+      "quantidade": 9,
+      "percentual": 3.4
+    },
+    {
+      "real": "D03_pinta_preta",
+      "predito": "D01_requeima",
+      "quantidade": 7,
+      "percentual": 4.7
+    },
+    {
+      "real": "D03_pinta_preta",
+      "predito": "D02_septoriose",
+      "quantidade": 9,
+      "percentual": 6.0
+    },
+    {
+      "real": "D03_pinta_preta",
+      "predito": "D03b_mancha_alvo",
+      "quantidade": 2,
+      "percentual": 1.3
+    },
+    {
+      "real": "D03_pinta_preta",
+      "predito": "D09_mancha_bacteriana",
+      "quantidade": 6,
+      "percentual": 4.0
+    },
+    {
+      "real": "D03b_mancha_alvo",
+      "predito": "D02_septoriose",
+      "quantidade": 3,
+      "percentual": 1.4
+    },
+    {
+      "real": "D03b_mancha_alvo",
+      "predito": "D03_pinta_preta",
+      "quantidade": 6,
+      "percentual": 2.8
+    },
+    {
+      "real": "D03b_mancha_alvo",
+      "predito": "D09_mancha_bacteriana",
+      "quantidade": 5,
+      "percentual": 2.4
+    },
+    {
+      "real": "D05_mofo_foliar",
+      "predito": "D02_septoriose",
+      "quantidade": 5,
+      "percentual": 3.5
+    },
+    {
+      "real": "D05_mofo_foliar",
+      "predito": "D06_vira_cabeca",
+      "quantidade": 4,
+      "percentual": 2.8
+    },
+    {
+      "real": "D05_mofo_foliar",
+      "predito": "D07_acaro_bronzeamento",
+      "quantidade": 3,
+      "percentual": 2.1
+    },
+    {
+      "real": "D05_mofo_foliar",
+      "predito": "D09_mancha_bacteriana",
+      "quantidade": 2,
+      "percentual": 1.4
+    },
+    {
+      "real": "D06_vira_cabeca",
+      "predito": "D02_septoriose",
+      "quantidade": 2,
+      "percentual": 0.2
+    },
+    {
+      "real": "D06_vira_cabeca",
+      "predito": "D09_mancha_bacteriana",
+      "quantidade": 5,
+      "percentual": 0.6
+    },
+    {
+      "real": "D07_acaro_bronzeamento",
+      "predito": "D03b_mancha_alvo",
+      "quantidade": 5,
+      "percentual": 2.0
+    },
+    {
+      "real": "D07_acaro_bronzeamento",
+      "predito": "D06_vira_cabeca",
+      "quantidade": 2,
+      "percentual": 0.8
+    },
+    {
+      "real": "saudavel",
+      "predito": "D05_mofo_foliar",
+      "quantidade": 2,
+      "percentual": 0.8
+    }
+  ]
+}
