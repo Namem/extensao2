@@ -97,7 +97,7 @@ class Command(BaseCommand):
 
             except Exception as erro:
                 self.stdout.write(self.style.ERROR(
-                    f'[MQTT] Falha na conexão: {erro}. Tentando novamente em {espera}s...'
+                    f'[MQTT] Falha na conexão ({host}:{port} TLS={use_tls} user={user}): {erro}. Tentando em {espera}s...'
                 ))
                 time.sleep(espera)
                 espera = min(espera * 2, 60)  # Máximo de 60s entre tentativas
