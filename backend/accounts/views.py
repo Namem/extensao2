@@ -90,9 +90,9 @@ def forgot_password(request):
             recipient_list=[email],
             fail_silently=False,
         )
-    except Exception:
+    except Exception as e:
         return Response(
-            {'erro': 'Falha ao enviar e-mail. Verifique a configuração SMTP.'},
+            {'erro': f'Falha ao enviar e-mail: {type(e).__name__}: {e}'},
             status=500,
         )
 

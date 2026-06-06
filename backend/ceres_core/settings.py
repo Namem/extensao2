@@ -151,11 +151,13 @@ TFLITE_MODEL_PATH = BASE_DIR / 'datasets' / 'modelo' / 'ceres_expe_int8.tflite'
 # ── E-mail (SMTP Gmail para reset de senha) ──────────────────────────────────
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '465'))
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True  # porta 465 usa SSL direto (mais compatível com PaaS)
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')  # App Password do Gmail
 DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER', 'noreply@ceres.app')
+EMAIL_TIMEOUT = 10  # segundos — evita timeout infinito
 
 # Token de reset expira em 15 minutos
 PASSWORD_RESET_TOKEN_EXPIRY_MINUTES = 15
