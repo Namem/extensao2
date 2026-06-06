@@ -92,6 +92,7 @@ class InferirImagemView(APIView):
         import base64
         import json as json_mod
         from pathlib import Path
+        from django.utils import timezone
 
         imagem = request.FILES.get('imagem')
         if not imagem:
@@ -106,6 +107,12 @@ class InferirImagemView(APIView):
                 {"erro": "Modelo TFLite nao encontrado. Verifique TFLITE_MODEL_PATH."},
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
+
+        # GPS opcional — enviado pelo app Flutter
+        lat_str = request.data.get('latitude')
+        lon_str = request.data.get('longitude')
+        latitude = float(lat_str) if lat_str else None
+        longitude = float(lon_str) if lon_str else None
 
         img_bytes = imagem.read()
         img_b64 = base64.b64encode(img_bytes).decode()
@@ -134,6 +141,21 @@ class InferirImagemView(APIView):
             resultado = json_mod.loads(output[-1])
             # Sobrescreve com a latência real percebida pela API (inclui subprocess)
             resultado['latencia_ms'] = latencia_api_ms
+
+            # ── Persistir como DiagnosticoEvento (alimenta o mapa) ──────
+            device_id = 'app_flutter'
+            if hasattr(request, 'user') and request.user.is_authenticated:
+                device_id = f'app_{request.user.username}'
+
+            DiagnosticoEvento.objects.create(
+                device_id=device_id,
+                classe_detectada=resultado.get('classe'),
+                confianca=resultado.get('confianca'),
+                latitude=latitude,
+                longitude=longitude,
+                timestamp=timezone.now(),
+            )
+
             return Response(resultado, status=status.HTTP_200_OK)
 
         except subprocess.TimeoutExpired:
