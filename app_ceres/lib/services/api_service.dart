@@ -74,12 +74,18 @@ class ApiService {
 
   /// Envia a imagem para o endpoint de inferência.
   /// Reenvia com token renovado automaticamente em caso de 401.
-  Future<ResultadoInferencia> inferir(File imagem) async {
+  /// [latitude] e [longitude] opcionais — incluídos no POST se disponíveis.
+  Future<ResultadoInferencia> inferir(File imagem, {
+    double? latitude,
+    double? longitude,
+  }) async {
     Future<http.StreamedResponse> enviar() async {
       final uri = Uri.parse(Config.inferirEndpoint);
       final req = http.MultipartRequest('POST', uri);
       req.headers.addAll(await _authHeader());
       req.files.add(await http.MultipartFile.fromPath('imagem', imagem.path));
+      if (latitude != null) req.fields['latitude'] = latitude.toString();
+      if (longitude != null) req.fields['longitude'] = longitude.toString();
       return req.send().timeout(const Duration(seconds: 60));
     }
 
@@ -121,6 +127,46 @@ class ApiService {
     if (resp.statusCode == 201) return;
     final body = jsonDecode(resp.body) as Map<String, dynamic>;
     throw Exception(body['erro'] ?? 'Erro ao criar conta.');
+  }
+
+  /// Solicita código de recuperação de senha por e-mail.
+  Future<String> esqueceuSenha({required String email}) async {
+    final uri = Uri.parse(Config.forgotPasswordEndpoint);
+    final resp = await http.post(
+      uri,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email}),
+    ).timeout(const Duration(seconds: 20));
+
+    final body = jsonDecode(resp.body) as Map<String, dynamic>;
+    if (resp.statusCode == 200) {
+      return body['mensagem'] as String;
+    }
+    throw Exception(body['erro'] ?? 'Erro ao solicitar recuperação.');
+  }
+
+  /// Redefine a senha usando o código recebido por e-mail.
+  Future<String> resetarSenha({
+    required String email,
+    required String codigo,
+    required String novaSenha,
+  }) async {
+    final uri = Uri.parse(Config.resetPasswordEndpoint);
+    final resp = await http.post(
+      uri,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'email': email,
+        'codigo': codigo,
+        'nova_senha': novaSenha,
+      }),
+    ).timeout(const Duration(seconds: 20));
+
+    final body = jsonDecode(resp.body) as Map<String, dynamic>;
+    if (resp.statusCode == 200) {
+      return body['mensagem'] as String;
+    }
+    throw Exception(body['erro'] ?? 'Erro ao redefinir senha.');
   }
 
   /// Busca dados do usuário autenticado + estatísticas.

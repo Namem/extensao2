@@ -147,3 +147,15 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # Caminho do modelo TFLite — Exp E (modelo final, 638KB INT8)
 TFLITE_MODEL_PATH = BASE_DIR / 'datasets' / 'modelo' / 'ceres_expe_int8.tflite'
+
+# ── E-mail (SMTP Gmail para reset de senha) ──────────────────────────────────
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')  # App Password do Gmail
+DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER', 'noreply@ceres.app')
+
+# Token de reset expira em 15 minutos
+PASSWORD_RESET_TOKEN_EXPIRY_MINUTES = 15

@@ -6,6 +6,7 @@ import 'screens/alertas_screen.dart';
 import 'screens/cadastro_screen.dart';
 import 'screens/camera_screen.dart';
 import 'screens/enciclopedia_screen.dart';
+import 'screens/esqueci_senha_screen.dart';
 import 'screens/historico_screen.dart';
 import 'screens/historico_local_screen.dart';
 import 'screens/login_screen.dart';
@@ -41,6 +42,7 @@ class CeresApp extends StatelessWidget {
         '/agronomos':     (_) => const AgronomosScreen(),
         '/seja-parceiro': (_) => const SejaParceiroScreen(),
         '/cadastro':      (_) => const CadastroScreen(),
+        '/esqueci-senha': (_) => const EsqueciSenhaScreen(),
       },
       home: const _BootScreen(),
     );

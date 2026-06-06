@@ -246,14 +246,17 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const Spacer(),
-                      Text(
-                        'Esqueci a senha',
-                        style: GoogleFonts.ibmPlexSans(
-                          fontSize: 11,
-                          color: CeresColors.leafDeep,
-                          fontWeight: FontWeight.w500,
-                          decoration: TextDecoration.underline,
-                          decorationColor: CeresColors.leafDeep,
+                      GestureDetector(
+                        onTap: () => Navigator.pushNamed(context, '/esqueci-senha'),
+                        child: Text(
+                          'Esqueci a senha',
+                          style: GoogleFonts.ibmPlexSans(
+                            fontSize: 11,
+                            color: CeresColors.leafDeep,
+                            fontWeight: FontWeight.w500,
+                            decoration: TextDecoration.underline,
+                            decorationColor: CeresColors.leafDeep,
+                          ),
                         ),
                       ),
                     ],

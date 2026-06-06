@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -37,6 +38,9 @@ class _CameraScreenState extends State<CameraScreen> {
   // Local desabilitado até tflite_flutter ser descomentado no pubspec.yaml
   bool _modoLocal = false;
   bool get _localDisponivel => !Platform.isWindows;
+
+  double? _latitude;
+  double? _longitude;
 
   final _picker = ImagePicker();
 
@@ -72,6 +76,31 @@ class _CameraScreenState extends State<CameraScreen> {
     );
   }
 
+  /// Captura localização GPS antes de inferir (silencioso — não bloqueia).
+  Future<void> _capturarGps() async {
+    try {
+      // Verifica permissão
+      var perm = await Geolocator.checkPermission();
+      if (perm == LocationPermission.denied) {
+        perm = await Geolocator.requestPermission();
+      }
+      if (perm == LocationPermission.denied ||
+          perm == LocationPermission.deniedForever) {
+        return; // sem permissão — segue sem GPS
+      }
+      final pos = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 5),
+        ),
+      );
+      _latitude = pos.latitude;
+      _longitude = pos.longitude;
+    } catch (_) {
+      // GPS indisponível — segue sem coordenadas
+    }
+  }
+
   Future<void> _capturar(ImageSource fonte) async {
     final picked = await _picker.pickImage(
       source: fonte,
@@ -86,7 +115,8 @@ class _CameraScreenState extends State<CameraScreen> {
       _erro = null;
       _salvo = false;
     });
-    await _inferir();
+    // Captura GPS em paralelo com a inferência
+    await Future.wait([_capturarGps(), _inferir()]);
   }
 
   Future<void> _inferir() async {
@@ -96,7 +126,11 @@ class _CameraScreenState extends State<CameraScreen> {
       // Rota: local (TFLite on-device) ou cloud (Django API)
       final res = (_modoLocal && _localDisponivel)
           ? await InferenceLocalService.instance.inferir(_imagem!)
-          : await ApiService.instance.inferir(_imagem!);
+          : await ApiService.instance.inferir(
+              _imagem!,
+              latitude: _latitude,
+              longitude: _longitude,
+            );
       setState(() => _resultado = res);
       await appDb.salvar(DiagnosticosLocaisCompanion(
         timestamp: Value(DateTime.now()),
@@ -105,6 +139,8 @@ class _CameraScreenState extends State<CameraScreen> {
         latenciaMs: Value(res.latenciaMs),
         scoresJson: Value(jsonEncode(res.scores)),
         imagemPath: Value(_imagem!.path),
+        latitude: Value(_latitude),
+        longitude: Value(_longitude),
       ));
       setState(() => _salvo = true);
     } catch (e) {

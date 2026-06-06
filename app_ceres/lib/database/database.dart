@@ -36,6 +36,10 @@ class DiagnosticosLocais extends Table {
 
   /// Caminho local da imagem usada (nullable — pode não estar disponível).
   TextColumn get imagemPath => text().nullable()();
+
+  /// Coordenadas GPS no momento do diagnóstico (nullable — GPS pode estar indisponível).
+  RealColumn get latitude => real().nullable()();
+  RealColumn get longitude => real().nullable()();
 }
 
 @DriftDatabase(tables: [DiagnosticosLocais])
@@ -43,7 +47,18 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_abrirConexao());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onUpgrade: (migrator, from, to) async {
+      if (from < 2) {
+        // v2: adicionou latitude e longitude
+        await migrator.addColumn(diagnosticosLocais, diagnosticosLocais.latitude);
+        await migrator.addColumn(diagnosticosLocais, diagnosticosLocais.longitude);
+      }
+    },
+  );
 
   /// Retorna os últimos [limite] diagnósticos, do mais recente ao mais antigo.
   Future<List<DiagnosticoLocal>> historico({int limite = 100}) =>
