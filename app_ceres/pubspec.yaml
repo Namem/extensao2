@@ -65,7 +65,7 @@ dependencies:
   shared_preferences: ^2.3.2
   # Manipulacao de imagem para pre-processamento (resize 96x96, RGB)
   image: ^4.2.0
-  # tflite_flutter: ^0.10.4  # BUG Windows 0.10.4 — reativar ao buildar APK Android
+  tflite_flutter: ^0.10.4
 
 # Pina flutter_svg em versao sem bug de compilacao Windows
 dependency_overrides:

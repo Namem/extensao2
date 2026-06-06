@@ -36,7 +36,7 @@ class _CameraScreenState extends State<CameraScreen> {
   // Modo de inferência: local (TFLite on-device) ou cloud (Django API)
   // Local desabilitado até tflite_flutter ser descomentado no pubspec.yaml
   bool _modoLocal = false;
-  bool get _localDisponivel => false; // stub ativo — ver inference_local_service.dart
+  bool get _localDisponivel => !Platform.isWindows;
 
   final _picker = ImagePicker();
 
