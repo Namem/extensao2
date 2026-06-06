@@ -882,10 +882,83 @@ O usuário solicitou planejamento completo de tudo que falta para concluir o app
 - Filtra por nome, agente e sintomas
 - Botão limpar (X) quando há texto, seções agrupadas ou lista flat conforme busca
 
-### Resultado
+### Resultado parcial (antes do MQTT Cloud)
 - API pública: `ceres.up.railway.app` ✅
 - APK instalado em celular real ✅
 - Modo Local (TFLite) habilitado para Android ✅
 - MQTT Cloud configurado (HiveMQ) ✅
 - Busca Enciclopédia funcional ✅
 - 4 novas telas + rotas ✅
+
+---
+
+## 2026-06-06 (noite) — Pipeline MQTT Cloud end-to-end
+
+### Objetivo
+Conectar toda a cadeia IoT: ESP32 real → HiveMQ Cloud (broker TLS) → Railway mqtt_listener → Django DB → Flutter app.
+
+### Problemas encontrados e soluções
+
+| # | Problema | Causa raiz | Solução |
+|---|----------|-----------|---------|
+| 1 | ESP32 publicava no Mosquitto local, Railway tentava HiveMQ | Brokers diferentes | Atualizar firmware ESP32 para HiveMQ Cloud (TLS 8883) |
+| 2 | Logs Railway invisíveis | stdout bufferizado no Docker | `ENV PYTHONUNBUFFERED=1` no Dockerfile |
+| 3 | Railway bloqueava porta 8883 | Firewall PaaS | Adicionar suporte WebSocket (porta 8884) no mqtt_listener |
+| 4 | `MQTT_HOST` e `MQTT_TLS` não injetadas pelo Railway | Railway filtra env vars com prefixo reservado | Renomear para `CERES_BROKER` e `CERES_TLS` |
+| 5 | ESP32 boot loop após flash | `boot:0x23 DOWNLOAD` mode | Pressionar RST + reconectar USB |
+| 6 | COM5 PermissionError | Processos `pio device monitor` órfãos | `Stop-Process` nos PIDs que seguravam a porta |
+
+### Firmware ESP32 — alterações
+
+**`firmware/esp32_mqtt_sensor/src/main.cpp`:**
+- `WiFiClientSecure` com `setInsecure()` (aceita qualquer cert — suficiente para HiveMQ Cloud)
+- Compilação condicional: `#ifdef MQTT_TLS` seleciona `WiFiClientSecure` vs `WiFiClient`
+- `#ifdef MQTT_USER` para autenticação condicional no `mqtt.connect()`
+
+**`firmware/esp32_mqtt_sensor/include/config.h.example`** (NOVO):
+- Template com blocos comentados para Mosquitto local e HiveMQ Cloud
+- Secrets reais em `config.h` (gitignored)
+
+### Backend — alterações
+
+**`backend/diagnostico/management/commands/mqtt_listener.py`:**
+- Suporte WebSocket: `--websocket` flag + `MQTT_WEBSOCKET` env var
+- `transport='websockets'` + `ws_set_options(path='/mqtt')` para porta 8884
+- Logging detalhado com host/port/TLS/user em mensagens de erro
+
+**`backend/Dockerfile`:**
+- `CERES_BROKER` substitui `MQTT_HOST` (Railway filtering)
+- `CERES_TLS` substitui `MQTT_TLS` (Railway filtering)
+- Shell expansion: `${CERES_BROKER:-localhost}`, `${CERES_TLS:+--tls}`
+
+### Variáveis Railway (estado final)
+
+| Variável | Valor | Status |
+|---|---|---|
+| `CERES_BROKER` | `ee2c89bab44b...s1.eu.hivemq.cloud` | ✅ Injetada |
+| `CERES_TLS` | `true` | ✅ Injetada |
+| `MQTT_PORT` | `8884` | ✅ Injetada |
+| `MQTT_USER` | `ceres` | ✅ Injetada |
+| `MQTT_PASSWORD` | `Ceresadmin1` | ✅ Injetada |
+| `MQTT_WEBSOCKET` | `true` | ✅ Injetada |
+
+### Resultado final — logs Railway
+
+```
+[MQTT] Iniciando listener → ee2c89bab...s1.eu.hivemq.cloud:8884 | TLS:True | WS:True | Tópico: ceres/sensor/#
+[MQTT] Conectado ao broker!
+[MQTT] Inscrito no tópico: ceres/sensor/#
+[MQTT] Mensagem recebida em "ceres/sensor/dados": {"device_id":"ceres-esp32-01","temperatura":32.7,"umidade_ar":41.8,"umidade_solo":0}
+[MQTT] Evento #1 salvo — dispositivo: ceres-esp32-01
+```
+
+**Pipeline completo validado:**
+```
+ESP32 (DHT22+ADC) → WiFi → HiveMQ Cloud (TLS 8883)
+                                    ↓
+Railway mqtt_listener (WebSocket+TLS 8884) → Django DB
+                                    ↓
+Flutter app → GET /api/diagnostico/historico/ → 200 OK (6 eventos)
+```
+
+**Dados reais do ESP32:** Temp 32.7°C, Umidade Ar 41.4–41.8%, Umidade Solo 0% (sem sensor submerso)

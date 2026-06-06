@@ -357,6 +357,15 @@ Django containerizado; experimento edge vs cloud documentado.
 - [x] `historico_screen.dart` — overflow `tempoLabel` corrigido com `Flexible + ellipsis`
 - [x] `historico_screen.dart` — `OfflineBanner` standalone removido (causava colapso de layout)
 
+### Pipeline MQTT Cloud — ESP32 → HiveMQ → Railway ✅ CONCLUÍDA (2026-06-06)
+- [x] ESP32 firmware atualizado: `WiFiClientSecure` + `setInsecure()` para TLS na porta 8883
+- [x] `config.h.example` criado com template local Mosquitto e HiveMQ Cloud
+- [x] `mqtt_listener.py` — suporte WebSocket (`--websocket`, `MQTT_WEBSOCKET`), TLS, auth user/pass
+- [x] HiveMQ Cloud cluster configurado: TLS 8883, WebSocket 8884, user `ceres`
+- [x] Dockerfile: env vars renomeadas `CERES_BROKER`/`CERES_TLS` (Railway filtra `MQTT_HOST`/`MQTT_TLS`)
+- [x] Railway deploy funcional: mqtt_listener conectado ao HiveMQ via WebSocket+TLS
+- [x] Pipeline end-to-end validado: ESP32 → HiveMQ Cloud → Railway Django → DB → Flutter (6 eventos persistidos)
+
 ### Rotas registradas em `main.dart` ✅
 - [x] `/alertas`, `/agronomos`, `/seja-parceiro`, `/cadastro`
 
@@ -400,6 +409,6 @@ Django containerizado; experimento edge vs cloud documentado.
 | Sprint 4A | Navegação + Persistência UX | ✅ Concluída | 11/11 |
 | Sprint 4B | Mapa + GPS | ✅ Concluída | 9/10 |
 | Sprint 5 | Perfil + Backend Usuário | ✅ Concluída | 8/8 |
-| Sprint 3.7 | Design Refresh + Novas Telas | ✅ Concluída | 20/20 |
+| Sprint 3.7 | Design Refresh + Novas Telas + MQTT Cloud | ✅ Concluída | 27/27 |
 | Sprint 6 | TCC Final + Defesa | ⏳ Pendente | 0/7 |
 | Fase Futura | RPi3B+ + EfficientNet (Exp F) | 📋 Registrado | — |

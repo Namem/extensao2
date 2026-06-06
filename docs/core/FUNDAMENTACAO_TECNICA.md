@@ -1,7 +1,7 @@
 # Fundamentação Técnica — Ceres Diagnóstico
 **TCC Engenharia da Computação — IFMT Cuiabá**
 **Autor:** Namem Rachid Jaudy Neto
-**Última atualização:** 2026-04-28
+**Última atualização:** 2026-06-06
 
 > Este documento registra a justificativa técnica e acadêmica de cada decisão
 > arquitetural do projeto. Deve ser consultado na escrita do artigo e na defesa.
@@ -277,6 +277,54 @@ monitoramento de plantações e detecção de incêndios agrícolas.
 - [Precision Agriculture with MQTT — ResearchGate](https://www.researchgate.net/publication/329470076_The_Precision_Agriculture_Based_on_Wireless_Sensor_Network_with_MQTT_Protocol)
 - [Smart farming for sustainable future — Springer](https://link.springer.com/article/10.1186/s42269-025-01366-8)
 
+### 5.1 MQTT over WebSocket + TLS (HiveMQ Cloud)
+
+#### Decisão
+Migrar do Mosquitto local para **HiveMQ Cloud** como broker MQTT de produção,
+utilizando **MQTT over WebSocket** (porta 8884) com **TLS** para comunicação
+entre o ESP32 e o backend Django hospedado no Railway.
+
+#### Por que HiveMQ Cloud e não Mosquitto self-hosted?
+
+| Critério | Mosquitto local | HiveMQ Cloud |
+|---|---|---|
+| Infraestrutura | Requer servidor próprio 24/7 | Gerenciado, SLA 99,95% |
+| TLS | Configuração manual de certificados | Certificados automáticos |
+| Custo | Custo do servidor | Gratuito até 100 conexões |
+| Manutenção | Atualizações, backups, firewall | Zero manutenção |
+| Acessibilidade | Apenas na rede local | Acessível de qualquer lugar (ESP32 em campo) |
+
+Para um TCC com dispositivo ESP32 em campo e backend em PaaS (Railway),
+o broker precisa ser acessível publicamente com TLS. Mosquitto exigiria
+um VPS dedicado — custo e complexidade injustificáveis para o escopo.
+
+#### Por que WebSocket (porta 8884) além de TCP (porta 8883)?
+
+Plataformas PaaS como Railway podem bloquear portas TCP arbitrárias ou
+impor proxies HTTP que interferem no protocolo MQTT nativo. O MQTT over
+WebSocket encapsula o protocolo MQTT dentro de uma conexão HTTP/WebSocket
+padrão (RFC 6455), compatível com qualquer proxy HTTP.
+
+O ESP32 continua usando MQTT TCP nativo (porta 8883) — a latência é menor
+e não há proxy no caminho. Apenas o backend Railway usa WebSocket.
+
+#### Segurança — TLS no ESP32
+
+O ESP32 utiliza `WiFiClientSecure` com `setInsecure()` (aceita qualquer
+certificado). Essa abordagem é aceitável para o escopo do TCC porque:
+1. A comunicação é criptografada (TLS) — proteção contra sniffing
+2. O risco de MITM em rede WiFi doméstica é baixo
+3. Validação de CA no ESP32 requer flash de certificado raiz (~1.5KB) e
+   atualização manual quando o certificado do broker expira
+
+Para produção, recomenda-se usar `setCACert()` com o certificado raiz
+do HiveMQ (ISRG Root X1 — Let's Encrypt).
+
+#### Referências
+- HiveMQ. *MQTT over WebSockets*. Disponível em: https://www.hivemq.com/blog/mqtt-essentials-special-mqtt-over-websockets/
+- OASIS. *MQTT Version 5.0 — Transport*. Seção 4.2. 2019. DOI: 10.17487/RFC9431
+- Espressif. *ESP-TLS — TLS Connection for ESP-IDF*. Disponível em: https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/api-reference/protocols/esp_tls.html
+
 ---
 
 ## 6. Backend — Django REST Framework
@@ -483,6 +531,6 @@ com estado da arte para modelos de porte similar).
 | Backend           | Django REST + PostgreSQL | FastAPI + SQLite                 | ORM, migrações, paho-mqtt |
 | App               | Flutter + Drift          | React Native                     | Performance nativa + offline |
 | Gap lab-campo     | Background Augmentation (rembg) | Domain adversarial training | Nao requer dados campo; nao altera tamanho final do modelo |
-| Broker MQTT cloud | HiveMQ Cloud (TLS 8883) | Mosquitto self-hosted | Gratuito até 100 conexões, TLS nativo, sem infra própria |
+| Broker MQTT cloud | HiveMQ Cloud (TLS 8883 + WS 8884) | Mosquitto self-hosted | Gratuito até 100 conexões, TLS nativo, WS para PaaS, sem infra própria |
 | Deploy backend    | Railway (Docker + SQLite) | AWS EC2 / Heroku | Deploy automático via GitHub, $5 crédito gratuito |
 | Inferência mobile | tflite_flutter 0.12.1 (on-device) | API cloud-only | Funciona offline, latência < 1s, sem custo por requisição |
