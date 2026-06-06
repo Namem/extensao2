@@ -52,18 +52,26 @@ class HistoricoPaginator(PageNumberPagination):
 
 class HistoricoEventosView(APIView):
     """
-    Retorna o histórico de eventos recebidos via MQTT dos dispositivos ESP32.
+    Retorna o histórico de eventos do usuário logado + eventos IoT (ESP32).
 
     GET /api/diagnostico/historico/
-        Retorna os últimos eventos paginados (page_size=10, max=20).
+        - Autenticado: retorna diagnósticos do próprio usuário + eventos MQTT
+        - Não autenticado: retorna apenas eventos MQTT (sem usuário vinculado)
         Suporta ?page=2 para navegar nas páginas.
     """
 
-    permission_classes = [AllowAny]  # Sprint 3: Flutter ainda sem JWT
+    permission_classes = [AllowAny]
 
     def get(self, request):
-        """Lista os eventos mais recentes, do mais novo para o mais antigo."""
-        eventos = DiagnosticoEvento.objects.all()
+        """Lista eventos filtrados por usuário (se logado) + IoT."""
+        if request.user and request.user.is_authenticated:
+            # Diagnósticos do usuário + eventos IoT (usuario=null)
+            from django.db.models import Q
+            eventos = DiagnosticoEvento.objects.filter(
+                Q(usuario=request.user) | Q(usuario__isnull=True)
+            )
+        else:
+            eventos = DiagnosticoEvento.objects.filter(usuario__isnull=True)
         paginator = HistoricoPaginator()
         pagina = paginator.paginate_queryset(eventos, request)
         serializer = DiagnosticoEventoSerializer(pagina, many=True)
@@ -144,8 +152,10 @@ class InferirImagemView(APIView):
 
             # ── Persistir como DiagnosticoEvento (alimenta o mapa) ──────
             device_id = 'app_flutter'
+            usuario = None
             if hasattr(request, 'user') and request.user.is_authenticated:
                 device_id = f'app_{request.user.username}'
+                usuario = request.user
 
             DiagnosticoEvento.objects.create(
                 device_id=device_id,
@@ -154,6 +164,7 @@ class InferirImagemView(APIView):
                 latitude=latitude,
                 longitude=longitude,
                 timestamp=timezone.now(),
+                usuario=usuario,
             )
 
             return Response(resultado, status=status.HTTP_200_OK)

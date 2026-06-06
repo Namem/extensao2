@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
@@ -114,6 +115,15 @@ class DiagnosticoEvento(models.Model):
     timestamp = models.DateTimeField(
         verbose_name="Timestamp do Dispositivo",
         help_text="Momento da captura no ESP32 (ISO8601)."
+    )
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='diagnosticos',
+        verbose_name="Usuário",
+        help_text="Usuário que realizou o diagnóstico (null para eventos MQTT do ESP32)."
     )
     diagnostico = models.ForeignKey(
         Diagnostico,

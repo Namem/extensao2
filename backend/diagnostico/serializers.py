@@ -22,7 +22,11 @@ class PerguntaSerializer(serializers.ModelSerializer):
 
 
 class DiagnosticoEventoSerializer(serializers.ModelSerializer):
-    """Serializa os eventos recebidos via MQTT dos dispositivos ESP32."""
+    """Serializa os eventos de diagnóstico (app + MQTT ESP32)."""
+
+    usuario_email = serializers.CharField(
+        source='usuario.username', read_only=True, default=None,
+    )
 
     class Meta:
         model = DiagnosticoEvento
@@ -37,6 +41,7 @@ class DiagnosticoEventoSerializer(serializers.ModelSerializer):
             'latitude',
             'longitude',
             'timestamp',
+            'usuario_email',
             'diagnostico',
             'criado_em',
         ]
