@@ -42,7 +42,9 @@ class InferenceLocalService {
 
     final bytes = await imagem.readAsBytes();
     final original = img.decodeImage(bytes)!;
-    final resized = img.copyResize(original, width: _inputSize, height: _inputSize);
+    final resized = img.copyResize(original,
+        width: _inputSize, height: _inputSize,
+        interpolation: img.Interpolation.cubic);
 
     // Input INT8: uint8 - 128 → [-128, 127]
     final input = List.generate(1, (_) =>
@@ -67,9 +69,15 @@ class InferenceLocalService {
         .map((v) => ((v - zeroPoint) * scale).toDouble())
         .toList();
 
+    // Temperature scaling — compensa compressão de range do INT8.
+    // T < 1.0 aguça a distribuição; calibrado em 300 imgs PlantVillage
+    // (T=0.25 → 96% acc, 84.4% avg conf). Mesmo valor do backend Django.
+    const temperature = 0.25;
+    final scaledLogits = logits.map((v) => v / temperature).toList();
+
     // Softmax (idêntico ao Django)
-    final maxLogit = logits.reduce(math.max);
-    final exps = logits.map((v) => math.exp(v - maxLogit)).toList();
+    final maxLogit = scaledLogits.reduce(math.max);
+    final exps = scaledLogits.map((v) => math.exp(v - maxLogit)).toList();
     final sumExp = exps.reduce((a, b) => a + b);
     final probs = exps.map((e) => e / sumExp).toList();
 

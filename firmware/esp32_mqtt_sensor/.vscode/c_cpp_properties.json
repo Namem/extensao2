@@ -10,7 +10,9 @@
             "includePath": [
                 "C:/Users/Rachid/Desktop/NR/Semestre 2026_1/extensao/ceres-diagnostico/firmware/esp32_mqtt_sensor/include",
                 "C:/Users/Rachid/Desktop/NR/Semestre 2026_1/extensao/ceres-diagnostico/firmware/esp32_mqtt_sensor/src",
+                "C:/Users/Rachid/.platformio/packages/framework-arduinoespressif32/libraries/WiFiClientSecure/src",
                 "C:/Users/Rachid/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src",
+                "C:/Users/Rachid/Desktop/NR/Semestre 2026_1/extensao/ceres-diagnostico/firmware/esp32_mqtt_sensor/.pio/libdeps/esp32-s3-devkitc-1/DHT sensor library for ESPx",
                 "C:/Users/Rachid/Desktop/NR/Semestre 2026_1/extensao/ceres-diagnostico/firmware/esp32_mqtt_sensor/.pio/libdeps/esp32-s3-devkitc-1/PubSubClient/src",
                 "C:/Users/Rachid/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/newlib/platform_include",
                 "C:/Users/Rachid/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/freertos/include",
@@ -240,7 +242,6 @@
                 "C:/Users/Rachid/.platformio/packages/framework-arduinoespressif32/libraries/USB/src",
                 "C:/Users/Rachid/.platformio/packages/framework-arduinoespressif32/libraries/Update/src",
                 "C:/Users/Rachid/.platformio/packages/framework-arduinoespressif32/libraries/WebServer/src",
-                "C:/Users/Rachid/.platformio/packages/framework-arduinoespressif32/libraries/WiFiClientSecure/src",
                 "C:/Users/Rachid/.platformio/packages/framework-arduinoespressif32/libraries/WiFiProv/src",
                 "C:/Users/Rachid/.platformio/packages/framework-arduinoespressif32/libraries/Wire/src",
                 ""
@@ -250,7 +251,9 @@
                 "path": [
                     "C:/Users/Rachid/Desktop/NR/Semestre 2026_1/extensao/ceres-diagnostico/firmware/esp32_mqtt_sensor/include",
                     "C:/Users/Rachid/Desktop/NR/Semestre 2026_1/extensao/ceres-diagnostico/firmware/esp32_mqtt_sensor/src",
+                    "C:/Users/Rachid/.platformio/packages/framework-arduinoespressif32/libraries/WiFiClientSecure/src",
                     "C:/Users/Rachid/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src",
+                    "C:/Users/Rachid/Desktop/NR/Semestre 2026_1/extensao/ceres-diagnostico/firmware/esp32_mqtt_sensor/.pio/libdeps/esp32-s3-devkitc-1/DHT sensor library for ESPx",
                     "C:/Users/Rachid/Desktop/NR/Semestre 2026_1/extensao/ceres-diagnostico/firmware/esp32_mqtt_sensor/.pio/libdeps/esp32-s3-devkitc-1/PubSubClient/src",
                     "C:/Users/Rachid/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/newlib/platform_include",
                     "C:/Users/Rachid/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/freertos/include",
@@ -480,7 +483,6 @@
                     "C:/Users/Rachid/.platformio/packages/framework-arduinoespressif32/libraries/USB/src",
                     "C:/Users/Rachid/.platformio/packages/framework-arduinoespressif32/libraries/Update/src",
                     "C:/Users/Rachid/.platformio/packages/framework-arduinoespressif32/libraries/WebServer/src",
-                    "C:/Users/Rachid/.platformio/packages/framework-arduinoespressif32/libraries/WiFiClientSecure/src",
                     "C:/Users/Rachid/.platformio/packages/framework-arduinoespressif32/libraries/WiFiProv/src",
                     "C:/Users/Rachid/.platformio/packages/framework-arduinoespressif32/libraries/Wire/src",
                     ""
