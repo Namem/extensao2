@@ -91,7 +91,7 @@ class _CameraScreenState extends State<CameraScreen> {
       final pos = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
-          timeLimit: Duration(seconds: 5),
+          timeLimit: Duration(seconds: 10),
         ),
       );
       _latitude = pos.latitude;
@@ -115,8 +115,9 @@ class _CameraScreenState extends State<CameraScreen> {
       _erro = null;
       _salvo = false;
     });
-    // Captura GPS em paralelo com a inferência
-    await Future.wait([_capturarGps(), _inferir()]);
+    // GPS primeiro — garante lat/lon prontos antes do POST
+    await _capturarGps();
+    await _inferir();
   }
 
   Future<void> _inferir() async {
