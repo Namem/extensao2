@@ -1,17 +1,13 @@
-version: '3.8'
-
 services:
   django:
     build: ./backend
     ports:
       - "8080:8080"
     volumes:
-      # Código montado do host — edições refletem sem rebuild
+      # Código montado do host — edições refletem sem rebuild (SQLite persiste aqui)
       - ./backend:/app
       # Modelo TFLite (nao commitado)
       - ./backend/datasets/modelo:/app/datasets/modelo:ro
-      # Banco SQLite persistido entre restarts
-      - sqlite_data:/app/db_notebook.sqlite3
     environment:
       - DJANGO_SETTINGS_MODULE=ceres_core.settings_notebook
     # Migra + sobe o servidor com auto-reload
@@ -21,5 +17,3 @@ services:
              python manage.py runserver 0.0.0.0:8080 --settings=ceres_core.settings_notebook"
     restart: unless-stopped
 
-volumes:
-  sqlite_data:
