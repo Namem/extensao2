@@ -77,13 +77,13 @@ def me(request):
     """Retorna dados do usuário autenticado + estatísticas de diagnósticos."""
     user = request.user
 
-    # Estatísticas baseadas nos eventos do usuário (ESP32 envia device_id fixo)
-    # Para o TCC, buscamos todos os eventos do sistema (sem filtro por usuário)
-    # pois o ESP32 não autentica — todos os eventos são do operador logado.
-    total = DiagnosticoEvento.objects.count()
-    saudaveis = DiagnosticoEvento.objects.filter(
-        classe_detectada='saudavel'
-    ).count()
+    # Estatísticas do usuário logado + eventos IoT (usuario=null)
+    from django.db.models import Q
+    qs = DiagnosticoEvento.objects.filter(
+        Q(usuario=user) | Q(usuario__isnull=True)
+    )
+    total = qs.count()
+    saudaveis = qs.filter(classe_detectada='saudavel').count()
     doencas = total - saudaveis
 
     return Response({

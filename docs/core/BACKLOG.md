@@ -316,7 +316,7 @@ Django containerizado; experimento edge vs cloud documentado.
 - [x] Bottom sheet ao clicar marcador: nome, data, confiança, GPS
 - [x] Fallback Windows/Web: centro em Sorriso-MT (GPS não suportado no desktop)
 - [x] `EventoMqtt` — campos `latitude`, `longitude`, `classeDetectada`; `timestamp` → `DateTime`
-- [ ] `CameraScreen` — capturar GPS antes do diagnóstico e enviar no POST *(próximo)*
+- [x] `CameraScreen` — capturar GPS antes do diagnóstico e enviar no POST ✅ (Sprint 5B)
 
 ---
 
@@ -388,6 +388,48 @@ Django containerizado; experimento edge vs cloud documentado.
 
 ---
 
+## Sprint 5B — Robustez Backend + Sync Offline ✅ CONCLUÍDA (2026-06-06)
+
+**Objetivo:** corrigir bugs de produção, persistência Railway, e implementar
+sincronização offline para diagnósticos feitos sem internet.
+
+### Backend — Persistência e Per-User ✅
+- [x] Railway: migrar de SQLite efêmero → PostgreSQL persistente (`settings_railway.py`)
+- [x] `Dockerfile` — `DJANGO_SETTINGS_MODULE=ceres_core.settings_railway`
+- [x] `dj-database-url` adicionado ao `requirements-backend.txt`
+- [x] `DATABASE_URL` configurado no Railway (Private Network `${{ Postgres.DATABASE_URL }}`)
+- [x] FK `usuario` em `DiagnosticoEvento` — diagnósticos vinculados à conta logada
+- [x] `InferirImagemView` — salva `usuario=request.user` + GPS no banco
+- [x] `HistoricoEventosView` — filtra: autenticado vê seus diags + IoT; anônimo vê só IoT
+- [x] `DiagnosticoEventoSerializer` — campo `usuario_email` (read-only)
+- [x] Migration `0005_diagnosticoevento_usuario.py`
+- [x] Conta de teste criada: `test@test.com` / `test123`
+
+### Backend — Temperature Scaling INT8 ✅
+- [x] `inference_service.py` — temperature scaling T=0.25 nos logits dequantizados
+- [x] Confiança média: 22.8% → 84.4% (calibrado em 300 imgs PlantVillage test)
+- [x] Acurácia mantida: 96% (sem degradação)
+
+### Flutter — Correções ✅
+- [x] GPS race condition corrigido — `await _capturarGps()` antes de `_inferir()` (era `Future.wait`)
+- [x] `MapaScreen` — busca TODAS as páginas de eventos (era só page 1, máx 10 itens)
+- [x] `ModoInferencia` singleton — toggle Cloud/Local sincronizado entre CameraScreen e PerfilScreen
+- [x] `inference_local_service.dart` — temperature scaling T=0.25 + resize cubic (era bilinear)
+
+### Flutter — Sync Offline ✅
+- [x] Drift schema v3 — colunas `sincronizado` + `modo` na tabela local
+- [x] `SyncService` — monitora conectividade, envia pendentes ao voltar online
+- [x] `CameraScreen` — diagnóstico local salva com `sincronizado=false`
+- [x] `main.dart` — `SyncService.instance.iniciar()` no boot
+
+### Validação ✅
+- [x] Matriz de confusão INT8 — 95.76% em 2.734 imgs (10 classes)
+- [x] `docs/resultados/matriz_confusao_int8.json` + `.png` + `acuracia_por_classe_int8.png`
+- [x] 10 eventos de teste com GPS espalhados por Cuiabá (1 por classe, autenticados)
+- [x] Pipeline: app Flutter → API Railway → PostgreSQL → mapa com pins coloridos
+
+---
+
 ## Sprint 6 — TCC Final + Defesa ⏳ PENDENTE
 
 - [ ] `docs/core/TCC_CERES.md` — preencher todas as seções [PENDENTE]
@@ -412,8 +454,9 @@ Django containerizado; experimento edge vs cloud documentado.
 | Sprint 3.5 | Design System + Telas Completas | ✅ Concluída | 20/20 |
 | Sprint 3.6 | Fidelidade pixel-perfect HTML → Flutter | ✅ Concluída | 11/11 |
 | Sprint 4A | Navegação + Persistência UX | ✅ Concluída | 11/11 |
-| Sprint 4B | Mapa + GPS | ✅ Concluída | 9/10 |
+| Sprint 4B | Mapa + GPS | ✅ Concluída | 10/10 |
 | Sprint 5 | Perfil + Backend Usuário | ✅ Concluída | 8/8 |
 | Sprint 3.7 | Design Refresh + Novas Telas + MQTT Cloud | ✅ Concluída | 27/27 |
+| Sprint 5B | Robustez Backend + Sync Offline | ✅ Concluída | 18/18 |
 | Sprint 6 | TCC Final + Defesa | ⏳ Pendente | 0/7 |
 | Fase Futura | RPi3B+ + EfficientNet (Exp F) | 📋 Registrado | — |

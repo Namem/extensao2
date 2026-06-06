@@ -21,6 +21,7 @@ ENV DJANGO_SETTINGS_MODULE=ceres_core.settings_railway
 
 CMD ["sh", "-c", \
      "python manage.py migrate --run-syncdb 2>/dev/null || true && \
+      python manage.py limpar_vazios 2>/dev/null || true && \
       python manage.py mqtt_listener \
         --host ${CERES_BROKER:-localhost} --port ${MQTT_PORT:-1883} \
         --user ${MQTT_USER:-} --password ${MQTT_PASSWORD:-} \

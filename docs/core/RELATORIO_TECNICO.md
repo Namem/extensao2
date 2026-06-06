@@ -1069,3 +1069,72 @@ Gráficos gerados:
 Latência local (~60ms) é 5× mais rápida que Cloud (~300ms).
 
 Esqueci a senha (reset direto sem e-mail): ✅ funcional no celular.
+
+---
+
+### 2026-06-06 (noite cont.) — Railway PostgreSQL + Per-User + Sync Offline
+
+**Problema 4 — Dados perdidos a cada deploy no Railway**
+
+O `Dockerfile` usava `settings_notebook` que configura SQLite. O arquivo
+`db_notebook.sqlite3` vivia dentro do container Docker — cada deploy destruía
+e recriava o container, zerando todos os dados (usuários, diagnósticos, tudo).
+
+**Solução:**
+1. Criado `ceres_core/settings_railway.py` — usa `dj-database-url` para
+   conectar via `DATABASE_URL` do Railway
+2. PostgreSQL adicionado como serviço separado no Railway (Private Network)
+3. `Dockerfile` atualizado: `DJANGO_SETTINGS_MODULE=ceres_core.settings_railway`
+4. `DATABASE_URL = ${{ Postgres.DATABASE_URL }}` configurado nas variables
+
+Agora os dados persistem entre deploys.
+
+**Per-User Diagnostics — Diagnósticos vinculados à conta**
+
+- FK `usuario` adicionada ao `DiagnosticoEvento` (nullable para eventos MQTT ESP32)
+- `InferirImagemView`: salva `usuario=request.user` quando autenticado
+- `HistoricoEventosView`: autenticado vê próprios diagnósticos + IoT; anônimo vê só IoT
+- `DiagnosticoEventoSerializer`: expõe `usuario_email` (read-only)
+- Migration `0005_diagnosticoevento_usuario.py`
+
+**Toggle Modo Sincronizado**
+
+`ModoInferencia` singleton (`ChangeNotifier`) compartilhado entre `CameraScreen`
+e `PerfilScreen`. Trocar o modo em qualquer tela reflete imediatamente na outra.
+
+**Mapa — Busca todas as páginas**
+
+`MapaScreen._carregarEventos()` agora itera até 10 páginas do endpoint historico
+(antes pegava só `page=1`, máx 10 itens). Suporta até 200 eventos com GPS no mapa.
+
+**Fila de Sincronização Offline → Servidor**
+
+Fluxo implementado:
+```
+OFFLINE: Foto → TFLite local → Drift (sincronizado=false, imagemPath guardado)
+ONLINE:  SyncService detecta internet → envia pendentes via POST /inferir/
+         → marca sincronizado=true no Drift
+```
+
+Componentes:
+- Drift schema v3: colunas `sincronizado` (bool) + `modo` (text) adicionadas
+- `SyncService` singleton: escuta `Connectivity`, envia fila na reconexão
+- `CameraScreen`: diagnósticos locais salvam com `sincronizado=false`
+- `main.dart`: `SyncService.instance.iniciar()` no boot do app
+
+**10 eventos de teste criados no Railway (autenticados como test@test.com):**
+
+| Classe | GPS (lat, lon) | Bairro aprox. |
+|---|---|---|
+| D01_requeima | -15.5650, -56.0850 | CPA |
+| D02_septoriose | -15.6150, -56.1050 | Coxipó |
+| D03_pinta_preta | -15.5800, -56.0650 | Araés |
+| D03b_mancha_alvo | -15.5550, -56.1200 | Morada da Serra |
+| D05_mofo_foliar | -15.6300, -56.0700 | Pedra 90 |
+| D06_vira_cabeca | -15.5950, -56.1350 | Ribeirão do Lipa |
+| D06b_mosaico | -15.6450, -56.0950 | Parque Cuiabá |
+| D07_acaro_bronzeamento | -15.5750, -56.1100 | Bosque da Saúde |
+| D09_mancha_bacteriana | -15.6100, -56.0500 | Porto |
+| saudavel | -15.5900, -56.0800 | Centro |
+
+Todos classificados corretamente (10/10) com confiança ~85.7%.
