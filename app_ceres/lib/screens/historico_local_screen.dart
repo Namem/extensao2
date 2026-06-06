@@ -7,8 +7,7 @@ import 'package:intl/intl.dart';
 import '../database/database.dart';
 import '../models/resultado_inferencia.dart';
 import '../theme/ceres_theme.dart';
-import '../widgets/ceres_app_bar.dart';
-import '../widgets/ceres_icons.dart';
+import '../widgets/ceres_widgets.dart';
 import '../widgets/offline_banner.dart';
 
 class HistoricoLocalScreen extends StatelessWidget {
@@ -18,24 +17,20 @@ class HistoricoLocalScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CeresColors.bone,
-      appBar: CeresAppBar(
-        pageTitleItalic: 'Salvos',
-        pageTitle: 'offline',
-        showBack: true,
-        actions: [
-          CeresIconButton(
-            svgString: CeresIconsSvg.iconSearch,
-            tooltip: 'Buscar',
-            onPressed: () {},
-          ),
-          CeresIconButton(
-            svgString: CeresIconsSvg.iconExport,
-            tooltip: 'Exportar',
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: OfflineBanner(child: StreamBuilder<List<DiagnosticoLocal>>(
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            CeresSubBar(
+              title: 'Salvos offline',
+              subtitle: 'local',
+              actions: [
+                CeresIconBtn(Icons.search, onTap: () {}),
+                CeresIconBtn(Icons.upload_outlined, onTap: () {}),
+              ],
+            ),
+            Expanded(child: OfflineBanner(child: StreamBuilder<List<DiagnosticoLocal>>(
         stream: appDb.historicoStream(),
         builder: (context, snap) {
           if (snap.connectionState == ConnectionState.waiting) {
@@ -64,7 +59,10 @@ class HistoricoLocalScreen extends StatelessWidget {
             ],
           );
         },
-      )),
+      ))),
+          ],
+        ),
+      ),
     );
   }
 

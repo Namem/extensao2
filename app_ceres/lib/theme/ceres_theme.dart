@@ -41,7 +41,14 @@ class CeresColors {
 
   // ── Estrutura ─────────────────────────────────────────────────────────────
   static const Color dust       = Color(0xFFD4CEC6); // bordas
+  static const Color dust2      = Color(0xFFE6E0D9); // bordas suaves / fundo de barra
   static const Color hairline   = Color(0xFFC8C1B9); // divisórias finas
+
+  // ── Tons adicionais ───────────────────────────────────────────────────────
+  static const Color boneDeep          = Color(0xFFE9E2D9); // fundo recuado / chips
+  static const Color actionBoxBg       = Color(0xFFFFEFEA); // fundo box "ação recomendada"
+  static const Color actionBoxBorder   = Color(0xFFE8B7AA); // borda box ação
+  static const Color splashLeafAccent  = Color(0xFFB8CBAA); // wordmark sobre verde (splash)
 
   // ── Semântica ─────────────────────────────────────────────────────────────
   /// Retorna a cor de status com base na classe e confiança.
@@ -56,6 +63,15 @@ class CeresColors {
     if (classe == 'saudavel') return leafSoft.withValues(alpha: 0.3);
     if (confianca < 0.40) return dryGrassSoft;
     return blightSoft;
+  }
+
+  /// Retorna a cor primária de um CeresStatus (usado em ceres_widgets).
+  static Color forStatus(CeresStatus s) {
+    switch (s) {
+      case CeresStatus.healthy: return leafLive;
+      case CeresStatus.warn:    return dryGrass;
+      case CeresStatus.disease: return blight;
+    }
   }
 }
 
@@ -227,3 +243,302 @@ class CeresTheme {
     );
   }
 }
+
+// ===========================================================================
+// STATUS — enum semântico de saúde da planta
+// ===========================================================================
+enum CeresStatus { healthy, warn, disease }
+
+extension CeresStatusColor on CeresStatus {
+  Color get color {
+    switch (this) {
+      case CeresStatus.healthy: return CeresColors.leafLive;
+      case CeresStatus.warn:    return CeresColors.dryGrass;
+      case CeresStatus.disease: return CeresColors.blight;
+    }
+  }
+}
+
+// ===========================================================================
+// TIPOGRAFIA — atalhos estáticos para os três pesos visuais
+// ===========================================================================
+class CeresType {
+  CeresType._();
+
+  static TextStyle serif([TextStyle? s]) => GoogleFonts.newsreader(textStyle: s);
+  static TextStyle sans([TextStyle? s])  => GoogleFonts.ibmPlexSans(textStyle: s);
+  static TextStyle mono([TextStyle? s])  => GoogleFonts.ibmPlexMono(textStyle: s);
+
+  static TextStyle get display => serif(const TextStyle(
+        fontSize: 32, fontWeight: FontWeight.w500, height: 1.02,
+        letterSpacing: -0.7, color: CeresColors.ink));
+
+  static TextStyle get pageTitle => serif(const TextStyle(
+        fontSize: 22, fontWeight: FontWeight.w500,
+        letterSpacing: -0.3, color: CeresColors.ink));
+
+  /// Nome da doença em destaque.
+  static TextStyle get diseaseName => serif(const TextStyle(
+        fontSize: 22, fontWeight: FontWeight.w500, height: 1.1,
+        letterSpacing: -0.35, color: CeresColors.ink));
+
+  /// Nome científico — itálico de herbário.
+  static TextStyle get latin => serif(const TextStyle(
+        fontSize: 13, fontStyle: FontStyle.italic, color: CeresColors.ink2));
+
+  /// Valor grande de sensor ou métrica.
+  static TextStyle get metricValue => serif(const TextStyle(
+        fontSize: 24, fontWeight: FontWeight.w500, height: 1,
+        letterSpacing: -0.45, color: CeresColors.ink));
+
+  static TextStyle get body => sans(const TextStyle(
+        fontSize: 13, height: 1.45, color: CeresColors.ink2));
+
+  static TextStyle get button => sans(const TextStyle(
+        fontSize: 13, fontWeight: FontWeight.w500, letterSpacing: 0.2));
+
+  /// Rótulo técnico — mono caps espaçado.
+  static TextStyle get label => mono(const TextStyle(
+        fontSize: 9, fontWeight: FontWeight.w400, letterSpacing: 1.8,
+        color: CeresColors.ink3));
+
+  static TextStyle get monoData => mono(const TextStyle(
+        fontSize: 10, color: CeresColors.ink2, letterSpacing: 0.3));
+}
+
+// ===========================================================================
+// ESPAÇAMENTO / RAIOS / SOMBRAS
+// ===========================================================================
+class CeresSpacing {
+  CeresSpacing._();
+  static const double xs = 4, sm = 8, md = 12, lg = 16, xl = 22, xxl = 32;
+}
+
+class CeresRadius {
+  CeresRadius._();
+  static const card   = Radius.circular(10);
+  static const button = Radius.circular(8);
+  static const chip   = Radius.circular(999);
+}
+
+class CeresShadows {
+  CeresShadows._();
+  static const card = [
+    BoxShadow(color: Color(0x22332A1F), blurRadius: 24, offset: Offset(0, 12)),
+    BoxShadow(color: Color(0x14332A1F), blurRadius: 4,  offset: Offset(0, 2)),
+  ];
+}
+
+// ===========================================================================
+// WIDGETS-ASSINATURA
+// ===========================================================================
+
+/// Logo Ceres — disco de instrumento + folha lanceolada + ponto focal.
+/// Escala via [size]; cor via [color].
+class CeresLogo extends StatelessWidget {
+  final double size;
+  final Color color;
+  const CeresLogo({super.key, this.size = 48, this.color = CeresColors.leafDeep});
+
+  @override
+  Widget build(BuildContext context) =>
+      CustomPaint(size: Size.square(size), painter: _CeresLogoPainter(color));
+}
+
+class _CeresLogoPainter extends CustomPainter {
+  final Color color;
+  const _CeresLogoPainter(this.color);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final c = Offset(size.width / 2, size.height / 2);
+    final u = size.width / 64;
+    final stroke = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2 * u
+      ..strokeCap = StrokeCap.round;
+    final fill = Paint()..color = color;
+
+    canvas.drawCircle(c, 27 * u, stroke);
+    for (final deg in [0.0, 90.0, 180.0, 270.0]) {
+      final dx = (deg == 0) ? 1.0 : (deg == 180) ? -1.0 : 0.0;
+      final dy = (deg == 90) ? 1.0 : (deg == 270) ? -1.0 : 0.0;
+      final dir = Offset(dx, dy);
+      canvas.drawLine(c + dir * (30 * u), c + dir * (33.5 * u), stroke);
+    }
+    canvas.save();
+    canvas.translate(c.dx, c.dy);
+    canvas.rotate(-32 * 3.1415926 / 180);
+    final leaf = Path()
+      ..moveTo(-19 * u, 0)
+      ..quadraticBezierTo(0, -19 * u, 19 * u, 0)
+      ..quadraticBezierTo(0, 19 * u, -19 * u, 0)
+      ..close();
+    canvas.drawPath(leaf, stroke..strokeWidth = 2.4 * u);
+    canvas.drawLine(Offset(-19 * u, 0), Offset(19 * u, 0),
+        Paint()
+          ..color = color.withValues(alpha: 0.65)
+          ..strokeWidth = 1.2 * u);
+    canvas.drawCircle(Offset(8 * u, 0), 2.8 * u, fill);
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _CeresLogoPainter old) => old.color != color;
+}
+
+/// Barra de confiança do modelo (0–1) com cor de status.
+class CeresConfidenceBar extends StatelessWidget {
+  final double value;
+  final Color color;
+  const CeresConfidenceBar({
+    super.key,
+    required this.value,
+    this.color = CeresColors.blight,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(2),
+      child: Container(
+        height: 8,
+        color: CeresColors.dust2,
+        child: FractionallySizedBox(
+          alignment: Alignment.centerLeft,
+          widthFactor: value.clamp(0.0, 1.0),
+          child: Container(color: color),
+        ),
+      ),
+    );
+  }
+}
+
+/// Box "Ação Recomendada" — borda esquerda colorida + ícone "!".
+class CeresActionBox extends StatelessWidget {
+  final String label;
+  final String priority;
+  final String body;
+  final Color accent;
+  const CeresActionBox({
+    super.key,
+    this.label    = 'AÇÃO RECOMENDADA',
+    this.priority = 'imediata',
+    required this.body,
+    this.accent = CeresColors.blight,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(10, 8, 10, 9),
+      decoration: BoxDecoration(
+        color: CeresColors.actionBoxBg,
+        border: Border(left: BorderSide(color: accent, width: 3)),
+        borderRadius: const BorderRadius.all(Radius.circular(4)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            Container(
+              width: 16, height: 16,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(color: accent, shape: BoxShape.circle),
+              child: Text('!', style: CeresType.serif(TextStyle(
+                  color: Colors.white, fontStyle: FontStyle.italic,
+                  fontWeight: FontWeight.w700, fontSize: 11, height: 1))),
+            ),
+            const SizedBox(width: 7),
+            Text(label, style: CeresType.mono(TextStyle(
+                fontSize: 8.5, letterSpacing: 1.6,
+                fontWeight: FontWeight.w500, color: accent))),
+            const Spacer(),
+            Text(priority.toUpperCase(), style: CeresType.label),
+          ]),
+          const SizedBox(height: 4),
+          Text(body, style: CeresType.serif(const TextStyle(
+              fontSize: 12.5, fontWeight: FontWeight.w500,
+              height: 1.25, color: CeresColors.ink))),
+        ],
+      ),
+    );
+  }
+}
+
+/// Métrica de sensor (temp / umidade) com ícone, valor e estado.
+class CeresSensorMetric extends StatelessWidget {
+  final IconData icon;
+  final String name;
+  final String value;
+  final String unit;
+  final String state;
+  final CeresStatus status;
+  const CeresSensorMetric({
+    super.key,
+    required this.icon,
+    required this.name,
+    required this.value,
+    required this.unit,
+    required this.state,
+    this.status = CeresStatus.healthy,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final c = status.color;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(children: [
+          Icon(icon, size: 13, color: CeresColors.ink2),
+          const SizedBox(width: 6),
+          Text(name.toUpperCase(), style: CeresType.mono(const TextStyle(
+              fontSize: 8, letterSpacing: 1.1, color: CeresColors.ink3))),
+        ]),
+        const SizedBox(height: 4),
+        RichText(text: TextSpan(children: [
+          TextSpan(text: value, style: CeresType.metricValue),
+          TextSpan(text: unit, style: CeresType.mono(const TextStyle(
+              fontSize: 11, color: CeresColors.ink3))),
+        ])),
+        const SizedBox(height: 6),
+        Row(mainAxisSize: MainAxisSize.min, children: [
+          Container(width: 5, height: 5,
+              decoration: BoxDecoration(color: c, shape: BoxShape.circle)),
+          const SizedBox(width: 5),
+          Text(state.toUpperCase(), style: CeresType.mono(TextStyle(
+              fontSize: 8, letterSpacing: 1.1, color: c))),
+        ]),
+      ],
+    );
+  }
+}
+
+/// Pílula de status — anel semitransparente + dot central.
+class CeresStatusDot extends StatelessWidget {
+  final CeresStatus status;
+  final double size;
+  const CeresStatusDot({super.key, required this.status, this.size = 24});
+
+  @override
+  Widget build(BuildContext context) {
+    final c = status.color;
+    return Container(
+      width: size, height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: c.withValues(alpha: 0.25)),
+      ),
+      child: Center(
+        child: Container(
+          width: size / 3, height: size / 3,
+          decoration: BoxDecoration(color: c, shape: BoxShape.circle),
+        ),
+      ),
+    );
+  }
+}
+

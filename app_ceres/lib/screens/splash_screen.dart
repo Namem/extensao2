@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../theme/ceres_theme.dart';
-import '../widgets/ceres_icons.dart';
 
 class SplashScreen extends StatefulWidget {
   final Widget destino;
@@ -79,21 +78,13 @@ class _SplashScreenState extends State<SplashScreen>
             _Bracket(bottom: bottom + 96, left: 18, corners: {_Corner.bl}),
             _Bracket(bottom: bottom + 96, right: 18, corners: {_Corner.br}),
 
-            // Rótulo topo
+            // Coordenadas no topo
             Positioned(
-              top: top + 56,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Text(
-                  'SISTEMA DE DIAGNÓSTICO',
-                  style: GoogleFonts.ibmPlexMono(
-                    fontSize: 8.5,
-                    letterSpacing: 0.22,
-                    color: const Color(0x8CFAF2E4),
-                  ),
-                ),
-              ),
+              top: top + 56, left: 0, right: 0,
+              child: Center(child: Text('15°34′S · 56°05′W',
+                  style: CeresType.mono(const TextStyle(
+                      fontSize: 8.5, letterSpacing: 2,
+                      color: Color(0x8CF3ECD9))))),
             ),
 
             // Conteúdo central
@@ -101,58 +92,34 @@ class _SplashScreenState extends State<SplashScreen>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Marca botânica SVG — lente foliar em branco/cream
-                  const CeresSvgIcon(
-                    svgString: CeresIconsSvg.mark,
-                    color: Color(0xFFFAF2E4),
-                    size: 96,
-                  ),
+                  const CeresLogo(size: 96, color: CeresColors.paper),
                   const SizedBox(height: 26),
-                  // Wordmark
-                  Text(
-                    'Ceres',
-                    style: GoogleFonts.newsreader(
-                      fontSize: 46,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: -0.02,
-                      color: const Color(0xFFFAF2E4),
-                      height: 1,
-                    ),
-                  ),
-                  Text(
-                    'Diagnóstico',
-                    style: GoogleFonts.newsreader(
-                      fontSize: 16,
-                      fontStyle: FontStyle.italic,
-                      fontWeight: FontWeight.w400,
-                      color: const Color(0xFFD4E8B8),
-                      height: 1.2,
-                    ),
-                  ),
+                  RichText(text: TextSpan(children: [
+                    TextSpan(text: 'C', style: CeresType.serif(const TextStyle(
+                        fontSize: 46, fontStyle: FontStyle.italic,
+                        fontWeight: FontWeight.w400,
+                        color: CeresColors.splashLeafAccent))),
+                    TextSpan(text: 'eres', style: CeresType.serif(const TextStyle(
+                        fontSize: 46, fontWeight: FontWeight.w500,
+                        color: CeresColors.paper, letterSpacing: -0.9))),
+                  ])),
+                  const SizedBox(height: 4),
+                  Text('Diagnóstico', style: CeresType.serif(const TextStyle(
+                      fontSize: 14, fontStyle: FontStyle.italic,
+                      color: Color(0xCCDCE6CE)))),
                   const SizedBox(height: 18),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                          width: 14,
-                          height: 1,
-                          color: const Color(0x99C8DFA0)),
-                      const SizedBox(width: 10),
-                      Text(
-                        'TOMATEIRO',
-                        style: GoogleFonts.ibmPlexMono(
-                          fontSize: 9.5,
-                          letterSpacing: 0.28,
-                          color: const Color(0x99C8DFA0),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Container(
-                          width: 14,
-                          height: 1,
-                          color: const Color(0x99C8DFA0)),
-                    ],
-                  ),
+                  Row(mainAxisSize: MainAxisSize.min, children: [
+                    Container(width: 14, height: 1,
+                        color: const Color(0xC7C8D7B8)),
+                    const SizedBox(width: 10),
+                    Text('INSTRUMENTO FOLIAR DE CAMPO',
+                        style: CeresType.mono(const TextStyle(
+                            fontSize: 9.5, letterSpacing: 2.8,
+                            color: Color(0xC7C8D7B8)))),
+                    const SizedBox(width: 10),
+                    Container(width: 14, height: 1,
+                        color: const Color(0xC7C8D7B8)),
+                  ]),
                 ],
               ),
             ),

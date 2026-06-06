@@ -1,12 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../models/evento_mqtt.dart';
 import '../services/api_service.dart';
 import '../theme/ceres_theme.dart';
-import '../widgets/ceres_app_bar.dart';
-import '../widgets/ceres_icons.dart';
-import '../widgets/offline_banner.dart';
+import '../widgets/ceres_widgets.dart';
+import 'mapa_screen.dart';
 
 class HistoricoScreen extends StatefulWidget {
   const HistoricoScreen({super.key});
@@ -23,14 +24,42 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
   bool _temProxima = false;
   int _total = 0;
 
-  // Dados do sensor (último evento recebido)
+  Timer? _timerRefresh;
+  Timer? _timerClock;
+  DateTime _agora = DateTime.now();
+
+  // Último evento recebido
   EventoMqtt? get _ultimoEvento =>
       _eventos.isNotEmpty ? _eventos.first : null;
+
+  /// ONLINE = último evento há menos de 2 minutos.
+  /// OFFLINE = último evento há 2+ minutos (ESP32 parou de enviar).
+  /// AGUARDANDO = nenhum evento na lista.
+  _SensorStatus get _statusSensor {
+    final e = _ultimoEvento;
+    if (e == null) return _SensorStatus.aguardando;
+    final diff = _agora.difference(e.timestamp.toLocal());
+    return diff.inMinutes < 10 ? _SensorStatus.online : _SensorStatus.offline;
+  }
 
   @override
   void initState() {
     super.initState();
     _carregar();
+    // Auto-refresh a cada 30 s
+    _timerRefresh = Timer.periodic(
+        const Duration(seconds: 30), (_) => _carregar(pagina: _paginaAtual));
+    // Tick do relógio para recalcular status em tempo real
+    _timerClock = Timer.periodic(
+        const Duration(seconds: 5),
+        (_) { if (mounted) setState(() => _agora = DateTime.now()); });
+  }
+
+  @override
+  void dispose() {
+    _timerRefresh?.cancel();
+    _timerClock?.cancel();
+    super.dispose();
   }
 
   Future<void> _carregar({int pagina = 1}) async {
@@ -57,27 +86,29 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CeresColors.bone,
-      appBar: CeresAppBar(
-        pageTitleItalic: 'Histórico',
-        pageTitle: 'IoT',
-        pageCount: '$_total · últ. 24h',
-        actions: [
-          CeresIconButton(
-            svgString: CeresIconsSvg.iconFilter,
-            tooltip: 'Filtrar',
-            onPressed: _carregando ? null : () => _carregar(),
-          ),
-          CeresIconButton(
-            svgString: CeresIconsSvg.iconMapGrid,
-            tooltip: 'Mapa',
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: OfflineBanner(
+      body: SafeArea(
+        bottom: false,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            CeresBrandBar(
+              subtitle: 'Histórico IoT',
+              actions: [
+                CeresIconBtn(Icons.filter_list,
+                    onTap: _carregando ? null : () => _carregar()),
+                CeresIconBtn(Icons.map_outlined, onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const MapaScreen()),
+                )),
+              ],
+            ),
+            CeresPageTitle(
+              emphasis: 'Histórico',
+              rest: 'IoT',
+              count: '$_total · últ. 24h',
+            ),
             _sensorCard(),
+            _mqttStrip(),
             Expanded(child: _body()),
             if (_eventos.isNotEmpty || _erro != null || _carregando)
               _rodapePaginacao(),
@@ -87,123 +118,116 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
     );
   }
 
+  // ── MQTT strip ──────────────────────────────────────────────────────────────
+  Widget _mqttStrip() {
+    final e = _ultimoEvento;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(22, 10, 22, 0),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFBF7EE),
+          border: Border.all(color: CeresColors.hairline),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Row(children: [
+          Container(width: 7, height: 7, decoration: const BoxDecoration(
+              color: CeresColors.leafLive, shape: BoxShape.circle)),
+          const SizedBox(width: 10),
+          Text(e != null ? 'ceres/talhao/leaf' : 'aguardando sensor',
+              style: CeresType.mono(const TextStyle(fontSize: 9.5, color: CeresColors.ink))),
+          const Spacer(),
+          Text('QoS 1 · MQTT', style: CeresType.mono(const TextStyle(
+              fontSize: 9.5, color: CeresColors.ink3))),
+        ]),
+      ),
+    );
+  }
+
   // ── Sensor status card ──────────────────────────────────────────────────────
   Widget _sensorCard() {
     final e = _ultimoEvento;
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 14, 16, 0),
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-      decoration: BoxDecoration(
-        color: CeresColors.paper,
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: CeresColors.hairline, width: 0.8),
-      ),
-      child: Column(
+    final status = _statusSensor;
+    final dotColor = switch (status) {
+      _SensorStatus.online    => CeresColors.leafLive,
+      _SensorStatus.offline   => CeresColors.blight,
+      _SensorStatus.aguardando => CeresColors.hairline,
+    };
+    final labelColor = switch (status) {
+      _SensorStatus.online    => CeresColors.leafDeep,
+      _SensorStatus.offline   => CeresColors.blight,
+      _SensorStatus.aguardando => CeresColors.ink3,
+    };
+    final labelText = switch (status) {
+      _SensorStatus.online    => 'ONLINE',
+      _SensorStatus.offline   => 'OFFLINE',
+      _SensorStatus.aguardando => 'AGUARDANDO',
+    };
+    // Tempo desde o último evento
+    String? tempoLabel;
+    if (e != null && status != _SensorStatus.online) {
+      final diff = _agora.difference(e.timestamp.toLocal());
+      if (diff.inMinutes < 60) {
+        tempoLabel = 'último há ${diff.inMinutes} min';
+      } else {
+        tempoLabel = 'último há ${diff.inHours}h';
+      }
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 22),
+      child: CeresPaperCard(child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              // Pulse dot
-              Container(
-                width: 7,
-                height: 7,
-                decoration: BoxDecoration(
-                  color: e != null ? CeresColors.leafLive : CeresColors.hairline,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 7),
-              Text(
-                'ESP32-S3 · SENSOR',
-                style: GoogleFonts.ibmPlexMono(
-                  fontSize: 9,
-                  letterSpacing: 0.6,
-                  color: CeresColors.ink3,
-                ),
-              ),
-              const Spacer(),
-              if (e != null)
-                Text(
-                  _formatTimestampShort(e.timestamp),
-                  style: GoogleFonts.ibmPlexMono(
-                    fontSize: 9,
-                    color: CeresColors.ink3,
-                  ),
-                ),
+          Row(children: [
+            Text('STATUS DO SENSOR · ', style: CeresType.label),
+            Text('ESP32-S3', style: CeresType.mono(const TextStyle(
+                fontSize: 9, letterSpacing: 1.6, color: CeresColors.ink))),
+            const Spacer(),
+            if (tempoLabel != null) ...[
+              Flexible(child: Text(tempoLabel, overflow: TextOverflow.ellipsis,
+                  style: CeresType.mono(const TextStyle(
+                      fontSize: 8, color: CeresColors.ink3)))),
+              const SizedBox(width: 6),
             ],
-          ),
+            Container(width: 6, height: 6, decoration: BoxDecoration(
+                color: dotColor, shape: BoxShape.circle)),
+            const SizedBox(width: 6),
+            Text(labelText, style: CeresType.mono(TextStyle(
+                fontSize: 8.5, letterSpacing: 1.6, color: labelColor))),
+          ]),
           const SizedBox(height: 12),
-          // 3-col grid: temperatura / umidade_ar / umidade_solo
-          Row(
-            children: [
-              _sensorCol(
-                label: 'TEMP',
+          IntrinsicHeight(child: Row(children: [
+            Expanded(child: CeresSensorMetric(
+                icon: Icons.thermostat,
+                name: 'temp ar',
                 value: e?.temperatura != null
-                    ? '${e!.temperatura!.toStringAsFixed(1)}°'
-                    : '--',
-                unit: 'ºC',
-              ),
-              _divisor(),
-              _sensorCol(
-                label: 'UM. AR',
+                    ? e!.temperatura!.toStringAsFixed(1) : '--',
+                unit: '°C',
+                state: 'normal',
+                status: CeresStatus.healthy)),
+            const VerticalDivider(width: 1, color: CeresColors.hairline),
+            Expanded(child: CeresSensorMetric(
+                icon: Icons.water_drop_outlined,
+                name: 'umid ar',
                 value: e?.umidadeAr != null
-                    ? '${e!.umidadeAr!.toStringAsFixed(0)}%'
-                    : '--',
+                    ? e!.umidadeAr!.toStringAsFixed(0) : '--',
                 unit: '%',
-              ),
-              _divisor(),
-              _sensorCol(
-                label: 'UM. SOLO',
+                state: (e?.umidadeAr ?? 0) > 70 ? 'atenção' : 'normal',
+                status: (e?.umidadeAr ?? 0) > 70
+                    ? CeresStatus.warn : CeresStatus.healthy)),
+            const VerticalDivider(width: 1, color: CeresColors.hairline),
+            Expanded(child: CeresSensorMetric(
+                icon: Icons.grass,
+                name: 'umid solo',
                 value: e?.umidadeSolo != null
-                    ? '${e!.umidadeSolo!.toStringAsFixed(0)}%'
-                    : '--',
+                    ? e!.umidadeSolo!.toStringAsFixed(0) : '--',
                 unit: '%',
-              ),
-            ],
-          ),
+                state: 'normal',
+                status: CeresStatus.healthy)),
+          ])),
         ],
-      ),
-    );
-  }
-
-  Widget _sensorCol({
-    required String label,
-    required String value,
-    required String unit,
-  }) {
-    return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            label,
-            style: GoogleFonts.ibmPlexMono(
-              fontSize: 8,
-              letterSpacing: 0.5,
-              color: CeresColors.ink3,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: GoogleFonts.newsreader(
-              fontSize: 26,
-              fontWeight: FontWeight.w400,
-              color: CeresColors.ink,
-              height: 1,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _divisor() {
-    return Container(
-      width: 0.8,
-      height: 40,
-      color: CeresColors.hairline,
-      margin: const EdgeInsets.symmetric(horizontal: 4),
+      )),
     );
   }
 
@@ -376,9 +400,12 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
   // ── IoT summary (2-col: total eventos / % doentes) ─────────────────────────
   Widget _iotSummary() {
     final total = _total;
-    final doentes = _eventos.where((e) => e.classe != 'saudavel').length;
-    final pctDoentes = total > 0
-        ? (doentes / _eventos.length * 100).toStringAsFixed(0)
+    // Conta só eventos com diagnóstico real (exclui '—' = só sensor, sem IA)
+    final comClasse = _eventos.where((e) => e.classe != '—').length;
+    final doentes = _eventos
+        .where((e) => e.classe != 'saudavel' && e.classe != '—').length;
+    final pctDoentes = comClasse > 0
+        ? (doentes / comClasse * 100).toStringAsFixed(0)
         : '--';
 
     return Container(
@@ -606,10 +633,6 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
   }
 
   // ── Helpers ─────────────────────────────────────────────────────────────────
-  String _formatTimestampShort(DateTime ts) {
-    return DateFormat('dd/MM HH:mm').format(ts.toLocal());
-  }
-
   List<_GrupoDia> _agruparPorDia(List<EventoMqtt> eventos) {
     final map = <String, List<EventoMqtt>>{};
     for (final e in eventos) {
@@ -699,3 +722,6 @@ class _BtnRetentar extends StatelessWidget {
     );
   }
 }
+
+/// Estado de conexão do sensor baseado em timestamp do último evento.
+enum _SensorStatus { online, offline, aguardando }

@@ -4,7 +4,7 @@
 $root     = Split-Path -Parent $MyInvocation.MyCommand.Path
 $appCeres = "$root\app_ceres"
 $backend  = "$root\backend"
-$flutter  = "C:\Users\Namem\flutter\bin\flutter.bat"
+$flutter  = "C:\Users\Rachid\flutter\bin\flutter.bat"
 $settings = "ceres_core.settings_notebook"
 
 Write-Host ""

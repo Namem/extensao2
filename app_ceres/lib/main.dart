@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'screens/agronomos_screen.dart';
+import 'screens/alertas_screen.dart';
+import 'screens/cadastro_screen.dart';
 import 'screens/camera_screen.dart';
+import 'screens/enciclopedia_screen.dart';
 import 'screens/historico_screen.dart';
 import 'screens/historico_local_screen.dart';
-import 'screens/enciclopedia_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/mapa_screen.dart';
 import 'screens/perfil_screen.dart';
+import 'screens/seja_parceiro_screen.dart';
 import 'screens/splash_screen.dart';
 import 'services/auth_storage.dart';
 import 'theme/ceres_theme.dart';
@@ -30,9 +34,13 @@ class CeresApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: CeresTheme.theme,
       routes: {
-        '/home': (_) => const HomeScreen(),
-        '/login': (_) => const LoginScreen(),
-        '/salvos': (_) => const HistoricoLocalScreen(),
+        '/home':          (_) => const HomeScreen(),
+        '/login':         (_) => const LoginScreen(),
+        '/salvos':        (_) => const HistoricoLocalScreen(),
+        '/alertas':       (_) => const AlertasScreen(),
+        '/agronomos':     (_) => const AgronomosScreen(),
+        '/seja-parceiro': (_) => const SejaParceiroScreen(),
+        '/cadastro':      (_) => const CadastroScreen(),
       },
       home: const _BootScreen(),
     );

@@ -1,188 +1,221 @@
-Avaliando no test set...
-
-=======================================================
-RESULTADO FINAL — Experimento E
-Acurácia test set : 98.43%
-Macro F1 test set : 0.9791
-INT8              : 638.1 KB → /mnt/c/Users/Namem/Desktop/Codiguins/extensao/ceres-diagnostico/backend/datasets/modelo/ceres_expe_int8.tflite
-Relatório         : /mnt/c/Users/Namem/Desktop/Codiguins/extensao/ceres-diagnostico/backend/datasets/modelo/relatorio_expe.txt
-=======================================================
-
-Próximo passo: rodar os 3 avaliadores de campo sequencialmente.
-  python3 datasets/scripts/avaliar_plantdoc.py
-  python3 datasets/scripts/avaliar_tomatovillage.py
-  python3 datasets/scripts/avaliar_daffodil.py
-
-  (venv_ceres) namem@DESKTOP-2UU9SQN:/mnt/c/Users/Namem/Desktop/Codiguins/extensao/ceres-diagnostico/backend$ python3 datasets/scripts/avaliar_plantdoc.py     --modelo ceres_expe_int8.tflite
-WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
-I0000 00:00:1778591063.462767  226320 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
-To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
-Carregando modelo: /mnt/c/Users/Namem/Desktop/Codiguins/extensao/ceres-diagnostico/backend/datasets/modelo/ceres_expe_int8.tflite
-/home/namem/venv_ceres/lib/python3.12/site-packages/tensorflow/lite/python/interpreter.py:457: UserWarning:     Warning: tf.lite.Interpreter is deprecated and is scheduled for deletion in
-    TF 2.20. Please use the LiteRT interpreter from the ai_edge_litert package.
-    See the [migration guide](https://ai.google.dev/edge/litert/migration)
-    for details.
-    
-  warnings.warn(_INTERPRETER_DELETION_WARNING)
-INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
-Input shape : [ 1 96 96  3]  dtype: <class 'numpy.int8'>
-Output shape: [ 1 10]  dtype: <class 'numpy.int8'>
-Escala: 0.007843137718737125  Zero-point: -1
-Classes: ['D01_requeima', 'D02_septoriose', 'D03_pinta_preta', 'D03b_mancha_alvo', 'D05_mofo_foliar', 'D06_vira_cabeca', 'D06b_mosaico', 'D07_acaro_bronzeamento', 'D09_mancha_bacteriana', 'saudavel']
-
-Avaliando imagens em: /mnt/c/Users/Namem/Desktop/Codiguins/extensao/ceres-diagnostico/backend/datasets/raw/plantdoc (splits: ['train', 'test'])
-  D01_requeima                         78/111  70.3%
-  D02_septoriose                       95/151  62.9%
-  D03_pinta_preta                      46/88   52.3%
-  D05_mofo_foliar                      77/91   84.6%
-  D06_vira_cabeca                      64/76   84.2%
-  D06b_mosaico                         37/54   68.5%
-  D07_acaro_bronzeamento                1/2    50.0%
-  D09_mancha_bacteriana                71/110  64.5%
-  saudavel                             36/63   57.1%
-
-==================================================
-Acuracia geral PlantDoc (campo real): 67.69%
-Total imagens avaliadas: 746
-Erros de leitura: 0
-==================================================
-
-Resultado salvo em: /mnt/c/Users/Namem/Desktop/Codiguins/extensao/ceres-diagnostico/docs/resultados/plantdoc_results.md
-
-(venv_ceres) namem@DESKTOP-2UU9SQN:/mnt/c/Users/Namem/Desktop/Codiguins/extensao/ceres-diagnostico/backend$ python3 datasets/scripts/avaliar_tomatovillage.py --modelo ceres_expe_int8.tflite
-WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
-I0000 00:00:1778591113.349059  226379 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
-To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
-Carregando modelo: /mnt/c/Users/Namem/Desktop/Codiguins/extensao/ceres-diagnostico/backend/datasets/modelo/ceres_expe_int8.tflite
-/home/namem/venv_ceres/lib/python3.12/site-packages/tensorflow/lite/python/interpreter.py:457: UserWarning:     Warning: tf.lite.Interpreter is deprecated and is scheduled for deletion in
-    TF 2.20. Please use the LiteRT interpreter from the ai_edge_litert package.
-    See the [migration guide](https://ai.google.dev/edge/litert/migration)
-    for details.
-    
-  warnings.warn(_INTERPRETER_DELETION_WARNING)
-INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
-Input shape : [ 1 96 96  3]  dtype: <class 'numpy.int8'>
-Output shape: [ 1 10]  dtype: <class 'numpy.int8'>
-Escala: 0.007843137718737125  Zero-point: -1
-Classes Ceres: ['D01_requeima', 'D02_septoriose', 'D03_pinta_preta', 'D03b_mancha_alvo', 'D05_mofo_foliar', 'D06_vira_cabeca', 'D06b_mosaico', 'D07_acaro_bronzeamento', 'D09_mancha_bacteriana', 'saudavel']
-Splits a avaliar: ['test']
-
-Dataset Tomato-Village: /mnt/c/Users/Namem/Desktop/Codiguins/extensao/ceres-diagnostico/backend/datasets/raw/tomato_village
-  D01_requeima                         52/92   56.5%
-    → D01_requeima: 52
-    → D09_mancha_bacteriana: 19
-    → D03_pinta_preta: 9
-  D03_pinta_preta                       4/50   8.0%
-    → D01_requeima: 27
-    → D06_vira_cabeca: 8
-    → D02_septoriose: 6
-  D06_vira_cabeca                       3/53   5.7%
-    → D01_requeima: 29
-    → D09_mancha_bacteriana: 9
-    → D02_septoriose: 8
-  saudavel                              1/22   4.5%
-    → D01_requeima: 12
-    → D06_vira_cabeca: 7
-    → D02_septoriose: 1
-
-=======================================================
-Acurácia geral Tomato-Village (campo real): 27.65%
-Total imagens avaliadas: 217
-Erros de leitura: 0
-Splits avaliados: ['test']
-=======================================================
-
-Resultado salvo em: /mnt/c/Users/Namem/Desktop/Codiguins/extensao/ceres-diagnostico/docs/resultados/tomatovillage_results.md
-(venv_ceres) namem@DESKTOP-2UU9SQN:/mnt/c/Users/Namem/Desktop/Codiguins/extensao/ceres-diagnostico/backend$ 
-(venv_ceres) namem@DESKTOP-2UU9SQN:/mnt/c/Users/Namem/Desktop/Codiguins/extensao/ceres-diagnostico/backend$ python3 datasets/scripts/avaliar_daffodil.py      --modelo ceres_expe_int8.tflite
-WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
-I0000 00:00:1778591134.336653  226433 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
-To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
-Carregando modelo: /mnt/c/Users/Namem/Desktop/Codiguins/extensao/ceres-diagnostico/backend/datasets/modelo/ceres_expe_int8.tflite
-/home/namem/venv_ceres/lib/python3.12/site-packages/tensorflow/lite/python/interpreter.py:457: UserWarning:     Warning: tf.lite.Interpreter is deprecated and is scheduled for deletion in
-    TF 2.20. Please use the LiteRT interpreter from the ai_edge_litert package.
-    See the [migration guide](https://ai.google.dev/edge/litert/migration)
-    for details.
-    
-  warnings.warn(_INTERPRETER_DELETION_WARNING)
-INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
-Input : [ 1 96 96  3]  dtype=<class 'numpy.int8'>
-Output: [ 1 10]  dtype=<class 'numpy.int8'>
-Classes Ceres: ['D01_requeima', 'D02_septoriose', 'D03_pinta_preta', 'D03b_mancha_alvo', 'D05_mofo_foliar', 'D06_vira_cabeca', 'D06b_mosaico', 'D07_acaro_bronzeamento', 'D09_mancha_bacteriana', 'saudavel']
-
-Dataset: /mnt/c/Users/Namem/Desktop/Codiguins/extensao/ceres-diagnostico/backend/datasets/raw/daffodil_bd/Tomato leaf diseases/Tomato Leaf
-Classes avaliadas: ['Late Blight', 'Leaf Mold', 'Early Blight', 'Spider Mites', 'Tomato Leaf Curl Virus', 'Bacterial Spot', 'Healthy']
-
-  D01_requeima                         68/166  41.0%
-    → D09_mancha_bacteriana: 86
-    → D01_requeima: 68
-    → D03_pinta_preta: 6
-  D05_mofo_foliar                      29/66   43.9%
-    → D09_mancha_bacteriana: 33
-    → D05_mofo_foliar: 29
-    → D02_septoriose: 2
-  D03_pinta_preta                      11/204  5.4%
-    → D01_requeima: 91
-    → D09_mancha_bacteriana: 82
-    → D02_septoriose: 13
-  D07_acaro_bronzeamento                0/307  0.0%
-    → D05_mofo_foliar: 153
-    → D09_mancha_bacteriana: 105
-    → D01_requeima: 44
-  D06_vira_cabeca                       0/394  0.0%
-    → D01_requeima: 259
-    → D09_mancha_bacteriana: 63
-    → D05_mofo_foliar: 46
-  D09_mancha_bacteriana               137/376  36.4%
-    → D01_requeima: 172
-    → D09_mancha_bacteriana: 137
-    → D05_mofo_foliar: 31
-  saudavel                             48/103  46.6%
-    → saudavel: 48
-    → D01_requeima: 25
-    → D05_mofo_foliar: 22
-
-=======================================================
-Acurácia geral Daffodil BD (campo real): 18.13%
-Total imagens avaliadas: 1616
-Erros de leitura: 0
-=======================================================
-
-Resultado salvo em: /mnt/c/Users/Namem/Desktop/Codiguins/extensao/ceres-diagnostico/docs/resultados/daffodil_results.md
-(venv_ceres) namem@DESKTOP-2UU9SQN:/mnt/c/Users/Namem/Desktop/Codiguins/extensao/ceres-diagnostico/backend$ 
-
-(venv_ceres) namem@DESKTOP-2UU9SQN:/mnt/c/Users/Namem/Desktop/Codiguins/extensao/ceres-diagnostico/backend$ python3 datasets/scripts/avaliar_plantdoc.py 
-WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
-I0000 00:00:1778591441.689149  226503 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
-To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
-Carregando modelo: /mnt/c/Users/Namem/Desktop/Codiguins/extensao/ceres-diagnostico/backend/datasets/modelo/ceres_mobilenetv2_int8.tflite
-/home/namem/venv_ceres/lib/python3.12/site-packages/tensorflow/lite/python/interpreter.py:457: UserWarning:     Warning: tf.lite.Interpreter is deprecated and is scheduled for deletion in
-    TF 2.20. Please use the LiteRT interpreter from the ai_edge_litert package.
-    See the [migration guide](https://ai.google.dev/edge/litert/migration)
-    for details.
-    
-  warnings.warn(_INTERPRETER_DELETION_WARNING)
-INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
-Input shape : [ 1 96 96  3]  dtype: <class 'numpy.int8'>
-Output shape: [ 1 10]  dtype: <class 'numpy.int8'>
-Escala: 0.007843137718737125  Zero-point: -1
-Classes: ['D01_requeima', 'D02_septoriose', 'D03_pinta_preta', 'D03b_mancha_alvo', 'D05_mofo_foliar', 'D06_vira_cabeca', 'D06b_mosaico', 'D07_acaro_bronzeamento', 'D09_mancha_bacteriana', 'saudavel']
-
-Avaliando imagens em: /mnt/c/Users/Namem/Desktop/Codiguins/extensao/ceres-diagnostico/backend/datasets/raw/plantdoc (splits: ['train', 'test'])
-  D01_requeima                         99/111  89.2%
-  D02_septoriose                      140/151  92.7%
-  D03_pinta_preta                      82/88   93.2%
-  D05_mofo_foliar                      82/91   90.1%
-  D06_vira_cabeca                      72/76   94.7%
-  D06b_mosaico                         39/54   72.2%
-  D07_acaro_bronzeamento                2/2    100.0%
-  D09_mancha_bacteriana                95/110  86.4%
-  saudavel                             49/63   77.8%
-
-==================================================
-Acuracia geral PlantDoc (campo real): 88.47%
-Total imagens avaliadas: 746
-Erros de leitura: 0
-==================================================
-
-Resultado salvo em: /mnt/c/Users/Namem/Desktop/Codiguins/extensao/ceres-diagnostico/docs/resultados/plantdoc_results.md
+(venv) PS C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres> cd "C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres"
+(venv) PS C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres> flutter run -d windows
+Launching lib\main.dart on Windows in debug mode...
+lib/main.dart(2,8): error GFAA2A68C: Error when reading '../../../../../../AppData/Local/Pub/Cache/hosted/pub.dev/flutter_native_splash-2.4.7/lib/flutter_native_splash.dart': O sistema n├úo pode encontrar o caminho especificado [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/main.dart(3,8): error GFAA2A68C: Error when reading '../../../../../../AppData/Local/Pub/Cache/hosted/pub.dev/google_fonts-6.3.3/lib/google_fonts.dart': O sistema n├úo pode encontrar o caminho especificado [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(7,8): error GFAA2A68C: Error when reading '../../../../../../AppData/Local/Pub/Cache/hosted/pub.dev/google_fonts-6.3.3/lib/google_fonts.dart': O sistema n├úo pode encontrar o caminho especificado [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_screen.dart(2,8): error GFAA2A68C: Error when reading '../../../../../../AppData/Local/Pub/Cache/hosted/pub.dev/google_fonts-6.3.3/lib/google_fonts.dart': O sistema n├úo pode encontrar o caminho especificado [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_local_screen.dart(4,8): error GFAA2A68C: Error when reading '../../../../../../AppData/Local/Pub/Cache/hosted/pub.dev/google_fonts-6.3.3/lib/google_fonts.dart': O sistema n├úo pode encontrar o caminho especificado [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/enciclopedia_screen.dart(2,8): error GFAA2A68C: Error when reading '../../../../../../AppData/Local/Pub/Cache/hosted/pub.dev/google_fonts-6.3.3/lib/google_fonts.dart': O sistema n├úo pode encontrar o caminho especificado [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/login_screen.dart(2,8): error GFAA2A68C: Error when reading '../../../../../../AppData/Local/Pub/Cache/hosted/pub.dev/google_fonts-6.3.3/lib/google_fonts.dart': O sistema n├úo pode encontrar o caminho especificado [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/mapa_screen.dart(7,8): error GFAA2A68C: Error when reading '../../../../../../AppData/Local/Pub/Cache/hosted/pub.dev/google_fonts-6.3.3/lib/google_fonts.dart': O sistema n├úo pode encontrar o caminho especificado [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/perfil_screen.dart(4,8): error GFAA2A68C: Error when reading '../../../../../../AppData/Local/Pub/Cache/hosted/pub.dev/google_fonts-6.3.3/lib/google_fonts.dart': O sistema n├úo pode encontrar o caminho especificado [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/splash_screen.dart(4,8): error GFAA2A68C: Error when reading '../../../../../../AppData/Local/Pub/Cache/hosted/pub.dev/google_fonts-6.3.3/lib/google_fonts.dart': O sistema n├úo pode encontrar o caminho especificado [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/theme/ceres_theme.dart(15,8): error GFAA2A68C: Error when reading '../../../../../../AppData/Local/Pub/Cache/hosted/pub.dev/google_fonts-6.3.3/lib/google_fonts.dart': O sistema n├úo pode encontrar o caminho especificado [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/widgets/ceres_app_bar.dart(3,8): error GFAA2A68C: Error when reading '../../../../../../AppData/Local/Pub/Cache/hosted/pub.dev/google_fonts-6.3.3/lib/google_fonts.dart': O sistema n├úo pode encontrar o caminho especificado [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/widgets/offline_banner.dart(4,8): error GFAA2A68C: Error when reading '../../../../../../AppData/Local/Pub/Cache/hosted/pub.dev/google_fonts-6.3.3/lib/google_fonts.dart': O sistema n├úo pode encontrar o caminho especificado [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/mapa_screen.dart(5,8): error GFAA2A68C: Error when reading '../../../../../../AppData/Local/Pub/Cache/hosted/pub.dev/flutter_map-7.0.2/lib/flutter_map.dart': O sistema n├úo pode encontrar o caminho especificado [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/mapa_screen.dart(6,8): error GFAA2A68C: Error when reading '../../../../../../AppData/Local/Pub/Cache/hosted/pub.dev/geolocator-13.0.4/lib/geolocator.dart': O sistema n├úo pode encontrar o caminho especificado [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/perfil_screen.dart(7,8): error GFAA2A68C: Error when reading '../../../../../../AppData/Local/Pub/Cache/hosted/pub.dev/share_plus-10.1.4/lib/share_plus.dart': O sistema n├úo pode encontrar o caminho especificado [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/widgets/ceres_icons.dart(5,8): error GFAA2A68C: Error when reading '../../../../../../AppData/Local/Pub/Cache/hosted/pub.dev/flutter_svg-2.0.10+1/lib/flutter_svg.dart': O sistema n├úo pode encontrar o caminho especificado [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/widgets/ceres_app_bar.dart(2,8): error GFAA2A68C: Error when reading '../../../../../../AppData/Local/Pub/Cache/hosted/pub.dev/flutter_svg-2.0.10+1/lib/flutter_svg.dart': O sistema n├úo pode encontrar o caminho especificado [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/services/inference_local_service.dart(18,8): error GFAA2A68C: Error when reading '../../../../../../AppData/Local/Pub/Cache/hosted/pub.dev/image-4.8.0/lib/image.dart': O sistema n├úo pode encontrar o caminho especificado [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/services/inference_local_service.dart(19,8): error GFAA2A68C: Error when reading '../../../../../../AppData/Local/Pub/Cache/hosted/pub.dev/tflite_flutter-0.10.4/lib/tflite_flutter.dart': O sistema n├úo pode encontrar o caminho especificado [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/mapa_screen.dart(166,8): error G5FE39F1E: Type 'Marker' not found. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/mapa_screen.dart(194,3): error G5FE39F1E: Type 'Marker' not found. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/services/inference_local_service.dart(44,3): error G5FE39F1E: Type 'Interpreter' not found. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/mapa_screen.dart(29,26): error G311314CC: Method not found: 'MapController'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/main.dart(18,3): error GC9768DF9: Undefined name 'FlutterNativeSplash'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/main.dart(20,3): error GC9768DF9: Undefined name 'FlutterNativeSplash'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/main.dart(142,38): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_HomeScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(64,18): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(219,28): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(250,28): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(300,20): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(353,22): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(361,22): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(396,20): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(426,34): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(435,34): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(445,34): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(459,34): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(466,32): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(486,30): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(489,30): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(497,26): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(516,24): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(519,24): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(566,26): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(586,26): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(605,32): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(615,20): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(649,34): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(658,32): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(665,32): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(672,26): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(711,30): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(714,30): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(734,32): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(746,36): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(770,32): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(831,22): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_CameraScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/camera_screen.dart(993,22): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_ActionBtn'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_screen.dart(118,24): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_HistoricoScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_screen.dart(128,26): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_HistoricoScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_screen.dart(180,20): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_HistoricoScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_screen.dart(189,20): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_HistoricoScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_screen.dart(236,20): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_HistoricoScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_screen.dart(245,20): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_HistoricoScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_screen.dart(277,24): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_HistoricoScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_screen.dart(285,24): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_HistoricoScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_screen.dart(308,22): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_HistoricoScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_screen.dart(316,22): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_HistoricoScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_screen.dart(361,20): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_HistoricoScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_screen.dart(432,22): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_HistoricoScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_screen.dart(441,22): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_HistoricoScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_screen.dart(451,22): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_HistoricoScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_screen.dart(505,26): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_HistoricoScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_screen.dart(518,30): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_HistoricoScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_screen.dart(535,30): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_HistoricoScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_screen.dart(552,24): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_HistoricoScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_screen.dart(563,24): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_HistoricoScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_screen.dart(592,20): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_HistoricoScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_screen.dart(655,24): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_BtnPagina'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_screen.dart(663,24): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_BtnPagina'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_screen.dart(693,18): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_BtnRetentar'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_local_screen.dart(88,20): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type 'HistoricoLocalScreen'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_local_screen.dart(97,20): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type 'HistoricoLocalScreen'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_local_screen.dart(175,40): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type 'HistoricoLocalScreen'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_local_screen.dart(184,40): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type 'HistoricoLocalScreen'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_local_screen.dart(201,34): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type 'HistoricoLocalScreen'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_local_screen.dart(211,36): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type 'HistoricoLocalScreen'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_local_screen.dart(219,36): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type 'HistoricoLocalScreen'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_local_screen.dart(235,34): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type 'HistoricoLocalScreen'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_local_screen.dart(272,24): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type 'HistoricoLocalScreen'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_local_screen.dart(311,24): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type 'HistoricoLocalScreen'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_local_screen.dart(337,20): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type 'HistoricoLocalScreen'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_local_screen.dart(345,20): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type 'HistoricoLocalScreen'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_local_screen.dart(364,18): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type 'HistoricoLocalScreen'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_local_screen.dart(371,18): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type 'HistoricoLocalScreen'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_local_screen.dart(381,22): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type 'HistoricoLocalScreen'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/historico_local_screen.dart(388,22): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type 'HistoricoLocalScreen'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/enciclopedia_screen.dart(102,18): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_EnciclopediaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/enciclopedia_screen.dart(108,18): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_EnciclopediaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/enciclopedia_screen.dart(169,38): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_EnciclopediaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/enciclopedia_screen.dart(183,44): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_EnciclopediaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/enciclopedia_screen.dart(193,44): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_EnciclopediaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/enciclopedia_screen.dart(213,42): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_EnciclopediaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/enciclopedia_screen.dart(239,32): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_EnciclopediaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/enciclopedia_screen.dart(257,36): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_EnciclopediaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/enciclopedia_screen.dart(277,40): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_EnciclopediaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/enciclopedia_screen.dart(319,42): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_EnciclopediaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/enciclopedia_screen.dart(329,42): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_EnciclopediaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/enciclopedia_screen.dart(348,46): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_EnciclopediaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/enciclopedia_screen.dart(377,18): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_EnciclopediaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/enciclopedia_screen.dart(387,20): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_EnciclopediaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/enciclopedia_screen.dart(420,20): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_EnciclopediaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/login_screen.dart(96,30): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_LoginScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/login_screen.dart(106,30): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_LoginScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/login_screen.dart(131,32): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_LoginScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/login_screen.dart(148,30): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_LoginScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/login_screen.dart(171,28): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_LoginScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/login_screen.dart(234,38): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_LoginScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/login_screen.dart(245,32): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_LoginScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/login_screen.dart(271,32): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_LoginScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/login_screen.dart(305,34): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_LoginScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/login_screen.dart(330,26): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_LoginScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/login_screen.dart(338,26): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_LoginScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/login_screen.dart(382,20): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_Campo'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/login_screen.dart(396,26): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_Campo'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/login_screen.dart(455,24): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_BotaoLogin'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/mapa_screen.dart(72,21): error G4020727C: Not a constant expression. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/mapa_screen.dart(71,33): error G4020727C: Not a constant expression. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/mapa_screen.dart(65,29): error G4127D1E8: The getter 'Geolocator' isn't defined for the type '_MapaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/mapa_screen.dart(66,24): error G4127D1E8: The getter 'LocationPermission' isn't defined for the type '_MapaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/mapa_screen.dart(67,27): error G4127D1E8: The getter 'Geolocator' isn't defined for the type '_MapaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/mapa_screen.dart(69,24): error G4127D1E8: The getter 'LocationPermission' isn't defined for the type '_MapaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/mapa_screen.dart(70,25): error G4127D1E8: The getter 'Geolocator' isn't defined for the type '_MapaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/mapa_screen.dart(111,24): error GE5CFE876: The method 'MapOptions' isn't defined for the type '_MapaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/mapa_screen.dart(117,17): error GE5CFE876: The method 'TileLayer' isn't defined for the type '_MapaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/mapa_screen.dart(122,17): error GE5CFE876: The method 'MarkerLayer' isn't defined for the type '_MapaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/mapa_screen.dart(125,19): error GE5CFE876: The method 'MarkerLayer' isn't defined for the type '_MapaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/mapa_screen.dart(109,13): error GE5CFE876: The method 'FlutterMap' isn't defined for the type '_MapaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/mapa_screen.dart(145,30): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_MapaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/mapa_screen.dart(169,14): error GE5CFE876: The method 'Marker' isn't defined for the type '_MapaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/mapa_screen.dart(195,12): error GE5CFE876: The method 'Marker' isn't defined for the type '_MapaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/mapa_screen.dart(245,18): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_MapaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/mapa_screen.dart(294,32): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_MapaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/mapa_screen.dart(303,34): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_MapaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/mapa_screen.dart(341,20): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_MapaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/mapa_screen.dart(351,20): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_MapaScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/perfil_screen.dart(47,36): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_PerfilScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/perfil_screen.dart(50,18): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_PerfilScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/perfil_screen.dart(56,24): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_PerfilScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/perfil_screen.dart(61,24): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_PerfilScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/perfil_screen.dart(81,22): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_PerfilScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/perfil_screen.dart(99,13): error G4127D1E8: The getter 'Share' isn't defined for the type '_PerfilScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/perfil_screen.dart(100,10): error GE5CFE876: The method 'XFile' isn't defined for the type '_PerfilScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/perfil_screen.dart(107,20): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_PerfilScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/perfil_screen.dart(178,28): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_PerfilScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/perfil_screen.dart(193,32): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_PerfilScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/perfil_screen.dart(203,32): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_PerfilScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/perfil_screen.dart(211,32): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_PerfilScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/perfil_screen.dart(256,28): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_PerfilScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/perfil_screen.dart(260,28): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_PerfilScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/perfil_screen.dart(295,24): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_PerfilScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/perfil_screen.dart(310,22): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_PerfilScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/perfil_screen.dart(314,22): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_PerfilScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/perfil_screen.dart(354,24): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_PerfilScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/splash_screen.dart(90,26): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_SplashScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/splash_screen.dart(114,28): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_SplashScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/splash_screen.dart(124,28): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_SplashScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/splash_screen.dart(143,32): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_SplashScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/splash_screen.dart(198,32): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_SplashScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/splash_screen.dart(206,32): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_SplashScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/screens/splash_screen.dart(217,28): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_SplashScreenState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/theme/ceres_theme.dart(97,23): error GC9768DF9: Undefined name 'GoogleFonts'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/theme/ceres_theme.dart(98,22): error GC9768DF9: Undefined name 'GoogleFonts'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/theme/ceres_theme.dart(99,22): error GC9768DF9: Undefined name 'GoogleFonts'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/theme/ceres_theme.dart(100,22): error GC9768DF9: Undefined name 'GoogleFonts'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/theme/ceres_theme.dart(101,22): error GC9768DF9: Undefined name 'GoogleFonts'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/theme/ceres_theme.dart(102,22): error GC9768DF9: Undefined name 'GoogleFonts'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/theme/ceres_theme.dart(103,22): error GC9768DF9: Undefined name 'GoogleFonts'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/theme/ceres_theme.dart(104,22): error GC9768DF9: Undefined name 'GoogleFonts'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/theme/ceres_theme.dart(105,22): error GC9768DF9: Undefined name 'GoogleFonts'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/theme/ceres_theme.dart(106,22): error GC9768DF9: Undefined name 'GoogleFonts'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/theme/ceres_theme.dart(107,22): error GC9768DF9: Undefined name 'GoogleFonts'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/theme/ceres_theme.dart(108,22): error GC9768DF9: Undefined name 'GoogleFonts'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/theme/ceres_theme.dart(109,22): error GC9768DF9: Undefined name 'GoogleFonts'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/theme/ceres_theme.dart(110,22): error GC9768DF9: Undefined name 'GoogleFonts'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/theme/ceres_theme.dart(111,22): error GC9768DF9: Undefined name 'GoogleFonts'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/theme/ceres_theme.dart(112,22): error GC9768DF9: Undefined name 'GoogleFonts'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/theme/ceres_theme.dart(124,25): error GC9768DF9: Undefined name 'GoogleFonts'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/theme/ceres_theme.dart(150,22): error GC9768DF9: Undefined name 'GoogleFonts'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/theme/ceres_theme.dart(161,22): error GC9768DF9: Undefined name 'GoogleFonts'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/theme/ceres_theme.dart(177,20): error GC9768DF9: Undefined name 'GoogleFonts'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/theme/ceres_theme.dart(180,18): error GC9768DF9: Undefined name 'GoogleFonts'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/theme/ceres_theme.dart(211,21): error GC9768DF9: Undefined name 'GoogleFonts'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/theme/ceres_theme.dart(212,20): error GC9768DF9: Undefined name 'GoogleFonts'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/theme/ceres_theme.dart(222,21): error GC9768DF9: Undefined name 'GoogleFonts'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/widgets/ceres_icons.dart(121,12): error G4127D1E8: The getter 'SvgPicture' isn't defined for the type 'CeresSvgIcon'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/widgets/ceres_icons.dart(125,14): error GE5CFE876: The method 'SvgTheme' isn't defined for the type 'CeresSvgIcon'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/widgets/ceres_icons.dart(156,14): error G4127D1E8: The getter 'SvgPicture' isn't defined for the type 'CeresMark'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/widgets/ceres_icons.dart(158,16): error GE5CFE876: The method 'SvgTheme' isn't defined for the type 'CeresMark'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/services/inference_local_service.dart(44,3): error GFC75D9F4: 'Interpreter' isn't a type. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/services/inference_local_service.dart(55,20): error G4127D1E8: The getter 'Interpreter' isn't defined for the type 'InferenceLocalService'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/services/inference_local_service.dart(72,25): error G311314CC: Method not found: 'decodeImage'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/services/inference_local_service.dart(77,26): error GC9768DF9: Undefined name 'Interpolation'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/services/inference_local_service.dart(73,25): error G311314CC: Method not found: 'copyResize'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/services/inference_local_service.dart(93,35): error GE5CFE876: The method 'reshape' isn't defined for the type 'Int8List'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/services/inference_local_service.dart(97,37): error GE5CFE876: The method 'reshape' isn't defined for the type 'Int8List'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/widgets/ceres_app_bar.dart(84,30): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type 'CeresAppBar'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/widgets/ceres_app_bar.dart(94,30): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type 'CeresAppBar'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/widgets/ceres_app_bar.dart(123,34): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type 'CeresAppBar'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/widgets/ceres_app_bar.dart(133,32): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type 'CeresAppBar'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/widgets/ceres_app_bar.dart(147,28): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type 'CeresAppBar'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/widgets/ceres_app_bar.dart(207,26): error G4020727C: Not a constant expression. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/widgets/ceres_app_bar.dart(205,18): error G4127D1E8: The getter 'SvgPicture' isn't defined for the type 'CeresIconButton'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+lib/widgets/offline_banner.dart(78,34): error G4127D1E8: The getter 'GoogleFonts' isn't defined for the type '_OfflineBannerState'. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Microsoft\VC\v170\Microsoft.CppCommon.targets(254,5): error MSB8066: o build personalizado para 'C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\CMakeFiles\052cee956bb878a41ab46a9c4073cf2c\flutter_windows.dll.rule;C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\CMakeFiles\4ab202f717c53a02a602fd2604f1218d\flutter_assemble.rule;C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\windows\flutter\CMakeLists.txt' foi encerrado com o código 1. [C:\Users\Rachid\Desktop\NR\Semestre 2026_1\extensao\ceres-diagnostico\app_ceres\build\windows\x64\flutter\flutter_assemble.vcxproj]
+Building Windows application...                                    31,0s
+Error: Build process failed.

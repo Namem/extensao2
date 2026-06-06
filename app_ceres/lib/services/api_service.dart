@@ -100,6 +100,29 @@ class ApiService {
     throw Exception('Servidor retornou ${streamed.statusCode}: $body');
   }
 
+  /// Cria novo usuário (sem autenticação).
+  Future<void> registrar({
+    required String nome,
+    required String email,
+    required String senha,
+    required String tipo,   // 'produtor' | 'agronomo'
+    String crea = '',
+  }) async {
+    final uri  = Uri.parse(Config.registerEndpoint);
+    final resp = await http.post(
+      uri,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'nome': nome, 'email': email, 'senha': senha,
+        'tipo': tipo, 'crea': crea,
+      }),
+    ).timeout(const Duration(seconds: 20));
+
+    if (resp.statusCode == 201) return;
+    final body = jsonDecode(resp.body) as Map<String, dynamic>;
+    throw Exception(body['erro'] ?? 'Erro ao criar conta.');
+  }
+
   /// Busca dados do usuário autenticado + estatísticas.
   Future<Map<String, dynamic>> me() async {
     Future<http.Response> buscar() async {

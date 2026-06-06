@@ -12,7 +12,7 @@ import '../data/doencas_data.dart';
 import '../models/evento_mqtt.dart';
 import '../services/api_service.dart';
 import '../theme/ceres_theme.dart';
-import '../widgets/ceres_app_bar.dart';
+import '../widgets/ceres_widgets.dart';
 import '../widgets/offline_banner.dart';
 
 class MapaScreen extends StatefulWidget {
@@ -23,8 +23,8 @@ class MapaScreen extends StatefulWidget {
 }
 
 class _MapaScreenState extends State<MapaScreen> {
-  // Centro padrão: Sorriso-MT (público-alvo do projeto)
-  static const _sorriso = LatLng(-12.5428, -55.7214);
+  // Centro padrão: Cuiabá-MT (sede do desenvolvimento)
+  static const _cuiaba = LatLng(-15.6014, -56.0979);
 
   final _mapController = MapController();
   List<EventoMqtt> _eventos = [];
@@ -93,17 +93,33 @@ class _MapaScreenState extends State<MapaScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final centro = _posicaoAtual ?? _sorriso;
+    final centro = _posicaoAtual ?? _cuiaba;
 
     return Scaffold(
       backgroundColor: CeresColors.bone,
-      appBar: CeresAppBar(
-        pageTitleItalic: 'Mapa',
-        pageTitle: 'de Ocorrências',
-        pageCount: _eventos.isEmpty ? null : '${_eventos.length} eventos',
-      ),
-      body: OfflineBanner(
-        child: Stack(
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            CeresBrandBar(
+              subtitle: 'Mapa da lavoura',
+              actions: [
+                CeresIconBtn(Icons.filter_list, onTap: () {}),
+                CeresIconBtn(Icons.my_location, onTap: () {
+                  if (_posicaoAtual != null) {
+                    _mapController.move(_posicaoAtual!, 14);
+                  }
+                }),
+              ],
+            ),
+            CeresPageTitle(
+              emphasis: 'Mapa',
+              rest: 'de ocorrências',
+              count: _eventos.isEmpty ? '' : '${_eventos.length} eventos',
+            ),
+            Expanded(child: OfflineBanner(
+              child: Stack(
           children: [
             // ── Mapa ────────────────────────────────────────────────────────
             FlutterMap(
@@ -157,6 +173,9 @@ class _MapaScreenState extends State<MapaScreen> {
               right: 12,
               child: _legenda(),
             ),
+          ],
+        ),
+      )),
           ],
         ),
       ),

@@ -13,11 +13,8 @@ RUN pip install --no-cache-dir -r requirements-backend.txt
 
 COPY . .
 
-# Cria migrations e banco SQLite na inicializacao
-RUN python manage.py migrate --settings=ceres_core.settings_notebook --run-syncdb 2>/dev/null || true
-
 EXPOSE 8080
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8080", \
-     "--settings=ceres_core.settings_notebook", \
-     "--noreload", "--nothreading"]
+CMD ["sh", "-c", \
+     "python manage.py migrate --settings=ceres_core.settings_notebook --run-syncdb 2>/dev/null || true && \
+      python manage.py runserver 0.0.0.0:8080 --settings=ceres_core.settings_notebook --noreload --nothreading"]

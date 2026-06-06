@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../services/api_service.dart';
 import '../services/auth_storage.dart';
 import '../theme/ceres_theme.dart';
-import '../widgets/ceres_icons.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -42,8 +41,13 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _entrar() async {
-    if (_emailCtrl.text.trim().isEmpty || _senhaCtrl.text.isEmpty) {
+    final email = _emailCtrl.text.trim();
+    if (email.isEmpty || _senhaCtrl.text.isEmpty) {
       setState(() => _erro = 'Preencha e-mail e senha.');
+      return;
+    }
+    if (!email.contains('@') || !email.contains('.')) {
+      setState(() => _erro = 'Digite um e-mail válido (ex: nome@email.com).');
       return;
     }
     setState(() { _carregando = true; _erro = null; });
@@ -80,12 +84,14 @@ class _LoginScreenState extends State<LoginScreen> {
             padding: EdgeInsets.fromLTRB(24, top + 10, 24, 0),
             child: Row(
               children: [
-                // Marca botânica SVG em leafDeep (design HTML: login-mark-row svg)
-                CeresMark(
-                  size: 32,
-                  color: CeresColors.leafDeep,
-                  borderColor: CeresColors.hairline,
-                  bgColor: Colors.transparent,
+                Container(
+                  width: 32, height: 32,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: CeresColors.hairline),
+                  ),
+                  child: const Center(
+                      child: CeresLogo(size: 18, color: CeresColors.leafDeep)),
                 ),
                 const SizedBox(width: 12),
                 Column(
@@ -102,7 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     Text(
-                      'DIAGNÓSTICO',
+                      'DIAGNÓSTICO FOLIAR',
                       style: GoogleFonts.ibmPlexMono(
                         fontSize: 8.5,
                         letterSpacing: 0.2,
@@ -127,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Row(
                     children: [
                       Text(
-                        'ACESSO',
+                        'CADERNO DE CAMPO · ACESSO',
                         style: GoogleFonts.ibmPlexMono(
                           fontSize: 9,
                           letterSpacing: 0.22,
@@ -153,9 +159,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: 1.05,
                       ),
                       children: const [
-                        TextSpan(text: 'Bem-vindo ao\n'),
+                        TextSpan(text: 'Bom dia,\n'),
                         TextSpan(
-                          text: 'Ceres',
+                          text: 'produtor.',
                           style: TextStyle(
                             fontStyle: FontStyle.italic,
                             fontWeight: FontWeight.w400,
@@ -167,7 +173,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'Diagnóstico de doenças em tomateiro via IA embarcada.',
+                    'Acesse o caderno para diagnosticar suas plantas e registrar ocorrências do talhão.',
                     style: GoogleFonts.ibmPlexSans(
                       fontSize: 12,
                       color: CeresColors.ink2,
@@ -230,7 +236,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              'Lembrar acesso',
+                              'Manter conectado',
                               style: GoogleFonts.ibmPlexSans(
                                 fontSize: 11,
                                 color: CeresColors.ink2,
@@ -241,7 +247,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const Spacer(),
                       Text(
-                        'Esqueceu a senha?',
+                        'Esqueci a senha',
                         style: GoogleFonts.ibmPlexSans(
                           fontSize: 11,
                           color: CeresColors.leafDeep,
@@ -278,40 +284,50 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
 
                   // Botão entrar
-                  _BotaoLogin(
-                    label: 'Entrar',
-                    primary: true,
-                    carregando: _carregando,
-                    onPressed: _entrar,
-                  ),
-                  const SizedBox(height: 10),
-                  _BotaoLogin(
-                    label: 'Continuar sem conta',
-                    primary: false,
-                    onPressed: () =>
-                        Navigator.of(context).pushReplacementNamed('/home'),
+                  FilledButton(
+                    onPressed: _carregando ? null : _entrar,
+                    child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                      Text(_carregando ? 'Entrando…' : 'Entrar no caderno'),
+                      if (!_carregando) ...[
+                        const SizedBox(width: 8),
+                        const Icon(Icons.arrow_forward, size: 18),
+                      ],
+                    ]),
                   ),
 
-                  // Divisor
+                  // Divisor OU
                   const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                          child: Container(height: 0.8, color: CeresColors.hairline)),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: Text(
-                          'ou',
-                          style: GoogleFonts.ibmPlexMono(
-                            fontSize: 8.5,
-                            letterSpacing: 0.2,
-                            color: CeresColors.ink3,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                          child: Container(height: 0.8, color: CeresColors.hairline)),
-                    ],
+                  Row(children: [
+                    const Expanded(child: Divider(height: 1)),
+                    Padding(padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Text('OU', style: CeresType.label)),
+                    const Expanded(child: Divider(height: 1)),
+                  ]),
+                  const SizedBox(height: 14),
+
+                  OutlinedButton.icon(
+                    onPressed: () =>
+                        Navigator.of(context).pushReplacementNamed('/home'),
+                    icon: const Icon(Icons.public, size: 16),
+                    label: const Text('Continuar offline'),
+                  ),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: GestureDetector(
+                      onTap: () => Navigator.pushNamed(context, '/cadastro'),
+                      child: RichText(text: TextSpan(children: [
+                        TextSpan(text: 'Não tem conta? ',
+                            style: GoogleFonts.ibmPlexSans(
+                                fontSize: 12, color: CeresColors.ink2)),
+                        TextSpan(text: 'Criar conta',
+                            style: GoogleFonts.ibmPlexSans(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: CeresColors.leafDeep,
+                                decoration: TextDecoration.underline,
+                                decorationColor: CeresColors.leafDeep)),
+                      ])),
+                    ),
                   ),
                 ],
               ),
@@ -326,7 +342,7 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'NAMEM RACHID',
+                  'V 0.3.2',
                   style: GoogleFonts.ibmPlexMono(
                     fontSize: 8.5,
                     letterSpacing: 0.2,
@@ -334,7 +350,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 Text(
-                  'IFMT · TCC 2026',
+                  'BUILD · 2026.05',
                   style: GoogleFonts.ibmPlexMono(
                     fontSize: 8.5,
                     letterSpacing: 0.2,
@@ -413,53 +429,3 @@ class _Campo extends StatelessWidget {
   }
 }
 
-class _BotaoLogin extends StatelessWidget {
-  final String label;
-  final bool primary;
-  final bool carregando;
-  final VoidCallback onPressed;
-
-  const _BotaoLogin({
-    required this.label,
-    required this.primary,
-    required this.onPressed,
-    this.carregando = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: carregando ? null : onPressed,
-      child: Container(
-        width: double.infinity,
-        height: 44,
-        decoration: BoxDecoration(
-          color: primary ? CeresColors.leafDark : CeresColors.paper2,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: primary ? CeresColors.leafDeep : CeresColors.hairline,
-          ),
-        ),
-        alignment: Alignment.center,
-        child: carregando
-            ? const SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(
-                  strokeWidth: 1.5,
-                  color: CeresColors.paper,
-                ),
-              )
-            : Text(
-                label,
-                style: GoogleFonts.ibmPlexSans(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: primary ? CeresColors.paper : CeresColors.ink,
-                  letterSpacing: 0.02,
-                ),
-              ),
-      ),
-    );
-  }
-}

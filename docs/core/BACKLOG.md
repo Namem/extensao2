@@ -1,7 +1,7 @@
 # Backlog do Produto — Ceres Diagnóstico
 **TCC Engenharia da Computação — IFMT Cuiabá**
 **Autor:** Namem Rachid Jaudy Neto
-**Última atualização:** 2026-05-08
+**Última atualização:** 2026-06-06
 
 > Backlog exclusivo do produto (software + firmware + hardware).
 > Para escrita do TCC e artigo científico, veja [BACKLOG_ESCRITA.md](BACKLOG_ESCRITA.md).
@@ -331,6 +331,49 @@ Django containerizado; experimento edge vs cloud documentado.
 
 ---
 
+## Sprint 3.7 — Design Refresh + Novas Telas ✅ CONCLUÍDA (2026-06-06)
+
+**Objetivo:** migrar 12 telas do mockup `ceres_namem` para o app funcional, preservando toda a lógica de backend/API.
+
+### Design System refinado ✅
+- [x] `lib/widgets/ceres_widgets.dart` criado — `CeresBrandBar`, `CeresSubBar`, `CeresIconBtn`, `CeresPageTitle`, `CeresChips` (com `onTap`), `CeresPaperCard`, `CeresSectionLabel`
+- [x] `CeresColors.forStatus(CeresStatus)` adicionado ao `ceres_theme.dart`
+- [x] Padrão de layout unificado: `SafeArea(bottom:false) > Column > [SubBar, PageTitle, ...content]`
+
+### Novas telas ✅
+- [x] `lib/screens/alertas_screen.dart` — rota `/alertas`, chips de filtro, lista com badge não-lido, ação colorida
+- [x] `lib/screens/seja_parceiro_screen.dart` — rota `/seja-parceiro`, benefícios + CTA cadastro
+- [x] `lib/screens/cadastro_screen.dart` — rota `/cadastro`, segmented Produtor/Agrônomo, validação + CREA condicional, chamada `ApiService.registrar()`
+
+### Telas reescritas ✅
+- [x] `agronomos_screen.dart` → `StatefulWidget`, filtro por especialidade via `CeresChips`, chat via `showModalBottomSheet`, botão "Seja parceiro"
+- [x] `perfil_screen.dart` → modo inferência, toggles notificação push, links para Alertas + Agrônomos, logout preservado
+- [x] `login_screen.dart` → texto "produtor" (não "agrônomo"), validação e-mail, link "Criar conta"
+- [x] `historico_local_screen.dart` → layout `SafeArea > Column > Expanded` sem AppBar nativo
+- [x] `camera_screen.dart` → `_localDisponivel = false` (stub TFLite Windows)
+
+### Fixes IoT ✅
+- [x] `historico_screen.dart` — threshold ONLINE: 2min → 10min (ESP envia a cada 5min)
+- [x] `historico_screen.dart` — overflow `tempoLabel` corrigido com `Flexible + ellipsis`
+- [x] `historico_screen.dart` — `OfflineBanner` standalone removido (causava colapso de layout)
+
+### Rotas registradas em `main.dart` ✅
+- [x] `/alertas`, `/agronomos`, `/seja-parceiro`, `/cadastro`
+
+### Backend ✅
+- [x] `accounts/views.py` — `register()` endpoint (POST `/api/auth/register/`) com validações
+- [x] `accounts/urls.py` — rota `register/` adicionada
+- [x] `accounts/views.py` — corrigido para `get_user_model()` (bug: usava `auth.User` hard-coded)
+- [x] `lib/config.dart` — `registerEndpoint` adicionado
+- [x] `lib/services/api_service.dart` — método `registrar()` implementado
+
+### Docker ✅
+- [x] `docker-compose.yml` — volume `./backend:/app` (live reload sem rebuild)
+- [x] `docker-compose.yml` — `mqtt_listener` sobe em background junto com `runserver`
+- [x] `docker-compose.yml` — SQLite persistido em volume nomeado
+
+---
+
 ## Sprint 6 — TCC Final + Defesa ⏳ PENDENTE
 
 - [ ] `docs/core/TCC_CERES.md` — preencher todas as seções [PENDENTE]
@@ -357,5 +400,6 @@ Django containerizado; experimento edge vs cloud documentado.
 | Sprint 4A | Navegação + Persistência UX | ✅ Concluída | 11/11 |
 | Sprint 4B | Mapa + GPS | ✅ Concluída | 9/10 |
 | Sprint 5 | Perfil + Backend Usuário | ✅ Concluída | 8/8 |
+| Sprint 3.7 | Design Refresh + Novas Telas | ✅ Concluída | 20/20 |
 | Sprint 6 | TCC Final + Defesa | ⏳ Pendente | 0/7 |
 | Fase Futura | RPi3B+ + EfficientNet (Exp F) | 📋 Registrado | — |

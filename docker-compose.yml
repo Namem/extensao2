@@ -6,12 +6,19 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      # Modelo TFLite (nao commitado — montado do host)
+      # Código montado do host — edições refletem sem rebuild
+      - ./backend:/app
+      # Modelo TFLite (nao commitado)
       - ./backend/datasets/modelo:/app/datasets/modelo:ro
       # Banco SQLite persistido entre restarts
-      - sqlite_data:/app
+      - sqlite_data:/app/db_notebook.sqlite3
     environment:
       - DJANGO_SETTINGS_MODULE=ceres_core.settings_notebook
+    # Migra + sobe o servidor com auto-reload
+    command: >
+      sh -c "python manage.py migrate --settings=ceres_core.settings_notebook &&
+             python manage.py mqtt_listener --settings=ceres_core.settings_notebook &
+             python manage.py runserver 0.0.0.0:8080 --settings=ceres_core.settings_notebook"
     restart: unless-stopped
 
 volumes:

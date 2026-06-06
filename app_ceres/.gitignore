@@ -43,3 +43,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Modelo TFLite — nao commitar (639KB, ja versionado em backend/datasets/modelo/)
+assets/models/*.tflite
