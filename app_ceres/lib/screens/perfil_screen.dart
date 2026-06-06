@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../services/api_service.dart';
 import '../services/auth_storage.dart';
+import '../services/modo_inferencia.dart';
 import '../theme/ceres_theme.dart';
 import '../widgets/ceres_widgets.dart';
 import '../widgets/offline_banner.dart';
@@ -16,14 +17,25 @@ class PerfilScreen extends StatefulWidget {
 class _PerfilScreenState extends State<PerfilScreen> {
   late Future<Map<String, dynamic>?> _futurePerfil;
 
-  // Estado local de configurações
-  int _modo = 0; // 0 = Online API, 1 = Offline TFLite
+  // Modo de inferência: estado global compartilhado com CameraScreen
+  final _modoInf = ModoInferencia.instance;
   bool _pushDoenca = true, _pushAmbiente = true, _resumoDiario = false;
 
   @override
   void initState() {
     super.initState();
+    _modoInf.addListener(_onModoChanged);
     _futurePerfil = _carregarPerfil();
+  }
+
+  @override
+  void dispose() {
+    _modoInf.removeListener(_onModoChanged);
+    super.dispose();
+  }
+
+  void _onModoChanged() {
+    if (mounted) setState(() {});
   }
 
   Future<Map<String, dynamic>?> _carregarPerfil() async {
@@ -196,9 +208,9 @@ class _PerfilScreenState extends State<PerfilScreen> {
   );
 
   Widget _modoOpt(int i, String nome, String desc, String tag) {
-    final on = _modo == i;
+    final on = (i == 0 && !_modoInf.isLocal) || (i == 1 && _modoInf.isLocal);
     return InkWell(
-      onTap: () => setState(() => _modo = i),
+      onTap: () => _modoInf.setLocal(i == 1),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
         child: Row(children: [

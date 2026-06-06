@@ -44,12 +44,24 @@ class _MapaScreenState extends State<MapaScreen> {
 
   Future<void> _carregarEventos() async {
     try {
-      final data = await ApiService.instance.historico(page: 1);
+      // Busca todas as páginas para popular o mapa completo
+      final List<EventoMqtt> todos = [];
+      int pagina = 1;
+      bool temProxima = true;
+
+      while (temProxima) {
+        final data = await ApiService.instance.historico(page: pagina);
+        final results = data['results'] as List<EventoMqtt>;
+        todos.addAll(results.where((e) => e.latitude != null && e.longitude != null));
+        temProxima = data['next'] != null;
+        pagina++;
+        // Limite de segurança: máximo 10 páginas (200 eventos)
+        if (pagina > 10) break;
+      }
+
       if (mounted) {
         setState(() {
-          _eventos = (data['results'] as List<EventoMqtt>)
-              .where((e) => e.latitude != null && e.longitude != null)
-              .toList();
+          _eventos = todos;
           _carregando = false;
         });
       }

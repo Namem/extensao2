@@ -15,6 +15,7 @@ import '../models/resultado_inferencia.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import '../services/api_service.dart';
 import '../services/inference_local_service.dart';
+import '../services/modo_inferencia.dart';
 import '../theme/ceres_theme.dart';
 import '../widgets/ceres_widgets.dart';
 import '../widgets/offline_banner.dart';
@@ -34,9 +35,9 @@ class _CameraScreenState extends State<CameraScreen> {
   bool _salvo = false;
   bool _offline = false;
 
-  // Modo de inferência: local (TFLite on-device) ou cloud (Django API)
-  // Local desabilitado até tflite_flutter ser descomentado no pubspec.yaml
-  bool _modoLocal = false;
+  // Modo de inferência: estado global compartilhado com PerfilScreen
+  final _modo = ModoInferencia.instance;
+  bool get _modoLocal => _modo.isLocal;
   bool get _localDisponivel => !Platform.isWindows;
 
   double? _latitude;
@@ -47,8 +48,19 @@ class _CameraScreenState extends State<CameraScreen> {
   @override
   void initState() {
     super.initState();
+    _modo.addListener(_onModoChanged);
     Connectivity().checkConnectivity().then(_atualizarConectividade);
     Connectivity().onConnectivityChanged.listen(_atualizarConectividade);
+  }
+
+  @override
+  void dispose() {
+    _modo.removeListener(_onModoChanged);
+    super.dispose();
+  }
+
+  void _onModoChanged() {
+    if (mounted) setState(() {});
   }
 
   void _atualizarConectividade(List<ConnectivityResult> results) {
@@ -57,7 +69,7 @@ class _CameraScreenState extends State<CameraScreen> {
     if (mounted && semConexao != _offline) {
       setState(() {
         _offline = semConexao;
-        if (semConexao && _localDisponivel) _modoLocal = true;
+        if (semConexao && _localDisponivel) _modo.setLocal(true);
       });
     }
   }
@@ -352,7 +364,7 @@ class _CameraScreenState extends State<CameraScreen> {
             sublabel: 'Django API',
             ativo: !_modoLocal,
             cor: CeresColors.leafDark,
-            onTap: () => setState(() => _modoLocal = false),
+            onTap: () => _modo.setLocal(false),
           ),
           const SizedBox(width: 6),
           _modoChip(
@@ -360,7 +372,7 @@ class _CameraScreenState extends State<CameraScreen> {
             sublabel: 'TFLite on-device',
             ativo: _modoLocal,
             cor: CeresColors.dryGrass,
-            onTap: () => setState(() => _modoLocal = true),
+            onTap: () => _modo.setLocal(true),
           ),
         ],
       ),
