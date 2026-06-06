@@ -129,26 +129,9 @@ class ApiService {
     throw Exception(body['erro'] ?? 'Erro ao criar conta.');
   }
 
-  /// Solicita código de recuperação de senha por e-mail.
-  Future<String> esqueceuSenha({required String email}) async {
-    final uri = Uri.parse(Config.forgotPasswordEndpoint);
-    final resp = await http.post(
-      uri,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'email': email}),
-    ).timeout(const Duration(seconds: 20));
-
-    final body = jsonDecode(resp.body) as Map<String, dynamic>;
-    if (resp.statusCode == 200) {
-      return body['mensagem'] as String;
-    }
-    throw Exception(body['erro'] ?? 'Erro ao solicitar recuperação.');
-  }
-
-  /// Redefine a senha usando o código recebido por e-mail.
+  /// Redefine a senha diretamente (sem código por e-mail).
   Future<String> resetarSenha({
     required String email,
-    required String codigo,
     required String novaSenha,
   }) async {
     final uri = Uri.parse(Config.resetPasswordEndpoint);
@@ -157,7 +140,6 @@ class ApiService {
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'email': email,
-        'codigo': codigo,
         'nova_senha': novaSenha,
       }),
     ).timeout(const Duration(seconds: 20));

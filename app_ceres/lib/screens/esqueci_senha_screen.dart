@@ -3,9 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../services/api_service.dart';
 import '../theme/ceres_theme.dart';
 
-/// Tela de recuperação de senha em 2 etapas:
-/// 1. Digita e-mail → recebe código de 6 dígitos por e-mail
-/// 2. Digita código + nova senha → senha redefinida
+/// Tela de redefinição de senha direta (sem código por e-mail).
+/// Usuário informa e-mail cadastrado + nova senha.
 class EsqueciSenhaScreen extends StatefulWidget {
   const EsqueciSenhaScreen({super.key});
 
@@ -15,54 +14,28 @@ class EsqueciSenhaScreen extends StatefulWidget {
 
 class _EsqueciSenhaScreenState extends State<EsqueciSenhaScreen> {
   final _emailCtrl = TextEditingController();
-  final _codigoCtrl = TextEditingController();
   final _senhaCtrl = TextEditingController();
   final _confirmCtrl = TextEditingController();
 
   bool _carregando = false;
   String? _erro;
-  String? _sucesso;
-  bool _codigoEnviado = false;
   bool _senhaVisivel = false;
 
   @override
   void dispose() {
     _emailCtrl.dispose();
-    _codigoCtrl.dispose();
     _senhaCtrl.dispose();
     _confirmCtrl.dispose();
     super.dispose();
   }
 
-  /// Etapa 1: solicita código de recuperação.
-  Future<void> _enviarCodigo() async {
+  Future<void> _redefinir() async {
     final email = _emailCtrl.text.trim();
-    if (email.isEmpty || !email.contains('@')) {
-      setState(() => _erro = 'Digite um e-mail válido.');
-      return;
-    }
-    setState(() { _carregando = true; _erro = null; _sucesso = null; });
-    try {
-      final msg = await ApiService.instance.esqueceuSenha(email: email);
-      setState(() {
-        _codigoEnviado = true;
-        _sucesso = msg;
-      });
-    } catch (e) {
-      setState(() => _erro = e.toString().replaceFirst('Exception: ', ''));
-    } finally {
-      setState(() => _carregando = false);
-    }
-  }
-
-  /// Etapa 2: valida código e redefine senha.
-  Future<void> _redefinirSenha() async {
-    final codigo = _codigoCtrl.text.trim();
     final senha = _senhaCtrl.text;
     final confirm = _confirmCtrl.text;
 
-    if (codigo.length != 6) {
-      setState(() => _erro = 'O código deve ter 6 dígitos.');
+    if (email.isEmpty || !email.contains('@') || !email.contains('.')) {
+      setState(() => _erro = 'Digite um e-mail válido.');
       return;
     }
     if (senha.length < 6) {
@@ -74,11 +47,10 @@ class _EsqueciSenhaScreenState extends State<EsqueciSenhaScreen> {
       return;
     }
 
-    setState(() { _carregando = true; _erro = null; _sucesso = null; });
+    setState(() { _carregando = true; _erro = null; });
     try {
       final msg = await ApiService.instance.resetarSenha(
-        email: _emailCtrl.text.trim(),
-        codigo: codigo,
+        email: email,
         novaSenha: senha,
       );
       if (!mounted) return;
@@ -88,7 +60,7 @@ class _EsqueciSenhaScreenState extends State<EsqueciSenhaScreen> {
           backgroundColor: CeresColors.leafLive,
         ),
       );
-      Navigator.of(context).pop(); // volta ao login
+      Navigator.of(context).pop();
     } catch (e) {
       setState(() => _erro = e.toString().replaceFirst('Exception: ', ''));
     } finally {
@@ -104,7 +76,7 @@ class _EsqueciSenhaScreenState extends State<EsqueciSenhaScreen> {
       backgroundColor: CeresColors.paper,
       body: Column(
         children: [
-          // Appbar simples com botão voltar
+          // Appbar com botão voltar
           Padding(
             padding: EdgeInsets.fromLTRB(16, top + 8, 24, 0),
             child: Row(
@@ -123,7 +95,7 @@ class _EsqueciSenhaScreenState extends State<EsqueciSenhaScreen> {
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  'Recuperar senha',
+                  'Redefinir senha',
                   style: GoogleFonts.newsreader(
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
@@ -143,9 +115,7 @@ class _EsqueciSenhaScreenState extends State<EsqueciSenhaScreen> {
                   // Eyebrow
                   Row(children: [
                     Text(
-                      _codigoEnviado
-                          ? 'ETAPA 2 · REDEFINIR SENHA'
-                          : 'ETAPA 1 · SOLICITAR CÓDIGO',
+                      'RECUPERAÇÃO DE ACESSO',
                       style: GoogleFonts.ibmPlexMono(
                         fontSize: 9, letterSpacing: 0.22, color: CeresColors.ink3,
                       ),
@@ -155,63 +125,51 @@ class _EsqueciSenhaScreenState extends State<EsqueciSenhaScreen> {
                   ]),
                   const SizedBox(height: 14),
 
-                  // Descrição
                   Text(
-                    _codigoEnviado
-                        ? 'Digite o código de 6 dígitos enviado para ${_emailCtrl.text.trim()} e escolha uma nova senha.'
-                        : 'Informe o e-mail cadastrado. Enviaremos um código de recuperação.',
+                    'Informe o e-mail cadastrado e escolha uma nova senha.',
                     style: GoogleFonts.ibmPlexSans(
                       fontSize: 12, color: CeresColors.ink2, height: 1.5,
                     ),
                   ),
                   const SizedBox(height: 20),
 
-                  // Etapa 1: campo e-mail
-                  if (!_codigoEnviado) ...[
-                    _campo('E-MAIL', _emailCtrl, keyboard: TextInputType.emailAddress),
-                    const SizedBox(height: 22),
-                  ],
-
-                  // Etapa 2: campos código + senha
-                  if (_codigoEnviado) ...[
-                    _campo('CÓDIGO (6 DÍGITOS)', _codigoCtrl, keyboard: TextInputType.number),
-                    const SizedBox(height: 4),
-                    _campo('NOVA SENHA', _senhaCtrl, obscure: !_senhaVisivel,
-                      trailing: GestureDetector(
-                        onTap: () => setState(() => _senhaVisivel = !_senhaVisivel),
-                        child: Icon(
-                          _senhaVisivel ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                          size: 16, color: CeresColors.ink3,
-                        ),
+                  _campo('E-MAIL', _emailCtrl, keyboard: TextInputType.emailAddress),
+                  const SizedBox(height: 4),
+                  _campo('NOVA SENHA', _senhaCtrl, obscure: !_senhaVisivel,
+                    trailing: GestureDetector(
+                      onTap: () => setState(() => _senhaVisivel = !_senhaVisivel),
+                      child: Icon(
+                        _senhaVisivel ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                        size: 16, color: CeresColors.ink3,
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    _campo('CONFIRMAR SENHA', _confirmCtrl, obscure: !_senhaVisivel),
-                    const SizedBox(height: 22),
-                  ],
+                  ),
+                  const SizedBox(height: 4),
+                  _campo('CONFIRMAR SENHA', _confirmCtrl, obscure: !_senhaVisivel),
+                  const SizedBox(height: 22),
 
-                  // Mensagens de erro/sucesso
+                  // Erro
                   if (_erro != null) ...[
-                    _msgBox(_erro!, CeresColors.blight, CeresColors.blightSoft),
-                    const SizedBox(height: 12),
-                  ],
-                  if (_sucesso != null && _codigoEnviado) ...[
-                    _msgBox(_sucesso!, CeresColors.leafLive,
-                        CeresColors.leafLive.withValues(alpha: 0.08)),
-                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: CeresColors.blightSoft,
+                        borderRadius: BorderRadius.circular(4),
+                        border: const Border(left: BorderSide(color: CeresColors.blight, width: 3)),
+                      ),
+                      child: Text(_erro!,
+                          style: GoogleFonts.ibmPlexSans(fontSize: 12, color: CeresColors.blight)),
+                    ),
+                    const SizedBox(height: 14),
                   ],
 
-                  // Botão principal
+                  // Botão
                   FilledButton(
-                    onPressed: _carregando
-                        ? null
-                        : (_codigoEnviado ? _redefinirSenha : _enviarCodigo),
+                    onPressed: _carregando ? null : _redefinir,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(_carregando
-                            ? 'Aguarde...'
-                            : (_codigoEnviado ? 'Redefinir senha' : 'Enviar código')),
+                        Text(_carregando ? 'Aguarde...' : 'Redefinir senha'),
                         if (!_carregando) ...[
                           const SizedBox(width: 8),
                           const Icon(Icons.arrow_forward, size: 18),
@@ -219,26 +177,6 @@ class _EsqueciSenhaScreenState extends State<EsqueciSenhaScreen> {
                       ],
                     ),
                   ),
-
-                  // Link reenviar código
-                  if (_codigoEnviado) ...[
-                    const SizedBox(height: 14),
-                    Center(
-                      child: GestureDetector(
-                        onTap: _carregando ? null : _enviarCodigo,
-                        child: Text(
-                          'Reenviar código',
-                          style: GoogleFonts.ibmPlexSans(
-                            fontSize: 12,
-                            color: CeresColors.leafDeep,
-                            fontWeight: FontWeight.w500,
-                            decoration: TextDecoration.underline,
-                            decorationColor: CeresColors.leafDeep,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
                 ],
               ),
             ),
@@ -247,8 +185,6 @@ class _EsqueciSenhaScreenState extends State<EsqueciSenhaScreen> {
       ),
     );
   }
-
-  // ── Widgets auxiliares ───────────────────────────────────────────────────
 
   Widget _campo(String label, TextEditingController ctrl, {
     bool obscure = false,
@@ -281,18 +217,6 @@ class _EsqueciSenhaScreenState extends State<EsqueciSenhaScreen> {
           ]),
         ],
       ),
-    );
-  }
-
-  Widget _msgBox(String msg, Color cor, Color bg) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(4),
-        border: Border(left: BorderSide(color: cor, width: 3)),
-      ),
-      child: Text(msg, style: GoogleFonts.ibmPlexSans(fontSize: 12, color: cor)),
     );
   }
 }

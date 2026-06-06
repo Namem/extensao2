@@ -23,7 +23,6 @@ class Config {
   static const String tokenRefreshEndpoint = '$baseUrl/api/auth/token/refresh/';
   static const String meEndpoint           = '$baseUrl/api/auth/me/';
   static const String registerEndpoint     = '$baseUrl/api/auth/register/';
-  static const String forgotPasswordEndpoint = '$baseUrl/api/auth/forgot-password/';
   static const String resetPasswordEndpoint = '$baseUrl/api/auth/reset-password/';
   static const String inferirEndpoint       = '$baseUrl/api/diagnostico/inferir/';
   static const String historicoEndpoint     = '$baseUrl/api/diagnostico/historico/';

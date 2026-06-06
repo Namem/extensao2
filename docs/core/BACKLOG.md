@@ -271,6 +271,11 @@ Django containerizado; experimento edge vs cloud documentado.
 - [ ] `flutter_secure_storage` — persistência JWT no KeyStore/Keychain → Sprint 4A
 - [ ] `shared_preferences` — "lembrar acesso" persistente → Sprint 4A
 - [ ] Tela Mapa (placeholder) — requer `geolocator` + backend com coordenadas GPS → Sprint 4B
+- [ ] **SMTP e-mail para reset de senha** — Railway bloqueia portas 465/587; migrar para Resend (API HTTP) ou hospedar em VPS
+  - E-mail: `ceres.diagnostico@gmail.com`
+  - App Password Gmail: `ttrb btxm utke aids`
+  - Config Django: `EMAIL_HOST=smtp.gmail.com`, `EMAIL_PORT=465`, `EMAIL_USE_SSL=True`
+  - Endpoint pronto: `forgot-password/` (código 6 dígitos) — reativar em `accounts/views.py` e `urls.py`
 
 ---
 

@@ -1,10 +1,4 @@
-import secrets
-from datetime import timedelta
-
-from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.cache import cache
-from django.core.mail import send_mail
 from django.utils import timezone
 
 User = get_user_model()
@@ -56,77 +50,23 @@ def register(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
-def forgot_password(request):
-    """Gera código de 6 dígitos e envia por e-mail para reset de senha."""
-    email = request.data.get('email', '').strip().lower()
-
-    if not email:
-        return Response({'erro': 'Informe o e-mail.'}, status=400)
-
-    try:
-        user = User.objects.get(username=email)
-    except User.DoesNotExist:
-        # Retorna 200 mesmo se não achar — evita enumeration de e-mails
-        return Response({'mensagem': 'Se o e-mail existir, enviaremos um código.'})
-
-    # Gera código de 6 dígitos
-    codigo = f'{secrets.randbelow(1000000):06d}'
-    expiry = getattr(settings, 'PASSWORD_RESET_TOKEN_EXPIRY_MINUTES', 15)
-
-    # Salva no cache com expiração (chave: reset_<email>)
-    cache.set(f'reset_{email}', codigo, timeout=expiry * 60)
-
-    # Envia e-mail
-    try:
-        send_mail(
-            subject='Ceres Diagnóstico — Código de recuperação',
-            message=(
-                f'Olá, {user.first_name or "produtor"}!\n\n'
-                f'Seu código de recuperação é: {codigo}\n\n'
-                f'Este código expira em {expiry} minutos.\n'
-                f'Se você não solicitou, ignore este e-mail.'
-            ),
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[email],
-            fail_silently=False,
-        )
-    except Exception as e:
-        return Response(
-            {'erro': f'Falha ao enviar e-mail: {type(e).__name__}: {e}'},
-            status=500,
-        )
-
-    return Response({'mensagem': 'Código enviado para o e-mail informado.'})
-
-
-@api_view(['POST'])
-@permission_classes([AllowAny])
 def reset_password(request):
-    """Valida código de 6 dígitos e troca a senha do usuário."""
-    email  = request.data.get('email', '').strip().lower()
-    codigo = request.data.get('codigo', '').strip()
-    nova   = request.data.get('nova_senha', '')
+    """Redefine a senha diretamente — valida e-mail e troca."""
+    email = request.data.get('email', '').strip().lower()
+    nova  = request.data.get('nova_senha', '')
 
-    if not email or not codigo or not nova:
-        return Response({'erro': 'E-mail, código e nova senha são obrigatórios.'}, status=400)
+    if not email or not nova:
+        return Response({'erro': 'E-mail e nova senha são obrigatórios.'}, status=400)
     if len(nova) < 6:
         return Response({'erro': 'Senha deve ter no mínimo 6 caracteres.'}, status=400)
 
-    # Busca código no cache
-    codigo_salvo = cache.get(f'reset_{email}')
-    if not codigo_salvo or codigo_salvo != codigo:
-        return Response({'erro': 'Código inválido ou expirado.'}, status=400)
-
     try:
         user = User.objects.get(username=email)
     except User.DoesNotExist:
-        return Response({'erro': 'Usuário não encontrado.'}, status=404)
+        return Response({'erro': 'E-mail não cadastrado.'}, status=404)
 
     user.set_password(nova)
     user.save()
-
-    # Invalida o código após uso
-    cache.delete(f'reset_{email}')
 
     return Response({'mensagem': 'Senha alterada com sucesso.'})
 
