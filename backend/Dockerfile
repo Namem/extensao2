@@ -19,5 +19,8 @@ ENV PYTHONUNBUFFERED=1
 
 CMD ["sh", "-c", \
      "python manage.py migrate --settings=ceres_core.settings_notebook --run-syncdb 2>/dev/null || true && \
-      python manage.py mqtt_listener --settings=ceres_core.settings_notebook 2>&1 & \
+      python manage.py mqtt_listener --settings=ceres_core.settings_notebook \
+        --host ${MQTT_HOST:-localhost} --port ${MQTT_PORT:-1883} \
+        --user ${MQTT_USER:-} --password ${MQTT_PASSWORD:-} \
+        ${MQTT_TLS:+--tls} ${MQTT_WEBSOCKET:+--websocket} 2>&1 & \
       python manage.py runserver 0.0.0.0:8080 --settings=ceres_core.settings_notebook --noreload --nothreading"]
