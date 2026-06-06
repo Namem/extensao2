@@ -483,3 +483,6 @@ com estado da arte para modelos de porte similar).
 | Backend           | Django REST + PostgreSQL | FastAPI + SQLite                 | ORM, migrações, paho-mqtt |
 | App               | Flutter + Drift          | React Native                     | Performance nativa + offline |
 | Gap lab-campo     | Background Augmentation (rembg) | Domain adversarial training | Nao requer dados campo; nao altera tamanho final do modelo |
+| Broker MQTT cloud | HiveMQ Cloud (TLS 8883) | Mosquitto self-hosted | Gratuito até 100 conexões, TLS nativo, sem infra própria |
+| Deploy backend    | Railway (Docker + SQLite) | AWS EC2 / Heroku | Deploy automático via GitHub, $5 crédito gratuito |
+| Inferência mobile | tflite_flutter 0.12.1 (on-device) | API cloud-only | Funciona offline, latência < 1s, sem custo por requisição |

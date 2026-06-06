@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as math;
 import 'package:image/image.dart' as img;
 import 'package:tflite_flutter/tflite_flutter.dart';
 import '../models/resultado_inferencia.dart';
@@ -7,18 +8,18 @@ class InferenceLocalService {
   static const _modelAsset = 'assets/models/ceres_mobilenetv2_int8.tflite';
   static const _inputSize = 96;
 
-  // Ordem alfabética das pastas PlantVillage — define índice de cada classe
+  // Ordem IDÊNTICA ao Django inference_service.py (diretórios ordenados alfabeticamente)
   static const _classes = [
-    'D09_mancha_bacteriana', // Bacterial_spot
-    'D03_pinta_preta',       // Early_blight
-    'D01_requeima',          // Late_blight
-    'D05_mofo_foliar',       // Leaf_Mold
-    'D02_septoriose',        // Septoria_leaf_spot
-    'D07_acaro_bronzeamento',// Spider_mites
-    'D03b_mancha_alvo',      // Target_Spot
-    'D06_vira_cabeca',       // Yellow_Leaf_Curl_Virus
-    'D06b_mosaico',          // mosaic_virus
-    'saudavel',              // healthy
+    'D01_requeima',
+    'D02_septoriose',
+    'D03_pinta_preta',
+    'D03b_mancha_alvo',
+    'D05_mofo_foliar',
+    'D06_vira_cabeca',
+    'D06b_mosaico',
+    'D07_acaro_bronzeamento',
+    'D09_mancha_bacteriana',
+    'saudavel',
   ];
 
   Interpreter? _interpreter;
@@ -53,25 +54,39 @@ class InferenceLocalService {
             return (ch.toInt() - 128).clamp(-128, 127);
           }))));
 
-    // Output: [1, 10] float32
-    final output = [List.filled(_classes.length, 0.0)];
-    _interpreter!.run(input, output);
+    // Output INT8 quantizado
+    final outTensor = _interpreter!.getOutputTensor(0);
+    final scale     = outTensor.params.scale;
+    final zeroPoint = outTensor.params.zeroPoint;
 
-    final scores = output[0];
+    final outputRaw = [List.filled(_classes.length, 0)];
+    _interpreter!.run(input, outputRaw);
+
+    // Dequantização: float = (int8 - zero_point) * scale
+    final logits = outputRaw[0]
+        .map((v) => ((v - zeroPoint) * scale).toDouble())
+        .toList();
+
+    // Softmax (idêntico ao Django)
+    final maxLogit = logits.reduce(math.max);
+    final exps = logits.map((v) => math.exp(v - maxLogit)).toList();
+    final sumExp = exps.reduce((a, b) => a + b);
+    final probs = exps.map((e) => e / sumExp).toList();
+
     int maxIdx = 0;
-    for (int i = 1; i < scores.length; i++) {
-      if (scores[i] > scores[maxIdx]) maxIdx = i;
+    for (int i = 1; i < probs.length; i++) {
+      if (probs[i] > probs[maxIdx]) maxIdx = i;
     }
 
     sw.stop();
 
     final scoreMap = <String, double>{
-      for (int i = 0; i < _classes.length; i++) _classes[i]: scores[i],
+      for (int i = 0; i < _classes.length; i++) _classes[i]: probs[i],
     };
 
     return ResultadoInferencia(
       classe: _classes[maxIdx],
-      confianca: scores[maxIdx],
+      confianca: probs[maxIdx],
       latenciaMs: sw.elapsedMilliseconds,
       scores: scoreMap,
     );

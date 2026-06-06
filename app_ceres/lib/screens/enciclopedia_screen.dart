@@ -27,6 +27,25 @@ class _EnciclopediaScreenState extends State<EnciclopediaScreen> {
   ];
 
   String? _expandido;
+  String _busca = '';
+  final _buscaCtrl = TextEditingController();
+
+  @override
+  void dispose() {
+    _buscaCtrl.dispose();
+    super.dispose();
+  }
+
+  List<String> get _ordenFiltrada {
+    if (_busca.isEmpty) return _ordem;
+    final q = _busca.toLowerCase();
+    return _ordem.where((k) {
+      final d = kDoencas[k]!;
+      return d.nomePopular.toLowerCase().contains(q) ||
+             d.nomeLatim.toLowerCase().contains(q) ||
+             d.descricao.toLowerCase().contains(q);
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +68,7 @@ class _EnciclopediaScreenState extends State<EnciclopediaScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 decoration: BoxDecoration(
                   color: CeresColors.paper2,
                   border: Border.all(color: CeresColors.hairline),
@@ -58,9 +77,27 @@ class _EnciclopediaScreenState extends State<EnciclopediaScreen> {
                 child: Row(children: [
                   const Icon(Icons.search, size: 14, color: CeresColors.ink3),
                   const SizedBox(width: 8),
-                  Text('buscar por nome, sintoma, agente…',
+                  Expanded(
+                    child: TextField(
+                      controller: _buscaCtrl,
+                      onChanged: (v) => setState(() => _busca = v),
                       style: CeresType.sans(const TextStyle(
-                          fontSize: 12, color: CeresColors.ink3))),
+                          fontSize: 12, color: CeresColors.ink)),
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        isDense: true,
+                        hintText: 'buscar por nome, sintoma, agente…',
+                        hintStyle: CeresType.sans(const TextStyle(
+                            fontSize: 12, color: CeresColors.ink3)),
+                        suffixIcon: _busca.isNotEmpty
+                          ? GestureDetector(
+                              onTap: () { _buscaCtrl.clear(); setState(() => _busca = ''); },
+                              child: const Icon(Icons.close, size: 14, color: CeresColors.ink3),
+                            )
+                          : null,
+                      ),
+                    ),
+                  ),
                 ]),
               ),
             ),
@@ -68,15 +105,20 @@ class _EnciclopediaScreenState extends State<EnciclopediaScreen> {
             Expanded(child: ListView(
               padding: const EdgeInsets.fromLTRB(22, 0, 22, 32),
               children: [
-                const CeresSectionLabel('Fungos · 5'),
-                ..._ordem.where((k) => _tipoTag(k) == 'F').map((k) =>
-                    _itemDoenca(k, kDoencas[k]!)),
-                const CeresSectionLabel('Bactérias · 1'),
-                ..._ordem.where((k) => _tipoTag(k) == 'B').map((k) =>
-                    _itemDoenca(k, kDoencas[k]!)),
-                const CeresSectionLabel('Vírus · Ácaros · Saudável'),
-                ..._ordem.where((k) => !['F','B'].contains(_tipoTag(k))).map((k) =>
-                    _itemDoenca(k, kDoencas[k]!)),
+                if (_busca.isNotEmpty) ...[
+                  CeresSectionLabel('${_ordenFiltrada.length} resultado(s)'),
+                  ..._ordenFiltrada.map((k) => _itemDoenca(k, kDoencas[k]!)),
+                ] else ...[
+                  const CeresSectionLabel('Fungos · 5'),
+                  ..._ordem.where((k) => _tipoTag(k) == 'F').map((k) =>
+                      _itemDoenca(k, kDoencas[k]!)),
+                  const CeresSectionLabel('Bactérias · 1'),
+                  ..._ordem.where((k) => _tipoTag(k) == 'B').map((k) =>
+                      _itemDoenca(k, kDoencas[k]!)),
+                  const CeresSectionLabel('Vírus · Ácaros · Saudável'),
+                  ..._ordem.where((k) => !['F','B'].contains(_tipoTag(k))).map((k) =>
+                      _itemDoenca(k, kDoencas[k]!)),
+                ],
               ],
             )),
           ],

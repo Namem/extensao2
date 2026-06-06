@@ -2,7 +2,7 @@
 **TCC Engenharia da Computação — IFMT Cuiabá**
 **Autor:** Namem Rachid Jaudy Neto
 **Orientador:** (a preencher)
-**Última atualização:** 2026-05-28
+**Última atualização:** 2026-06-06
 
 > Este documento registra cronologicamente tudo que foi implementado,
 > as decisões tomadas, os resultados obtidos e os problemas resolvidos.
@@ -836,3 +836,56 @@ O usuário solicitou planejamento completo de tudo que falta para concluir o app
 - Persistência de sessão (boot sem login) ✅
 - Banner offline em todas as telas ✅
 - Exportar CSV + logout ✅
+
+---
+
+## 2026-06-06 — Sprint 3.7: Design Refresh + Deploy + TFLite Mobile + MQTT Cloud
+
+### O que foi feito
+
+**Design Refresh — 12 telas migradas do mockup `ceres_namem`:**
+- `CeresBrandBar`, `CeresSubBar`, `CeresIconBtn`, `CeresPageTitle`, `CeresChips` (com `onTap`), `CeresPaperCard`, `CeresSectionLabel` — widgets compartilhados criados em `ceres_widgets.dart`
+- `CeresColors.forStatus(CeresStatus)` adicionado ao design system
+- Layout unificado: `SafeArea(bottom:false) > Column > [SubBar, PageTitle, ...content]`
+- 4 novas telas: `AlertasScreen` (`/alertas`), `SejaParceiroScreen` (`/seja-parceiro`), `CadastroScreen` (`/cadastro`), e busca funcional na `EnciclopediaScreen`
+- `AgronomosScreen` → StatefulWidget com filtro por especialidade via `CeresChips`, chat via `showModalBottomSheet`
+- `PerfilScreen` reescrita: modo inferência, toggles push, links Alertas/Agrônomos
+- `LoginScreen`: texto "produtor" (não "agrônomo"), validação e-mail, link "Criar conta"
+- IoT: threshold ONLINE 2min → 10min, overflow `tempoLabel` corrigido
+
+**Backend — Registro de usuário:**
+- `accounts/views.py` — `register()` endpoint POST `/api/auth/register/` com validações
+- Bug corrigido: `from django.contrib.auth.models import User` → `get_user_model()` (projeto usa `CustomUser`)
+- `settings.py` — `SECRET_KEY` e `DATABASES` com `getenv()` + fallback (deploy-ready)
+
+**Deploy Railway:**
+- Dockerfile atualizado: migrate no startup, mqtt_listener em background
+- `docker-compose.yml` corrigido: volume `./backend:/app` (live reload), sem volume SQLite em arquivo
+- Deploy em `ceres.up.railway.app` — API pública funcionando
+- Contas de teste criadas: `produtor@ceres.mt` / `agronomo@ceres.mt` (senha: `ceres123`)
+
+**TFLite on-device (Android):**
+- `tflite_flutter: ^0.12.1` habilitado no pubspec (0.10.4 tinha bug `UnmodifiableUint8ListView`)
+- `inference_local_service.dart` implementado: carrega `ceres_mobilenetv2_int8.tflite` do assets
+- Input INT8: `uint8 - 128` → [-128, 127]; Output INT8: dequantização com `scale`/`zeroPoint` do tensor
+- `_localDisponivel` ativado para Android (`!Platform.isWindows`)
+- APK release gerado e testado no celular real via WhatsApp
+
+**MQTT Cloud (HiveMQ):**
+- `mqtt_listener.py` atualizado: lê broker via env vars (`MQTT_HOST`, `MQTT_PORT`, `MQTT_USER`, `MQTT_PASSWORD`, `MQTT_TLS`)
+- Suporte TLS + autenticação por usuário/senha
+- HiveMQ Cloud cluster configurado: `ee2c89bab...s1.eu.hivemq.cloud:8883`
+- Variáveis configuradas no Railway
+
+**Enciclopédia — busca funcional:**
+- `TextField` com `TextEditingController` substituindo texto decorativo
+- Filtra por nome, agente e sintomas
+- Botão limpar (X) quando há texto, seções agrupadas ou lista flat conforme busca
+
+### Resultado
+- API pública: `ceres.up.railway.app` ✅
+- APK instalado em celular real ✅
+- Modo Local (TFLite) habilitado para Android ✅
+- MQTT Cloud configurado (HiveMQ) ✅
+- Busca Enciclopédia funcional ✅
+- 4 novas telas + rotas ✅

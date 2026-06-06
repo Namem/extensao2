@@ -51,7 +51,10 @@ class _CameraScreenState extends State<CameraScreen> {
     final semConexao = results.isEmpty ||
         (results.length == 1 && results.first == ConnectivityResult.none);
     if (mounted && semConexao != _offline) {
-      setState(() => _offline = semConexao);
+      setState(() {
+        _offline = semConexao;
+        if (semConexao && _localDisponivel) _modoLocal = true;
+      });
     }
   }
 
@@ -582,16 +585,16 @@ class _CameraScreenState extends State<CameraScreen> {
       padding: const EdgeInsets.fromLTRB(22, 6, 22, 12),
       child: Row(children: [
         Expanded(child: FilledButton.icon(
-          onPressed: (temCamera && !_carregando && !_offline)
-              ? () => _offline ? _avisoOffline() : _capturar(ImageSource.camera)
+          onPressed: (temCamera && !_carregando && !(_offline && !_modoLocal))
+              ? () => _capturar(ImageSource.camera)
               : null,
           icon: const Icon(Icons.photo_camera_outlined, size: 18),
           label: const Text('Câmera'),
         )),
         const SizedBox(width: 10),
         Expanded(child: OutlinedButton.icon(
-          onPressed: (!_carregando && !_offline)
-              ? () => _offline ? _avisoOffline() : _capturar(ImageSource.gallery)
+          onPressed: (!_carregando && !(_offline && !_modoLocal))
+              ? () => _capturar(ImageSource.gallery)
               : null,
           icon: const Icon(Icons.photo_library_outlined, size: 18),
           label: const Text('Galeria'),
