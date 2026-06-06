@@ -31,6 +31,7 @@ _MQTT_PORT     = int(os.getenv('MQTT_PORT', '1883'))
 _MQTT_USER     = os.getenv('MQTT_USER', '')
 _MQTT_PASSWORD = os.getenv('MQTT_PASSWORD', '')
 _MQTT_TLS      = os.getenv('MQTT_TLS', 'false').lower() == 'true'
+_MQTT_WS       = os.getenv('MQTT_WEBSOCKET', 'false').lower() == 'true'
 
 
 class Command(BaseCommand):
@@ -45,6 +46,7 @@ class Command(BaseCommand):
         parser.add_argument('--user', default=_MQTT_USER, help='Usuário MQTT.')
         parser.add_argument('--password', default=_MQTT_PASSWORD, help='Senha MQTT.')
         parser.add_argument('--tls', action='store_true', default=_MQTT_TLS, help='Usar TLS.')
+        parser.add_argument('--websocket', action='store_true', default=_MQTT_WS, help='MQTT sobre WebSocket.')
 
     def handle(self, *args, **options):
         """Ponto de entrada do command — inicializa o cliente MQTT."""
@@ -53,31 +55,36 @@ class Command(BaseCommand):
         user     = options['user']
         password = options['password']
         use_tls  = options['tls']
+        use_ws   = options['websocket']
 
         self.stdout.write(self.style.SUCCESS(
-            f'[MQTT] Iniciando listener → {host}:{port} | TLS:{use_tls} | Tópico: {TOPICO}'
+            f'[MQTT] Iniciando listener → {host}:{port} | TLS:{use_tls} | WS:{use_ws} | Tópico: {TOPICO}'
         ))
 
         self._rodando = True
         signal.signal(signal.SIGTERM, self._encerrar)
         signal.signal(signal.SIGINT, self._encerrar)
 
-        self._conectar_com_retry(host, port, user, password, use_tls)
+        self._conectar_com_retry(host, port, user, password, use_tls, use_ws)
 
     def _encerrar(self, signum, frame):
         """Callback de shutdown limpo ao receber SIGTERM ou SIGINT."""
         self.stdout.write(self.style.WARNING('\n[MQTT] Encerrando listener...'))
         self._rodando = False
 
-    def _conectar_com_retry(self, host, port, user='', password='', use_tls=False):
+    def _conectar_com_retry(self, host, port, user='', password='', use_tls=False, use_ws=False):
         """Tenta conectar ao broker com retry exponencial (1s, 2s, 4s, 8s...)."""
         espera = 1
         while self._rodando:
             try:
-                cliente = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+                transport = 'websockets' if use_ws else 'tcp'
+                cliente = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, transport=transport)
                 cliente.on_connect = self._ao_conectar
                 cliente.on_message = self._ao_receber_mensagem
                 cliente.on_disconnect = self._ao_desconectar
+
+                if use_ws:
+                    cliente.ws_set_options(path='/mqtt')
 
                 if user:
                     cliente.username_pw_set(user, password)
