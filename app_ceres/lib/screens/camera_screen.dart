@@ -145,6 +145,8 @@ class _CameraScreenState extends State<CameraScreen> {
               longitude: _longitude,
             );
       setState(() => _resultado = res);
+      // Cloud já salvou no servidor; local precisa sincronizar depois
+      final foiLocal = _modoLocal && _localDisponivel;
       await appDb.salvar(DiagnosticosLocaisCompanion(
         timestamp: Value(DateTime.now()),
         classe: Value(res.classe),
@@ -154,6 +156,8 @@ class _CameraScreenState extends State<CameraScreen> {
         imagemPath: Value(_imagem!.path),
         latitude: Value(_latitude),
         longitude: Value(_longitude),
+        sincronizado: Value(!foiLocal),
+        modo: Value(foiLocal ? 'local' : 'cloud'),
       ));
       setState(() => _salvo = true);
     } catch (e) {

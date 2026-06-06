@@ -15,12 +15,15 @@ import 'screens/perfil_screen.dart';
 import 'screens/seja_parceiro_screen.dart';
 import 'screens/splash_screen.dart';
 import 'services/auth_storage.dart';
+import 'services/sync_service.dart';
 import 'theme/ceres_theme.dart';
 import 'widgets/ceres_icons.dart';
 
 void main() {
   final binding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: binding);
+  // Inicia fila de sincronização offline → servidor
+  SyncService.instance.iniciar();
   runApp(const CeresApp());
   FlutterNativeSplash.remove();
 }

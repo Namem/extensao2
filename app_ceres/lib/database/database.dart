@@ -40,6 +40,13 @@ class DiagnosticosLocais extends Table {
   /// Coordenadas GPS no momento do diagnóstico (nullable — GPS pode estar indisponível).
   RealColumn get latitude => real().nullable()();
   RealColumn get longitude => real().nullable()();
+
+  /// Se o diagnóstico já foi sincronizado com o servidor.
+  /// false = pendente de envio (diagnóstico feito offline).
+  BoolColumn get sincronizado => boolean().withDefault(const Constant(true))();
+
+  /// Modo usado: 'local' (TFLite) ou 'cloud' (API Django).
+  TextColumn get modo => text().withDefault(const Constant('cloud'))();
 }
 
 @DriftDatabase(tables: [DiagnosticosLocais])
@@ -47,15 +54,19 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_abrirConexao());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onUpgrade: (migrator, from, to) async {
       if (from < 2) {
-        // v2: adicionou latitude e longitude
         await migrator.addColumn(diagnosticosLocais, diagnosticosLocais.latitude);
         await migrator.addColumn(diagnosticosLocais, diagnosticosLocais.longitude);
+      }
+      if (from < 3) {
+        // v3: fila de sincronização offline
+        await migrator.addColumn(diagnosticosLocais, diagnosticosLocais.sincronizado);
+        await migrator.addColumn(diagnosticosLocais, diagnosticosLocais.modo);
       }
     },
   );
@@ -78,10 +89,32 @@ class AppDatabase extends _$AppDatabase {
   Future<int> salvar(DiagnosticosLocaisCompanion entry) =>
       into(diagnosticosLocais).insert(entry);
 
+  /// Retorna diagnósticos pendentes de sincronização.
+  Future<List<DiagnosticoLocal>> pendentes() =>
+      (select(diagnosticosLocais)
+            ..where((t) => t.sincronizado.equals(false))
+            ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
+          .get();
+
+  /// Marca um diagnóstico como sincronizado.
+  Future<void> marcarSincronizado(int id) =>
+      (update(diagnosticosLocais)..where((t) => t.id.equals(id)))
+          .write(const DiagnosticosLocaisCompanion(sincronizado: Value(true)));
+
   /// Total de diagnósticos armazenados.
   Future<int> total() async {
     final count = diagnosticosLocais.id.count();
     final query = selectOnly(diagnosticosLocais)..addColumns([count]);
+    final row = await query.getSingle();
+    return row.read(count) ?? 0;
+  }
+
+  /// Total de pendentes de sincronização.
+  Future<int> totalPendentes() async {
+    final count = diagnosticosLocais.id.count();
+    final query = selectOnly(diagnosticosLocais)
+      ..addColumns([count])
+      ..where(diagnosticosLocais.sincronizado.equals(false));
     final row = await query.getSingle();
     return row.read(count) ?? 0;
   }
