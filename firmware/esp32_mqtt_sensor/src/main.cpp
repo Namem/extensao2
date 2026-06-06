@@ -1,10 +1,15 @@
 #include <Arduino.h>
 #include <WiFi.h>
+#include <WiFiClientSecure.h>
 #include <PubSubClient.h>
 #include <DHTesp.h>
 #include "config.h"
 
-WiFiClient   wifiClient;
+#ifdef MQTT_TLS
+WiFiClientSecure wifiClient;
+#else
+WiFiClient       wifiClient;
+#endif
 PubSubClient mqtt(wifiClient);
 DHTesp       dht;
 
@@ -23,7 +28,11 @@ void conectarWifi() {
 void conectarMqtt() {
     while (!mqtt.connected()) {
         Serial.print("Conectando MQTT...");
+        #ifdef MQTT_USER
+        if (mqtt.connect(DEVICE_ID, MQTT_USER, MQTT_PASSWORD)) {
+        #else
         if (mqtt.connect(DEVICE_ID)) {
+        #endif
             Serial.println("OK");
         } else {
             Serial.printf("falhou rc=%d — tentando em 5s\n", mqtt.state());
@@ -90,6 +99,11 @@ void setup() {
     analogSetAttenuation(ADC_11db); // faixa 0-3.3V
 
     conectarWifi();
+
+    #ifdef MQTT_TLS
+    wifiClient.setInsecure(); // aceita qualquer cert — suficiente para HiveMQ Cloud
+    #endif
+
     mqtt.setServer(MQTT_BROKER, MQTT_PORT);
     mqtt.setBufferSize(256);
 }
