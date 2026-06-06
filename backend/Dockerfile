@@ -17,4 +17,5 @@ EXPOSE 8080
 
 CMD ["sh", "-c", \
      "python manage.py migrate --settings=ceres_core.settings_notebook --run-syncdb 2>/dev/null || true && \
+      python manage.py mqtt_listener --settings=ceres_core.settings_notebook & \
       python manage.py runserver 0.0.0.0:8080 --settings=ceres_core.settings_notebook --noreload --nothreading"]
