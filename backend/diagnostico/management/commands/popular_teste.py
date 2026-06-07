@@ -67,14 +67,17 @@ class Command(BaseCommand):
     help = 'Limpa eventos vazios e popula banco com dados realistas para apresentação.'
 
     def handle(self, *args, **options):
-        # 1. Limpar eventos sem classe_detectada
+        # 1. Limpar eventos sem classe_detectada E sem dados de sensor
+        #    (eventos do MQTT com sensores reais são preservados mesmo sem classe)
         vazios = DiagnosticoEvento.objects.filter(
             Q(classe_detectada__isnull=True) | Q(classe_detectada='')
+        ).filter(
+            temperatura__isnull=True,  # sem dados de sensor = lixo real
         )
         n_vazios = vazios.count()
         if n_vazios:
             vazios.delete()
-            self.stdout.write(f'{n_vazios} eventos vazios removidos.')
+            self.stdout.write(f'{n_vazios} eventos vazios removidos (sensores preservados).')
 
         # 2. Verificar se já tem dados completos (GPS + sensores)
         completos = DiagnosticoEvento.objects.filter(
