@@ -28,15 +28,19 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
   Timer? _timerClock;
   DateTime _agora = DateTime.now();
 
-  // Último evento recebido
+  // Último evento recebido (qualquer)
   EventoMqtt? get _ultimoEvento =>
       _eventos.isNotEmpty ? _eventos.first : null;
 
-  /// ONLINE = último evento há menos de 2 minutos.
-  /// OFFLINE = último evento há 2+ minutos (ESP32 parou de enviar).
-  /// AGUARDANDO = nenhum evento na lista.
+  // Último evento COM dados de sensor (para o card de status)
+  EventoMqtt? _cachedSensor;
+  EventoMqtt? get _ultimoSensor => _cachedSensor;
+
+  /// ONLINE = último evento com sensor há menos de 10 minutos.
+  /// OFFLINE = último evento com sensor há 10+ minutos.
+  /// AGUARDANDO = nenhum evento com sensor na lista.
   _SensorStatus get _statusSensor {
-    final e = _ultimoEvento;
+    final e = _ultimoSensor;
     if (e == null) return _SensorStatus.aguardando;
     final diff = _agora.difference(e.timestamp.toLocal());
     return diff.inMinutes < 10 ? _SensorStatus.online : _SensorStatus.offline;
@@ -69,16 +73,47 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
     });
     try {
       final data = await ApiService.instance.historico(page: pagina);
+      final results = data['results'] as List<EventoMqtt>;
       setState(() {
-        _eventos = data['results'] as List<EventoMqtt>;
+        _eventos = results;
         _temProxima = data['next'] != null;
         _total = data['count'] as int;
         _paginaAtual = pagina;
       });
+      // Busca o último evento com dados de sensor (pode estar em outra página)
+      await _buscarUltimoSensor(results, data['next'] != null);
     } catch (e) {
       setState(() => _erro = e.toString());
     } finally {
       setState(() => _carregando = false);
+    }
+  }
+
+  /// Varre páginas até encontrar um evento com temperatura (sensor real).
+  Future<void> _buscarUltimoSensor(List<EventoMqtt> primeira, bool temMais) async {
+    // Tenta achar na página atual
+    for (final e in primeira) {
+      if (e.temperatura != null) {
+        if (mounted) setState(() => _cachedSensor = e);
+        return;
+      }
+    }
+    // Se não achou, busca nas próximas (máximo 5 páginas)
+    if (!temMais) return;
+    for (int p = 2; p <= 6; p++) {
+      try {
+        final data = await ApiService.instance.historico(page: p);
+        final results = data['results'] as List<EventoMqtt>;
+        for (final e in results) {
+          if (e.temperatura != null) {
+            if (mounted) setState(() => _cachedSensor = e);
+            return;
+          }
+        }
+        if (data['next'] == null) break;
+      } catch (_) {
+        break;
+      }
     }
   }
 
@@ -146,7 +181,7 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
 
   // ── Sensor status card ──────────────────────────────────────────────────────
   Widget _sensorCard() {
-    final e = _ultimoEvento;
+    final e = _ultimoSensor;
     final status = _statusSensor;
     final dotColor = switch (status) {
       _SensorStatus.online    => CeresColors.leafLive,
