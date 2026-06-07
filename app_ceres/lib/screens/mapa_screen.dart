@@ -117,7 +117,10 @@ class _MapaScreenState extends State<MapaScreen> {
             CeresBrandBar(
               subtitle: 'Mapa da lavoura',
               actions: [
-                CeresIconBtn(Icons.filter_list, onTap: () {}),
+                CeresIconBtn(Icons.refresh, onTap: () {
+                  setState(() { _carregando = true; _erro = null; });
+                  _carregarEventos();
+                }),
                 CeresIconBtn(Icons.my_location, onTap: () {
                   if (_posicaoAtual != null) {
                     _mapController.move(_posicaoAtual!, 14);
@@ -155,11 +158,16 @@ class _MapaScreenState extends State<MapaScreen> {
             ),
 
             // ── Overlay de status (carregando / erro) ────────────────────
-            if (_carregando || _erro != null)
+            if (_carregando)
               Positioned(
                 top: 12,
-                left: 0,
-                right: 0,
+                left: 16, right: 16,
+                child: _loadingSkeleton(),
+              )
+            else if (_erro != null)
+              Positioned(
+                top: 12,
+                left: 0, right: 0,
                 child: Center(
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
@@ -169,10 +177,10 @@ class _MapaScreenState extends State<MapaScreen> {
                       border: Border.all(color: CeresColors.hairline),
                     ),
                     child: Text(
-                      _carregando ? 'Carregando eventos...' : 'Sem conexão — exibindo cache',
+                      'Sem conexão — exibindo cache',
                       style: GoogleFonts.ibmPlexMono(
                         fontSize: 10,
-                        color: _erro != null ? CeresColors.dryGrass : CeresColors.ink3,
+                        color: CeresColors.dryGrass,
                       ),
                     ),
                   ),
@@ -190,6 +198,49 @@ class _MapaScreenState extends State<MapaScreen> {
       )),
           ],
         ),
+      ),
+    );
+  }
+
+  /// Skeleton de carregamento sobre o mapa.
+  Widget _loadingSkeleton() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: CeresColors.paper.withValues(alpha: 0.92),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: CeresColors.hairline),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(children: [
+            SizedBox(
+              width: 14, height: 14,
+              child: CircularProgressIndicator(
+                strokeWidth: 1.5,
+                color: CeresColors.leafLive,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text('Carregando eventos…',
+                style: GoogleFonts.ibmPlexMono(fontSize: 10, color: CeresColors.ink3)),
+          ]),
+          const SizedBox(height: 10),
+          // Barras skeleton
+          for (var i = 0; i < 3; i++) ...[
+            Container(
+              height: 8,
+              margin: EdgeInsets.only(right: i * 30.0),
+              decoration: BoxDecoration(
+                color: CeresColors.dust2,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            const SizedBox(height: 6),
+          ],
+        ],
       ),
     );
   }

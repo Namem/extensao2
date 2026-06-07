@@ -16,6 +16,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import '../services/api_service.dart';
 import '../services/inference_local_service.dart';
 import '../services/modo_inferencia.dart';
+import '../services/sync_service.dart';
 import '../theme/ceres_theme.dart';
 import '../widgets/ceres_widgets.dart';
 import '../widgets/offline_banner.dart';
@@ -160,6 +161,19 @@ class _CameraScreenState extends State<CameraScreen> {
         modo: Value(foiLocal ? 'local' : 'cloud'),
       ));
       setState(() => _salvo = true);
+      // Snackbar de confirmação
+      if (mounted) {
+        final msg = foiLocal
+            ? 'Salvo offline — será sincronizado'
+            : 'Diagnóstico salvo ✓';
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(msg, style: GoogleFonts.ibmPlexSans(
+              fontSize: 13, color: CeresColors.paper)),
+          backgroundColor: foiLocal ? CeresColors.dryGrass : CeresColors.leafLive,
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        ));
+      }
     } catch (e) {
       setState(() => _erro = e.toString());
     } finally {
@@ -180,8 +194,7 @@ class _CameraScreenState extends State<CameraScreen> {
             CeresBrandBar(
               subtitle: 'Diagnóstico foliar',
               actions: [
-                CeresIconBtn(Icons.save_alt_outlined,
-                    onTap: () => Navigator.pushNamed(context, '/salvos')),
+                _salvosComBadge(),
                 CeresIconBtn(Icons.sync, onTap: _resultado == null ? null : _inferir),
               ],
             ),
@@ -195,6 +208,8 @@ class _CameraScreenState extends State<CameraScreen> {
                   if (_erro != null) _erroCard(),
                   if (_resultado != null) ...[
                     _resultCard(),
+                    const SizedBox(height: 6),
+                    _top3Card(),
                     const SizedBox(height: 6),
                     _sobreDoenca(),
                     const SizedBox(height: 6),
@@ -564,6 +579,102 @@ class _CameraScreenState extends State<CameraScreen> {
     );
   }
 
+  // ── Top 3 diagnósticos ─────────────────────────────────────────────────────
+  Widget _top3Card() {
+    final r = _resultado!;
+    final sorted = r.scores.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    final top3 = sorted.take(3).toList();
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(22, 4, 22, 0),
+      child: CeresPaperCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('DIAGNÓSTICOS MAIS PROVÁVEIS', style: CeresType.label),
+            const SizedBox(height: 8),
+            ...top3.asMap().entries.map((entry) {
+              final i = entry.key;
+              final e = entry.value;
+              final isTop = i == 0;
+              final cor = isTop
+                  ? CeresColors.statusColor(e.key, e.value)
+                  : CeresColors.ink3;
+              final pct = (e.value * 100).toStringAsFixed(1);
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  children: [
+                    // Posição (medalha)
+                    Container(
+                      width: 22, height: 22,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isTop ? cor.withValues(alpha: 0.12) : CeresColors.boneDeep,
+                        border: Border.all(
+                          color: isTop ? cor : CeresColors.hairline,
+                          width: isTop ? 1.5 : 0.8,
+                        ),
+                      ),
+                      child: Center(child: Text(
+                        '${i + 1}',
+                        style: CeresType.mono(TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w600,
+                          color: isTop ? cor : CeresColors.ink3,
+                        )),
+                      )),
+                    ),
+                    const SizedBox(width: 10),
+                    // Nome + barra
+                    Expanded(child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          ResultadoInferencia.rotuloDeClasse(e.key),
+                          style: CeresType.sans(TextStyle(
+                            fontSize: isTop ? 12 : 11,
+                            fontWeight: isTop ? FontWeight.w600 : FontWeight.w400,
+                            color: isTop ? CeresColors.ink : CeresColors.ink2,
+                          )),
+                        ),
+                        const SizedBox(height: 3),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(2),
+                          child: Container(
+                            height: isTop ? 4 : 3,
+                            color: CeresColors.dust2,
+                            child: FractionallySizedBox(
+                              alignment: Alignment.centerLeft,
+                              widthFactor: e.value.clamp(0.0, 1.0),
+                              child: Container(color: cor),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )),
+                    const SizedBox(width: 10),
+                    // Percentual
+                    Text(
+                      '$pct%',
+                      style: CeresType.mono(TextStyle(
+                        fontSize: isTop ? 13 : 10,
+                        fontWeight: isTop ? FontWeight.w600 : FontWeight.w400,
+                        color: isTop ? cor : CeresColors.ink3,
+                      )),
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+
   // ── Scores ─────────────────────────────────────────────────────────────────
   Widget _scores() {
     final r = _resultado!;
@@ -653,6 +764,41 @@ class _CameraScreenState extends State<CameraScreen> {
           label: const Text('Galeria'),
         )),
       ]),
+    );
+  }
+
+  /// Ícone de salvos com badge de pendentes de sync.
+  Widget _salvosComBadge() {
+    return ValueListenableBuilder<int>(
+      valueListenable: SyncService.instance.pendentes,
+      builder: (_, n, __) {
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            CeresIconBtn(Icons.save_alt_outlined,
+                onTap: () => Navigator.pushNamed(context, '/salvos')),
+            if (n > 0)
+              Positioned(
+                right: -2, top: -2,
+                child: Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: const BoxDecoration(
+                    color: CeresColors.dryGrass,
+                    shape: BoxShape.circle,
+                  ),
+                  constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                  child: Text(
+                    n > 9 ? '9+' : '$n',
+                    textAlign: TextAlign.center,
+                    style: CeresType.mono(const TextStyle(
+                        fontSize: 8, fontWeight: FontWeight.w600,
+                        color: CeresColors.paper)),
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 

@@ -136,6 +136,10 @@ class _PerfilScreenState extends State<PerfilScreen> {
           ]),
         ),
 
+        // ── Estatísticas ──────────────────────────────────────────────────
+        _secao('Estatísticas'),
+        _statsRow(perfil),
+
         // ── Notificações push ────────────────────────────────────────────
         _secao('Notificações push'),
         _toggleRow('Doença detectada pelo sensor',
@@ -195,6 +199,50 @@ class _PerfilScreenState extends State<PerfilScreen> {
         ]),
       ),
     );
+  }
+
+  // ── Estatísticas ──────────────────────────────────────────────────────────
+  Widget _statsRow(Map<String, dynamic>? perfil) {
+    final total = perfil?['total_diagnosticos'] as int? ?? 0;
+    final doencas = perfil?['total_doencas'] as int? ?? 0;
+    final saudaveis = perfil?['total_saudavel'] as int? ?? 0;
+    final membro = perfil?['membro_desde'] as String? ?? '—';
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: CeresColors.paper2,
+        border: Border.all(color: CeresColors.hairline),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          _statItem('Total', '$total', CeresColors.ink),
+          _statDivider(),
+          _statItem('Doenças', '$doencas', CeresColors.blight),
+          _statDivider(),
+          _statItem('Saudáveis', '$saudaveis', CeresColors.leafLive),
+          _statDivider(),
+          _statItem('Membro', membro, CeresColors.ink2),
+        ],
+      ),
+    );
+  }
+
+  Widget _statItem(String label, String value, Color cor) {
+    return Expanded(child: Column(
+      children: [
+        Text(value, style: CeresType.serif(TextStyle(
+            fontSize: 18, fontWeight: FontWeight.w500, color: cor))),
+        const SizedBox(height: 2),
+        Text(label.toUpperCase(), style: CeresType.mono(const TextStyle(
+            fontSize: 7.5, letterSpacing: 0.8, color: CeresColors.ink3))),
+      ],
+    ));
+  }
+
+  Widget _statDivider() {
+    return Container(width: 1, height: 30, color: CeresColors.hairline);
   }
 
   // ── Helpers de seção ────────────────────────────────────────────────────────

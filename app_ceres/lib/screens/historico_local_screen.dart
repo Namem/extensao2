@@ -203,22 +203,25 @@ class HistoricoLocalScreen extends StatelessWidget {
                             height: 1,
                           ),
                         ),
-                        if (baixaConfianca)
-                          Text(
-                            '⚠ baixa',
-                            style: GoogleFonts.ibmPlexMono(
-                              fontSize: 8,
-                              color: CeresColors.dryGrass,
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (baixaConfianca)
+                              Text('⚠ baixa',
+                                style: GoogleFonts.ibmPlexMono(
+                                  fontSize: 8, color: CeresColors.dryGrass))
+                            else
+                              Text('${d.latenciaMs} ms',
+                                style: GoogleFonts.ibmPlexMono(
+                                  fontSize: 8, color: CeresColors.ink3)),
+                            const SizedBox(width: 6),
+                            Icon(
+                              d.sincronizado ? Icons.cloud_done : Icons.cloud_upload_outlined,
+                              size: 12,
+                              color: d.sincronizado ? CeresColors.leafLive : CeresColors.dryGrass,
                             ),
-                          )
-                        else
-                          Text(
-                            '${d.latenciaMs} ms',
-                            style: GoogleFonts.ibmPlexMono(
-                              fontSize: 8,
-                              color: CeresColors.ink3,
-                            ),
-                          ),
+                          ],
+                        ),
                       ],
                     ),
                     children: [
