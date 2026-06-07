@@ -32,7 +32,7 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
   EventoMqtt? get _ultimoEvento =>
       _eventos.isNotEmpty ? _eventos.first : null;
 
-  // Último evento COM dados de sensor (para o card de status)
+  // Último evento COM dados de sensor (endpoint dedicado /sensor/)
   EventoMqtt? _cachedSensor;
   EventoMqtt? get _ultimoSensor => _cachedSensor;
 
@@ -50,9 +50,13 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
   void initState() {
     super.initState();
     _carregar();
-    // Auto-refresh a cada 30 s
+    _carregarSensor();
+    // Auto-refresh a cada 30 s (histórico + sensor)
     _timerRefresh = Timer.periodic(
-        const Duration(seconds: 30), (_) => _carregar(pagina: _paginaAtual));
+        const Duration(seconds: 30), (_) {
+      _carregar(pagina: _paginaAtual);
+      _carregarSensor();
+    });
     // Tick do relógio para recalcular status em tempo real
     _timerClock = Timer.periodic(
         const Duration(seconds: 5),
@@ -80,8 +84,8 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
         _total = data['count'] as int;
         _paginaAtual = pagina;
       });
-      // Busca o último evento com dados de sensor (pode estar em outra página)
-      await _buscarUltimoSensor(results, data['next'] != null);
+      // Busca último sensor via endpoint dedicado (independente do histórico)
+      _carregarSensor();
     } catch (e) {
       setState(() => _erro = e.toString());
     } finally {
@@ -89,31 +93,11 @@ class _HistoricoScreenState extends State<HistoricoScreen> {
     }
   }
 
-  /// Varre páginas até encontrar um evento com temperatura (sensor real).
-  Future<void> _buscarUltimoSensor(List<EventoMqtt> primeira, bool temMais) async {
-    // Tenta achar na página atual
-    for (final e in primeira) {
-      if (e.temperatura != null) {
-        if (mounted) setState(() => _cachedSensor = e);
-        return;
-      }
-    }
-    // Se não achou, busca nas próximas (máximo 5 páginas)
-    if (!temMais) return;
-    for (int p = 2; p <= 6; p++) {
-      try {
-        final data = await ApiService.instance.historico(page: p);
-        final results = data['results'] as List<EventoMqtt>;
-        for (final e in results) {
-          if (e.temperatura != null) {
-            if (mounted) setState(() => _cachedSensor = e);
-            return;
-          }
-        }
-        if (data['next'] == null) break;
-      } catch (_) {
-        break;
-      }
+  /// Busca a última leitura do ESP32 via GET /api/diagnostico/sensor/
+  Future<void> _carregarSensor() async {
+    final sensor = await ApiService.instance.ultimoSensor();
+    if (mounted && sensor != null) {
+      setState(() => _cachedSensor = sensor);
     }
   }
 

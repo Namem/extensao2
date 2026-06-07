@@ -26,6 +26,7 @@ class Config {
   static const String resetPasswordEndpoint = '$baseUrl/api/auth/reset-password/';
   static const String inferirEndpoint       = '$baseUrl/api/diagnostico/inferir/';
   static const String historicoEndpoint     = '$baseUrl/api/diagnostico/historico/';
+  static const String sensorEndpoint        = '$baseUrl/api/diagnostico/sensor/';
 
   // Limiar mínimo de confiança para exibir resultado como confiável
   static const double confiancaMinima = 0.40;

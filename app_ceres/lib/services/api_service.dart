@@ -203,4 +203,24 @@ class ApiService {
     }
     throw Exception('Histórico: ${resp.statusCode}');
   }
+
+  /// Busca a última leitura de sensor do ESP32 (endpoint dedicado).
+  /// Retorna null se não houver leitura disponível.
+  Future<EventoMqtt?> ultimoSensor() async {
+    try {
+      final uri = Uri.parse(Config.sensorEndpoint);
+      final resp = await http.get(uri, headers: await _authHeader())
+          .timeout(const Duration(seconds: 10));
+
+      if (resp.statusCode == 200) {
+        final data = jsonDecode(resp.body) as Map<String, dynamic>;
+        if (data['status'] == 'ok' && data['sensor'] != null) {
+          return EventoMqtt.fromJson(data['sensor'] as Map<String, dynamic>);
+        }
+      }
+    } catch (_) {
+      // Sensor indisponível — silencioso
+    }
+    return null;
+  }
 }

@@ -78,6 +78,36 @@ class HistoricoEventosView(APIView):
         return paginator.get_paginated_response(serializer.data)
 
 
+class UltimoSensorView(APIView):
+    """
+    GET /api/diagnostico/sensor/
+    Retorna a última leitura de sensor do ESP32 (temperatura, umidade, solo).
+
+    Sem filtro de usuário — dados do sensor são globais (IoT).
+    Usado pelo card STATUS DO SENSOR na tela IoT do Flutter.
+    """
+
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        evento = (
+            DiagnosticoEvento.objects
+            .filter(temperatura__isnull=False)
+            .order_by('-criado_em')
+            .first()
+        )
+        if evento is None:
+            return Response(
+                {'status': 'aguardando', 'mensagem': 'Nenhuma leitura de sensor disponível.'},
+                status=status.HTTP_200_OK,
+            )
+        serializer = DiagnosticoEventoSerializer(evento)
+        return Response({
+            'status': 'ok',
+            'sensor': serializer.data,
+        })
+
+
 class InferirImagemView(APIView):
     """
     POST /api/diagnostico/inferir/
