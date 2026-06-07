@@ -76,14 +76,15 @@ class Command(BaseCommand):
             vazios.delete()
             self.stdout.write(f'{n_vazios} eventos vazios removidos.')
 
-        # 2. Verificar se já tem dados suficientes
-        com_gps = DiagnosticoEvento.objects.filter(
+        # 2. Verificar se já tem dados completos (GPS + sensores)
+        completos = DiagnosticoEvento.objects.filter(
             latitude__isnull=False,
             classe_detectada__isnull=False,
+            temperatura__isnull=False,
         ).exclude(classe_detectada='').count()
 
-        if com_gps >= 15:
-            self.stdout.write(f'Banco já tem {com_gps} eventos com GPS — pulando seed.')
+        if completos >= 15:
+            self.stdout.write(f'Banco já tem {completos} eventos completos — pulando seed.')
             return
 
         # 3. Buscar usuário test (ou None)
