@@ -45,38 +45,59 @@ void conectarMqtt() {
 // Raw ADC 0-4095: seco=alto, molhado=baixo → inverte para %
 int lerUmidadeSolo() {
     int raw = analogRead(PIN_SOLO);
-    // Calibração básica: ar livre ~3400 (0%), submerso ~600 (100%)
     int pct = map(raw, 3400, 600, 0, 100);
     return constrain(pct, 0, 100);
 }
 
+// ── Leitura DHT22 com retry (WiFi IRQs corrompem timing one-wire) ────────────
+bool lerDHT22(float &temp, float &umid) {
+    for (int tentativa = 0; tentativa < DHT_MAX_RETRIES; tentativa++) {
+        if (tentativa > 0) delay(DHT_RETRY_DELAY_MS);
+
+        TempAndHumidity leitura = dht.getTempAndHumidity();
+        if (dht.getStatus() == DHTesp::ERROR_NONE) {
+            temp = leitura.temperature;
+            umid = leitura.humidity;
+            return true;
+        }
+        Serial.printf("DHT22 tentativa %d/%d: %s\n",
+                      tentativa + 1, DHT_MAX_RETRIES, dht.getStatusString());
+    }
+    return false;
+}
+
 // ── Publicação MQTT ───────────────────────────────────────────────────────────
 void publicarSensores() {
-    // Lê DHT22
-    TempAndHumidity leitura = dht.getTempAndHumidity();
+    float temp, umid;
+    bool dhtOk = lerDHT22(temp, umid);
 
-    if (dht.getStatus() != DHTesp::ERROR_NONE) {
-        Serial.printf("DHT22 erro: %s\n", dht.getStatusString());
-        return;
+    int umidade_solo = lerUmidadeSolo();
+
+    char payload[200];
+
+    if (dhtOk) {
+        Serial.printf("Temp: %.1f°C  Umid.Ar: %.1f%%  Umid.Solo: %d%%\n",
+                      temp, umid, umidade_solo);
+        snprintf(payload, sizeof(payload),
+            "{"
+            "\"device_id\":\"%s\","
+            "\"temperatura\":%.1f,"
+            "\"umidade_ar\":%.1f,"
+            "\"umidade_solo\":%d"
+            "}",
+            DEVICE_ID, temp, umid, umidade_solo
+        );
+    } else {
+        Serial.printf("Solo: %d%% (DHT22 falhou %d tentativas)\n",
+                      umidade_solo, DHT_MAX_RETRIES);
+        snprintf(payload, sizeof(payload),
+            "{"
+            "\"device_id\":\"%s\","
+            "\"umidade_solo\":%d"
+            "}",
+            DEVICE_ID, umidade_solo
+        );
     }
-
-    float temperatura  = leitura.temperature;
-    float umidade_ar   = leitura.humidity;
-    int   umidade_solo = lerUmidadeSolo();
-
-    Serial.printf("Temp: %.1f°C  Umid.Ar: %.1f%%  Umid.Solo: %d%%\n",
-                  temperatura, umidade_ar, umidade_solo);
-
-    char payload[160];
-    snprintf(payload, sizeof(payload),
-        "{"
-        "\"device_id\":\"%s\","
-        "\"temperatura\":%.1f,"
-        "\"umidade_ar\":%.1f,"
-        "\"umidade_solo\":%d"
-        "}",
-        DEVICE_ID, temperatura, umidade_ar, umidade_solo
-    );
 
     if (mqtt.publish(MQTT_TOPIC, payload)) {
         Serial.printf("Publicado em %s\n", MQTT_TOPIC);
@@ -90,18 +111,23 @@ void setup() {
     Serial.begin(115200);
     delay(1000);
 
-    // Inicializa DHT22 no pino IO4
+    // GPIO 4 (DHT22) e GPIO 5 (solo) estão ambos no ADC1 do ESP32-S3.
+    // Forçar GPIO 4 como digital ANTES do DHT para evitar que o ADC1
+    // peripheral deixe o pin mux em modo analógico.
+    pinMode(PIN_DHT22, INPUT_PULLUP);
+    delay(100);
+
     dht.setup(PIN_DHT22, DHTesp::DHT22);
     Serial.printf("DHT22 em IO%d  |  Solo ADC em IO%d\n", PIN_DHT22, PIN_SOLO);
 
-    // ADC 12 bits (0-4095)
+    // ADC só para o pino do solo — DEPOIS do DHT para não corromper pin mux
     analogReadResolution(12);
-    analogSetAttenuation(ADC_11db); // faixa 0-3.3V
+    analogSetPinAttenuation(PIN_SOLO, ADC_11db);
 
     conectarWifi();
 
     #ifdef MQTT_TLS
-    wifiClient.setInsecure(); // aceita qualquer cert — suficiente para HiveMQ Cloud
+    wifiClient.setInsecure();
     #endif
 
     mqtt.setServer(MQTT_BROKER, MQTT_PORT);

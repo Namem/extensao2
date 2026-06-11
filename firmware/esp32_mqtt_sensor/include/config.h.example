@@ -29,7 +29,11 @@
 
 // ── Sensores ──────────────────────────────────────────────────────────────────
 #define PIN_DHT22   4
-#define PIN_SOLO    34
+#define PIN_SOLO    5
+
+// ── DHT22 retry (checksum errors por interferencia WiFi IRQ) ─────────────────
+#define DHT_MAX_RETRIES    3
+#define DHT_RETRY_DELAY_MS 500
 
 // ── Intervalo de publicacao (ms) ──────────────────────────────────────────────
-#define PUBLISH_INTERVAL_MS 10000
+#define PUBLISH_INTERVAL_MS 30000
