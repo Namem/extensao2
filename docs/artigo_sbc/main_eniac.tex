@@ -124,6 +124,11 @@ e energia ($<$1~W) \cite{warden2019}. O TensorFlow Lite Micro (TFLite Micro) é 
 principal \textit{framework} para esse paradigma, executando modelos quantizados
 diretamente no firmware sem sistema operacional. A ausência de dependência de rede
 torna o TinyML adequado para ambientes rurais com conectividade instável.
+A opção por um microcontrolador (ESP32-S3, $\approx$R\$~80) em vez de um computador
+de placa única (Raspberry Pi~4, $\approx$R\$~400$+$) deve-se ao menor custo, à
+ausência de sistema operacional (menor superfície de ataque e \textit{boot}
+instantâneo) e ao consumo reduzido ($<$500~mW vs.\ $>$5~W), viabilizando o
+\textit{deploy} rural de baixo custo.
 
 \subsection{MobileNetV2 e Quantização INT8}
 
@@ -492,6 +497,11 @@ consistência entre \textit{datasets} ($+$16~pp no Tomato-Village: 11,52\%~$\to$
 \textbf{Gap geográfico:} EUA/Europa (30,43\%) $>$ Índia (27,65\%) $>$ Bangladesh
 (18,13\%), confirmando Barbedo~\cite{barbedo2019}: especificidade geográfica em
 função de variedades locais e condições tropicais.
+
+\textbf{Colapso de classe:} no Exp.~D avaliado no Tomato-Village, o modelo
+classificou D02\_septoriose para 73\% das folhas saudáveis indianas --- padrão de
+colapso sob \textit{shift} de domínio extremo, parcialmente mitigado no Exp.~E com
+Focal Loss.
 
 \subsection{Comparativo Edge, Mobile e Cloud}
 

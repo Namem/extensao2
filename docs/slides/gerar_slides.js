@@ -14,7 +14,7 @@ const VM2 = "40916C";   // verde médio 2
 const RD  = "B91C1C";   // vermelho
 const GN  = "166534";   // verde escuro positivo
 
-const TOTAL = 22;
+const TOTAL = 24;
 
 const makeShadow = () => ({
   type: "outer", blur: 5, offset: 2, angle: 135, color: "000000", opacity: 0.14
@@ -600,12 +600,72 @@ pres.title   = "Ceres Diagnóstico — PSI";
 }
 
 // ===========================================================================
-// SLIDE 20 — CONCLUSÃO E LIMITAÇÕES
+// SLIDE 20 — O SISTEMA EM FUNCIONAMENTO (app + hardware)
+// ===========================================================================
+{
+  const s = pres.addSlide();
+  headerBar(s, "O Sistema em Funcionamento");
+  slideNum(s, 20);
+
+  // App (print do celular)
+  s.addImage({ path: "app_iot.jpg", x: 0.5, y: 0.92, w: 1.85, h: 4.0 });
+  s.addText("App Flutter — tela IoT", { x: 0.35, y: 4.95, w: 2.15, h: 0.3, fontSize: 10.5, italic: true, color: "6B7280", align: "center" });
+
+  // Hardware (foto real)
+  s.addImage({ path: "hardware_setup.jpg", x: 2.7, y: 0.92, w: 2.25, h: 4.0 });
+  s.addText("ESP32-S3 + DHT22 + sensor de solo", { x: 2.55, y: 4.95, w: 2.55, h: 0.3, fontSize: 10.5, italic: true, color: "6B7280", align: "center" });
+
+  card(s, 5.35, 0.92, 4.4, 4.0, VM, VC, "O que está em produção");
+  s.addText([
+    { text: "App Flutter (Android)\n", options: { bold: true, color: VE, fontSize: 12.5 } },
+    { text: "Diagnóstico · Histórico IoT · Mapa · Enciclopédia · Perfil\n\n", options: { color: GT, fontSize: 12 } },
+    { text: "Sensoriamento em tempo real\n", options: { bold: true, color: VE, fontSize: 12.5 } },
+    { text: "ESP32-S3 publica temperatura, umidade do ar e do solo via MQTT (QoS 1). A tela mostra 29,5 °C · 49% · 34%, status ONLINE.\n\n", options: { color: GT, fontSize: 12 } },
+    { text: "Pipeline integrado\n", options: { bold: true, color: VE, fontSize: 12.5 } },
+    { text: "Backend Django persiste cada evento com GPS; o app sincroniza diagnósticos offline → online ao reconectar.", options: { color: GT, fontSize: 12 } }
+  ], { x: 5.55, y: 1.5, w: 4.05, h: 3.3, valign: "top" });
+}
+
+// ===========================================================================
+// SLIDE 21 — DEMONSTRAÇÃO (vídeo + QR)
+// ===========================================================================
+{
+  const s = pres.addSlide();
+  headerBar(s, "Demonstração e Recursos");
+  slideNum(s, 21);
+
+  // Vídeo embarcado (toca no PowerPoint)
+  s.addMedia({ type: "video", path: "demo_ceres.mp4", x: 0.55, y: 0.95, w: 2.55, h: 4.2 });
+  s.addText("▶  Vídeo demonstrativo", { x: 0.55, y: 5.0, w: 2.55, h: 0.3, fontSize: 10.5, italic: true, color: "6B7280", align: "center" });
+
+  card(s, 3.35, 0.95, 3.0, 4.2, VM, VC, "O que o vídeo mostra");
+  s.addText([
+    { text: "1. ", options: { bold: true, color: DO, fontSize: 12.5 } },
+    { text: "Captura da folha pela câmera do app\n\n", options: { color: GT, fontSize: 12 } },
+    { text: "2. ", options: { bold: true, color: DO, fontSize: 12.5 } },
+    { text: "Diagnóstico INT8 (Edge / Mobile / Cloud)\n\n", options: { color: GT, fontSize: 12 } },
+    { text: "3. ", options: { bold: true, color: DO, fontSize: 12.5 } },
+    { text: "Publicação via MQTT do ESP32-S3\n\n", options: { color: GT, fontSize: 12 } },
+    { text: "4. ", options: { bold: true, color: DO, fontSize: 12.5 } },
+    { text: "Histórico e mapa de eventos com GPS", options: { color: GT, fontSize: 12 } }
+  ], { x: 3.55, y: 1.55, w: 2.65, h: 3.5, valign: "top" });
+
+  // QR
+  s.addShape("rect", { x: 6.55, y: 0.95, w: 3.2, h: 4.2, fill: { color: BR }, line: { color: DO, pt: 1.5 }, rectRadius: 0.08, shadow: makeShadow() });
+  s.addImage({ path: "qrcode_drive.png", x: 6.85, y: 1.25, w: 2.6, h: 2.74 });
+  s.addText([
+    { text: "Baixe e teste\n", options: { bold: true, color: VE, fontSize: 13 } },
+    { text: "APK + imagens de teste\ngithub.com/Namem/extensao2", options: { color: GT, fontSize: 11.5 } }
+  ], { x: 6.65, y: 4.1, w: 3.0, h: 0.95, align: "center", valign: "top" });
+}
+
+// ===========================================================================
+// SLIDE 22 — CONCLUSÃO E LIMITAÇÕES
 // ===========================================================================
 {
   const s = pres.addSlide();
   headerBar(s, "Conclusão e Limitações");
-  slideNum(s, 20);
+  slideNum(s, 22);
   const colW = 4.6, colH = 4.52, colY = 0.8;
   const cols = [
     { x: 0.25, bg: "F0FFF4", border: VC, hbg: VM2, label: "✅  O que funcionou" },
@@ -643,7 +703,7 @@ pres.title   = "Ceres Diagnóstico — PSI";
 {
   const s = pres.addSlide();
   headerBar(s, "Trabalhos Futuros");
-  slideNum(s, 21);
+  slideNum(s, 23);
   const items = [
     { badge: "Sprint 2", txt: "Integração da câmera OV5640 + medição de latência real com sensor no ESP32-S3" },
     { badge: "Sprint 3", txt: "Coleta de dataset em lavouras de Sorriso-MT + validação com produtores rurais" },
