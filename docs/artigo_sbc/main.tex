@@ -5,6 +5,10 @@
 \usepackage[utf8]{inputenc}
 \usepackage[brazil]{babel}
 \usepackage{booktabs}
+\usepackage{placeins}
+\setlength{\textfloatsep}{8pt plus 2pt minus 4pt}
+\setlength{\floatsep}{8pt plus 2pt minus 4pt}
+\setlength{\intextsep}{8pt plus 2pt minus 4pt}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta}
 \newcommand{\circled}[1]{\textcircled{\raisebox{-0.5pt}{\small #1}}}
@@ -108,7 +112,7 @@ controlada). Singh et al.~\cite{singh2020} introduziram o PlantDoc
 sem adaptação de domínio. Neste trabalho utiliza-se o subconjunto de tomateiro
 (1.353~imagens) para validação independente. A remoção manual do fundo das imagens PlantDoc elevou a acurácia de
 29,73\% para 70,53\% ($+$40,8~pp) sem modificar o modelo~\cite{singh2020},
-confirmando que o modelo aprendeu o fundo como feature discriminativa, não as lesões.
+confirmando que o modelo aprendeu o fundo como \textit{feature} discriminativa, não as lesões.
 Xu et al.~\cite{xu2024} revisaram 42~trabalhos e quantificaram o gap em 29--58~pp,
 concluindo que a maioria dos modelos de doenças em plantas carece de validação
 em condições de campo. Barbedo~\cite{barbedo2019} documentou especificidade
@@ -123,10 +127,10 @@ Jacob et al.~\cite{jacob2018} demonstraram que a quantização INT8 sem
 \textit{representative\_dataset} causa degradação severa dos fatores de escala ---
 resultado reproduzido experimentalmente neste trabalho (Exp.~A: $-$30,5~pp).
 
-O Ceres Diagnóstico se diferencia por: (a)~validação em 3~datasets de campo
-independentes em três continentes; (b)~\textit{pipeline} IoT completo
-(MQTT + REST + Flutter); (c)~documentação de 5~experimentos com resultados negativos
-reprodutíveis.
+O Ceres Diagnóstico se diferencia por: (a)~validação em 3~\textit{datasets} de campo
+independentes em três continentes; (b)~\textit{pipeline} IoT completo, integrando
+MQTT, API REST (\textit{Representational State Transfer}) e Flutter;
+(c)~documentação de 5~experimentos com resultados negativos reprodutíveis.
 
 
 %% ----------------------------------------------------------------
@@ -270,7 +274,7 @@ tracejada marca a transição da Fase~1 (\textit{backbone} congelado) para a Fas
 \label{fig:treino}
 \end{figure}
 
-\textbf{Quantização INT8 calibrada:} 50~batches do val set como
+\textbf{Quantização INT8 calibrada:} 50~batches do \textit{val set} como
 \textit{representative\_dataset} \cite{jacob2018}. Sem calibração, a quantização
 degrada a acurácia em $-$30,5~pp (Exp.~A); com calibração, a perda residual cai para
 apenas 2,37~pp (98,13\% float $\to$ 95,76\% INT8 no \textit{test set}).
@@ -330,9 +334,10 @@ MQTT com QoS~1 (\textit{Quality of Service}, TLS) ao \textit{broker} HiveMQ Clou
 (porta~8883); \textit{broker} Mosquitto local utilizado apenas em desenvolvimento.
 O \textit{backend} Django persiste o evento em PostgreSQL e expõe o histórico via
 REST. O aplicativo Flutter captura a coordenada GPS (\textit{Global Positioning
-System}) do dispositivo antes de cada inferência e a inclui no POST de diagnóstico. Cache local gerenciado pelo
-Drift (SQLite) com \texttt{SyncService} que reenvia automaticamente diagnósticos
-pendentes ao restaurar conectividade (\textit{offline-first}).
+System}) do dispositivo antes de cada inferência e a inclui no POST de diagnóstico.
+O \textit{cache} local é gerenciado pelo Drift (SQLite) com \texttt{SyncService}, que
+reenvia automaticamente diagnósticos pendentes ao restaurar conectividade
+(\textit{offline-first}).
 
 \subsection{Justificativa das Tecnologias Principais}
 
@@ -372,7 +377,8 @@ e suporte nativo ao TFLite Micro \cite{warden2019}. O Raspberry Pi seria viável
 para modelos maiores (EfficientNet-B0), mas inviável para \textit{deploy} rural de baixo custo.
 
 \textbf{MQTT vs.\ HTTP:} O MQTT opera com header de apenas 2~bytes e suporta
-QoS~0/1/2, projetado para redes instáveis e MCUs com recursos limitados. O HTTP
+QoS~0/1/2, projetado para redes instáveis e microcontroladores (MCUs) com recursos
+limitados. O HTTP
 REST exige header de $\approx$800~bytes e não oferece QoS nativo --- inadequado
 para comunicação ESP32~→~servidor em ambiente rural \cite{oasis2019}.
 
@@ -403,11 +409,11 @@ Tamanho modelo    & 1.637~KB & 547~KB & ---    & \textbf{638~KB} \\
 A ausência de \textit{representative\_dataset} no Exp.~A causou queda de 30,5~pp
 (92,5\%~$\to$~62,0\%), confirmando Jacob et al.~\cite{jacob2018}. As classes mais
 afetadas foram D01\_requeima ($-$30,7~pp) e D03b\_mancha\_alvo ($-$28,6~pp) ---
-as com menos amostras no val set, evidenciando que a representatividade do
+as com menos amostras no \textit{val set}, evidenciando que a representatividade do
 \textit{dataset} de calibração determina diretamente a qualidade dos fatores de
 escala (scale e zero-point) por tensor.
 
-O Exp.~B, com calibração sobre 50~batches reais do val set, reduz a perda de
+O Exp.~B, com calibração sobre 50~batches reais do \textit{val set}, reduz a perda de
 quantização a apenas 2,37~pp: o modelo float atinge 98,13\% e o INT8 embarcado,
 95,76\% no \textit{test set} (Figura~\ref{fig:matriz}) --- ainda assim $+$33,8~pp
 acima do INT8 não-calibrado do Exp.~A (62,0\%). A calibração adequada, portanto,
@@ -423,13 +429,15 @@ semelhantes.}
 \label{fig:matriz}
 \end{figure}
 
+\FloatBarrier
 \subsection{Latência no ESP32-S3}
 
 A latência medida foi de \textbf{692~ms} (desvio padrão $\pm$1~ms, determinístico),
 com 10/10~imagens corretas no benchmark. A arena PSRAM ocupa 200~KB de 512~KB
-alocados (39\%), deixando margem para modelos maiores. A estimativa do Edge Impulse
-(1.365~ms) foi superada em 2$\times$, indicando que simuladores tendem a
-subestimar a eficiência real do Xtensa~LX7 em operações INT8.
+alocados (39\%), deixando margem para modelos maiores. A latência real (692~ms)
+ficou cerca de 2$\times$ abaixo da estimativa do Edge Impulse (1.365~ms), indicando
+que simuladores tendem a superestimar o tempo de inferência do Xtensa~LX7 em
+operações INT8.
 
 A meta de 300~ms não foi atingida. O fator limitante é a ausência de unidade SIMD
 (\textit{Single Instruction, Multiple Data}) INT8 dedicada no Xtensa~LX7 --- as
@@ -461,6 +469,10 @@ float no \textit{test set}; o INT8 embarcado do Exp.~B atinge 95,76\%
 \end{tabular}
 \end{table}
 
+Tomato-Village e Daffodil~BD foram avaliados apenas nos modelos finais (Exp.~D e~E),
+como teste adicional de generalização geográfica; os experimentos B e~C, anteriores,
+não foram reexecutados sobre eles --- daí as células~``---'' na Tabela~\ref{tab:gap}.
+
 \textbf{\textit{Background augmentation} sintética (Exp.~C):} Remoção de fundo com rembg
 U2-Net~\cite{qin2020} e recomposição sobre fundos PlantDoc não melhorou o
 desempenho de campo ($+$0~pp vs.\ Exp.~B). Artefatos de borda e inconsistências de
@@ -479,7 +491,7 @@ PlantDoc/train (repetidas 10$\times$) produziu ganho real de $+$10~pp
 \textbf{Focal Loss (Exp.~E):} Focal Loss ($\gamma=2$)~\cite{lin2017} melhorou
 consistência entre \textit{datasets} (+16~pp no Tomato-Village: 11,52\%~$\to$~27,65\%).
 O mecanismo é a redução de peso para exemplos fáceis (imagens laboratoriais com
-fundo cinza), forçando o modelo a focar nas features diagnósticas da lesão.
+fundo cinza), forçando o modelo a focar nas \textit{features} diagnósticas da lesão.
 
 \textbf{Gap geográfico:} A acurácia cai com a distância geográfica do PlantDoc:
 EUA/Europa (30,43\%) $>$ Índia (27,65\%) $>$ Bangladesh (18,13\%), confirmando
@@ -564,7 +576,7 @@ OV5640, e validação de usabilidade com produtores rurais.
 
 
 %% ----------------------------------------------------------------
-\section*{Agradecimentos}
+\section*{Uso de Inteligência Artificial Generativa}
 %% ----------------------------------------------------------------
 
 O autor declara que ferramentas de inteligência artificial generativa

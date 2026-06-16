@@ -5,6 +5,10 @@
 \usepackage[utf8]{inputenc}
 \usepackage[brazil]{babel}
 \usepackage{booktabs}
+\usepackage{placeins}
+\setlength{\textfloatsep}{8pt plus 2pt minus 4pt}
+\setlength{\floatsep}{8pt plus 2pt minus 4pt}
+\setlength{\intextsep}{8pt plus 2pt minus 4pt}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta}
 \newcommand{\circled}[1]{\textcircled{\raisebox{-0.5pt}{\small #1}}}
@@ -163,9 +167,9 @@ incompatível com classificação de folha.}
 O MQTT (\textit{Message Queuing Telemetry Transport}) \cite{oasis2019} é um
 protocolo de mensageria projetado para dispositivos com recursos limitados e redes
 instáveis. Opera com cabeçalho mínimo de 2~bytes e suporta três níveis de
-qualidade de serviço (QoS~0, 1 e~2), tornando-o superior ao HTTP REST (cabeçalho
-$\approx$800~bytes, sem QoS nativo) para comunicação ESP32~→~servidor em ambientes
-rurais.
+qualidade de serviço (QoS~0, 1 e~2), tornando-o superior ao HTTP REST
+(\textit{Representational State Transfer}; cabeçalho $\approx$800~bytes, sem QoS
+nativo) para comunicação ESP32~→~servidor em ambientes rurais.
 
 Estabelecidos esses fundamentos, a próxima seção posiciona o Ceres Diagnóstico
 frente aos trabalhos que aplicam tais técnicas à detecção de doenças em plantas.
@@ -330,7 +334,7 @@ tracejada marca a transição da Fase~1 (\textit{backbone} congelado) para a Fas
 \label{fig:treino}
 \end{figure}
 
-\textbf{Quantização INT8 calibrada:} 50~batches do val set como
+\textbf{Quantização INT8 calibrada:} 50~batches do \textit{val set} como
 \textit{representative\_dataset} \cite{jacob2018}. Sem calibração, a quantização
 degrada a acurácia em $-$30,5~pp (Exp.~A); com calibração, a perda residual cai
 para apenas 2,37~pp (98,13\% float $\to$ 95,76\% INT8 no \textit{test set}).
@@ -385,7 +389,7 @@ inferência. O \textit{cache} local é gerenciado pelo Drift (SQLite) com
 (\textit{offline-first}).
 
 A próxima seção apresenta os resultados obtidos com os cinco experimentos, a latência
-medida no ESP32-S3 e a análise do gap laboratório-campo nos três datasets de campo.
+medida no ESP32-S3 e a análise do gap laboratório-campo nos três \textit{datasets} de campo.
 
 
 %% ----------------------------------------------------------------
@@ -414,7 +418,7 @@ Tamanho modelo    & 1.637~KB & 547~KB & ---    & \textbf{638~KB} \\
 A ausência de \textit{representative\_dataset} no Exp.~A causou queda de 30,5~pp
 (92,5\%~$\to$~62,0\%), confirmando Jacob et al.~\cite{jacob2018}. As classes mais
 afetadas foram D01\_requeima ($-$30,7~pp) e D03b\_mancha\_alvo ($-$28,6~pp) ---
-as com menos amostras no val set, evidenciando que a representatividade do
+as com menos amostras no \textit{val set}, evidenciando que a representatividade do
 \textit{dataset} de calibração determina diretamente a qualidade dos fatores de
 escala por tensor.
 
@@ -434,6 +438,7 @@ semelhantes.}
 \label{fig:matriz}
 \end{figure}
 
+\FloatBarrier
 \subsection{Latência no ESP32-S3}
 
 A latência medida foi de \textbf{692~ms} ($\pm$1~ms, determinístico), com
@@ -464,6 +469,10 @@ float no \textit{test set}; o INT8 embarcado do Exp.~B atinge 95,76\%
 (Fig.~\ref{fig:matriz}). Colunas de campo: modelo INT8 (mesma quantização do ESP32-S3).}
 \end{tabular}
 \end{table}
+
+Tomato-Village e Daffodil~BD foram avaliados apenas nos modelos finais (Exp.~D e~E),
+como teste adicional de generalização geográfica; os experimentos B e~C, anteriores,
+não foram reexecutados sobre eles --- daí as células~``---'' na Tabela~\ref{tab:gap}.
 
 \textbf{Background augmentation sintética (Exp.~C):} remoção de fundo com
 U2-Net~\cite{qin2020} e recomposição sobre fundos do PlantDoc não melhorou o
@@ -562,7 +571,7 @@ Mato Grosso.
 
 
 %% ----------------------------------------------------------------
-\section*{Agradecimentos}
+\section*{Uso de Inteligência Artificial Generativa}
 %% ----------------------------------------------------------------
 
 O autor declara que ferramentas de inteligência artificial generativa
