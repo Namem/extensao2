@@ -1138,3 +1138,49 @@ Componentes:
 | saudavel | -15.5900, -56.0800 | Centro |
 
 Todos classificados corretamente (10/10) com confiança ~85.7%.
+
+---
+
+## 2026-06-16 — Artigos SBC (PSI + ENIAC): redação, figuras e auditoria de referências
+
+Produzidas e refinadas **duas versões** do artigo científico em `docs/artigo_sbc/`,
+ambas avaliadas contra a rubrica da orientadora (modo SBC) em **~98/100**:
+
+- `main.tex` — **versão PSI** (5 seções; Trabalhos Relacionados unificado; mais densa
+  em conteúdo — inclui "Colapso de classe" e "ESP32 vs. Raspberry Pi").
+- `main_eniac.tex` — **versão ENIAC** (6 seções; Referencial Teórico separado de
+  Trabalhos Relacionados; Considerações Finais + Trabalhos Futuros; `\keywords`).
+
+**Correção científica importante (float vs INT8):** identificado que os **98,13%**
+reportados até então eram do **modelo float (Keras)**, medido por `modelo.evaluate`
+em `export_tflite.py`. O **modelo INT8 efetivamente embarcado** (matriz de confusão,
+`matriz_confusao_int8.json`) atinge **95,76%** (2.618/2.734) no test set. Ou seja, a
+calibração não "elimina" o quantization loss — reduz a uma **perda residual de
+2,37 pp** (98,13% float → 95,76% INT8). Os artigos passaram a reportar os dois
+números separadamente; o ganho da calibração foi reescrito como **+34 pp** sobre o
+INT8 não-calibrado (62,0% → 95,76%), não +36 pp.
+
+**Figuras adicionadas aos artigos:**
+- `historico_treino.png` (curvas de treino Exp. B, transição Fase 1→2, ep. 46 97,90%).
+- `matriz_confusao_int8.png` (matriz INT8 95,76% — confusões pinta-preta/septoriose/requeima).
+- Tabela de recursos de hardware/software (GPU RTX 3060 Ti, Python/TF, Django/PG,
+  ESP32-S3, PlatformIO, Flutter, MQTT).
+
+**Auditoria das 18 referências (`referencias.bib`) — 2 erros corrigidos via busca:**
+- `singh2020` (PlantDoc): proceedings corrigido para *7th ACM IKDD CoDS and 25th COMAD*
+  (estava "8th/26th").
+- `girase2024` → **`gehlot2023`**: entrada inteira estava errada. Correto:
+  Gehlot, Saxena, Gandhi; *Multimedia Systems* 29:3305–3328, 2023;
+  DOI 10.1007/s00530-023-01158-y (estava "Girase et al., Data in Brief 2024").
+- As outras 16 confirmadas corretas (autores, páginas, DOIs).
+
+**Conformidade com a rubrica:** estrutura completa, tipo de pesquisa declarado,
+tabela de recursos, custo (R$~80, sem financiamento), siglas expandidas, termos em
+inglês em itálico, parágrafo de estrutura, lições aprendidas. Declaração de uso de IA
+em **seção dedicada** ("Uso de Inteligência Artificial Generativa", sem nomear a
+ferramenta — opção do autor; único item da rubrica em "N").
+
+**Pendência:** propagar a distinção float (98,13%) / INT8 (95,76%) para
+`TCC_CERES.md` e `FUNDAMENTACAO_TECNICA.md`, que ainda reportam "INT8 98,13%".
+
+**Próximo foco:** apresentação de 30 min (defesa do artigo) — detalhar slides.

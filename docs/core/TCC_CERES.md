@@ -1495,7 +1495,7 @@ FAO — Food and Agriculture Organization. *FAOSTAT — Production: Crops and li
 
 GANIN, Y. et al. Domain-Adversarial Training of Neural Networks. *Journal of Machine Learning Research*, v. 17, n. 59, p. 1-35, 2016.
 
-GIRASE, B. et al. Tomato-Village: A Dataset for Plant Disease Detection in Indian Agricultural Settings. *Data in Brief*, 2024.
+GEHLOT, M.; SAXENA, R. K.; GANDHI, G. C. Tomato-Village: A Dataset for End-to-End Tomato Disease Detection in a Real-World Environment. *Multimedia Systems*, v. 29, p. 3305-3328, 2023. DOI: 10.1007/s00530-023-01158-y.
 
 HIVEMQ. *HiveMQ Cloud — Fully managed MQTT broker*. Disponível em: https://www.hivemq.com/mqtt-cloud-broker/. Acesso em: jun. 2026.
 

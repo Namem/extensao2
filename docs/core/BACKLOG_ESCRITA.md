@@ -1,10 +1,29 @@
 # Backlog de Escrita — TCC e Artigo Científico
 **TCC Engenharia da Computação — IFMT Cuiabá**
 **Autor:** Namem Rachid Jaudy Neto
-**Última atualização:** 2026-04-23
+**Última atualização:** 2026-06-16
 
 > Backlog exclusivo da produção escrita do TCC e do artigo científico.
 > Para o produto (software + firmware), veja [BACKLOG.md](BACKLOG.md).
+
+---
+
+## Artigo Científico SBC — CONCLUÍDO (2026-06-16)
+
+Duas versões em `docs/artigo_sbc/`, ambas ~98/100 na rubrica da orientadora:
+
+- [x] **`main.tex` — versão PSI** (5 seções, conteúdo mais denso)
+- [x] **`main_eniac.tex` — versão ENIAC** (6 seções, Referencial Teórico separado + keywords)
+- [x] Estrutura completa (intro com lacuna+objetivo+estrutura, M&M com tabela de recursos/custo, resultados, conclusão com lições + trabalhos futuros)
+- [x] Abstract (EN) + Resumo (PT); ENIAC com `\keywords`/`\palavraschave`
+- [x] Figuras: arquitetura (TikZ), curvas de treino, matriz de confusão INT8
+- [x] Correção float (98,13%) vs INT8 embarcado (95,76%) propagada nos dois artigos
+- [x] Auditoria das 18 referências (`referencias.bib`) — 2 erros corrigidos (singh2020, gehlot2023)
+- [x] Declaração de uso de IA em seção dedicada
+- [ ] **Decidir evento-alvo** (PSI = disciplina; ENIAC = submissão a evento)
+- [ ] (opcional) Merge na ENIAC dos 2 trechos só do PSI (colapso de classe, ESP32 vs RPi)
+- [ ] **Apresentação de 30 min** (defesa) — detalhar slides `docs/slides/`
+- [ ] Propagar float/INT8 (98,13% / 95,76%) para `TCC_CERES.md` e `FUNDAMENTACAO_TECNICA.md`
 
 ---
 
