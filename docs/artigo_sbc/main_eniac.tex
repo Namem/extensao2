@@ -38,9 +38,10 @@ images) via two-phase transfer learning, is deployed across three inference
 architectures:
 ESP32-S3 edge (692~ms, offline), Android on-device via \texttt{tflite\_flutter}
 ($\approx$200--400~ms, offline), and Django REST API (306~ms, cloud). Five training
-experiments document the impact of INT8 calibration (+36~pp), synthetic background
-augmentation (ineffective), and real-data fine-tuning (+10~pp). The final model
-achieves 98.43\% on PlantVillage and 18--30\% on three independent field datasets,
+experiments document the impact of INT8 calibration (+34~pp over the uncalibrated
+model; 2.37~pp residual loss vs.\ float), synthetic background augmentation
+(ineffective), and real-data fine-tuning (+10~pp). The final model achieves 98.43\%
+(float) on PlantVillage and 18--30\% on three independent field datasets,
 quantifying the persistent lab-field gap.
 \end{abstract}
 
@@ -56,8 +57,9 @@ fases, é implantado em três arquiteturas de inferência: ESP32-S3 embarcado
 (692~ms, offline), on-device no
 Android via \texttt{tflite\_flutter} ($\approx$200--400~ms, offline) e API Django
 REST (306~ms, nuvem). Cinco experimentos documentam o impacto da calibração INT8
-(+36~pp), augmentation sintética (ineficaz) e fine-tuning real (+10~pp). O modelo
-final atinge 98,43\% no PlantVillage e 18--30\% em três datasets de campo,
+(+34~pp sobre o modelo não-calibrado; 2,37~pp de perda residual vs.\ float),
+augmentation sintética (ineficaz) e fine-tuning real (+10~pp). O modelo final atinge
+98,43\% (float) no PlantVillage e 18--30\% em três datasets de campo,
 quantificando o gap laboratório-campo.
 \end{resumo}
 
@@ -314,13 +316,25 @@ Dense(10, softmax).
 \textbf{Treinamento em duas fases:} Fase~1 (10~épocas, LR$=1\!\times\!10^{-3}$) ---
 backbone congelado, cabeça treinada; val\_acc estabiliza em 87,4\%.
 Fase~2 (40~épocas, LR$=5\!\times\!10^{-4}$) --- últimas 30~camadas descongeladas,
-EarlyStopping($p=8$) + ReduceLROnPlateau($f=0{,}5$). Melhor val\_acc: 97,79\%
-(época~28).
+EarlyStopping($p=8$) + ReduceLROnPlateau($f=0{,}5$). A melhor acurácia de validação
+(97,90\%) ocorre na época~46, como ilustra a Figura~\ref{fig:treino}.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.92\textwidth]{historico_treino.png}
+\caption{Curvas de treinamento do Exp.~B (MobileNetV2 96$\times$96). A linha vertical
+tracejada marca a transição da Fase~1 (\textit{backbone} congelado) para a Fase~2
+(\textit{fine-tuning} das últimas 30~camadas). A melhor acurácia de validação
+(97,90\%, época~46) corresponde a 98,13\% no \textit{test set} para o modelo float.}
+\label{fig:treino}
+\end{figure}
 
 \textbf{Quantização INT8 calibrada:} 50~batches do val set como
-\textit{representative\_dataset} \cite{jacob2018}, eliminando o quantization loss
-observado sem calibração ($-$30,5~pp). \textbf{Pós-processamento:} temperature
-scaling ($T=0{,}25$) nos logits antes do softmax em todos os caminhos de inferência.
+\textit{representative\_dataset} \cite{jacob2018}. Sem calibração, a quantização
+degrada a acurácia em $-$30,5~pp (Exp.~A); com calibração, a perda residual cai
+para apenas 2,37~pp (98,13\% float $\to$ 95,76\% INT8 no \textit{test set}).
+\textbf{Pós-processamento:} temperature scaling ($T=0{,}25$) nos logits antes do
+softmax em todos os caminhos de inferência.
 
 \subsection{Dataset}
 
@@ -381,16 +395,17 @@ medida no ESP32-S3 e a análise do gap laboratório-campo nos três datasets de 
 
 \begin{table}[ht]
 \centering
-\caption{Comparativo Exp.~A (Edge Impulse) vs.\ Exp.~B (TensorFlow local).}
+\caption{Comparativo Exp.~A (Edge Impulse) vs.\ Exp.~B (TensorFlow local).
+O modelo efetivamente embarcado no ESP32-S3 é o INT8.}
 \label{tab:ab}
-\begin{tabular}{@{}lrrr@{}}
+\begin{tabular}{@{}lrrrr@{}}
 \toprule
-\textbf{Métrica} & \textbf{Exp.~A FP32} & \textbf{Exp.~A INT8} & \textbf{Exp.~B INT8} \\
+\textbf{Métrica} & \textbf{Exp.~A FP32} & \textbf{Exp.~A INT8} & \textbf{Exp.~B float} & \textbf{Exp.~B INT8} \\
 \midrule
-Acurácia val set  & 92,5\% & 62,0\% & 97,79\% \\
-Acurácia test set & ---    & ---    & \textbf{98,13\%} \\
-Macro F1          & 0,92   & 0,62   & 0,977 \\
-Tamanho modelo    & 1.637~KB & 547~KB & \textbf{639~KB} \\
+Acurácia val set  & 92,5\% & 62,0\% & 97,90\% & --- \\
+Acurácia test set & ---    & ---    & 98,13\% & \textbf{95,76\%} \\
+Macro F1          & 0,92   & 0,62   & 0,977   & --- \\
+Tamanho modelo    & 1.637~KB & 547~KB & ---    & \textbf{639~KB} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -402,8 +417,21 @@ as com menos amostras no val set, evidenciando que a representatividade do
 \textit{dataset} de calibração determina diretamente a qualidade dos fatores de
 escala por tensor.
 
-O Exp.~B, com calibração sobre 50~batches reais, eliminou o quantization loss:
-INT8 (98,13\%) superou o FP32 do Exp.~A (92,5\%) em 5,6~pp.
+O Exp.~B, com calibração sobre 50~batches reais, reduz a perda de quantização a
+apenas 2,37~pp: o modelo float atinge 98,13\% e o INT8 embarcado, 95,76\% no
+\textit{test set} --- ainda assim $+$33,8~pp acima do INT8 não-calibrado do Exp.~A
+(62,0\%). A Figura~\ref{fig:matriz} detalha os acertos e as confusões por classe do
+modelo INT8.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.78\textwidth]{matriz_confusao_int8.png}
+\caption{Matriz de confusão do modelo INT8 ($T=0{,}25$) no \textit{test set} do
+PlantVillage (2.734~imagens, acurácia 95,76\%). As maiores confusões ocorrem entre
+pinta-preta, septoriose e requeima --- doenças com lesões necróticas visualmente
+semelhantes.}
+\label{fig:matriz}
+\end{figure}
 
 \subsection{Latência no ESP32-S3}
 
@@ -430,6 +458,9 @@ C -- aug.\ sintét.   & 96,20\% & 20,24\% & ---              & --- \\
 D -- fine-tun.\ real & 97,55\% & \textbf{30,43\%} & 11,52\% & --- \\
 E -- Focal Loss      & \textbf{98,43\%} & 30,43\% & \textbf{27,65\%} & \textbf{18,13\%} \\
 \bottomrule
+\multicolumn{5}{p{0.95\linewidth}}{\footnotesize Coluna lab: acurácia do modelo
+float no \textit{test set}; o INT8 embarcado do Exp.~B atinge 95,76\%
+(Fig.~\ref{fig:matriz}). Colunas de campo: modelo INT8 (mesma quantização do ESP32-S3).}
 \end{tabular}
 \end{table}
 
@@ -489,8 +520,9 @@ determinística. As principais contribuições são:
   \item \textbf{Pipeline reproduzível:} PlantVillage $\to$ 88.949~imgs $\to$
         MobileNetV2 INT8 $\to$ ESP32-S3, código aberto
         (\url{https://github.com/Namem/extensao2}).
-  \item \textbf{Quantificação da calibração INT8:} $+$36~pp com
-        \textit{representative\_dataset} vs.\ quantização automática.
+  \item \textbf{Quantificação da calibração INT8:} $+$34~pp com
+        \textit{representative\_dataset} (62,0\%~$\to$~95,76\%) vs.\ quantização
+        automática, com perda residual de apenas 2,37~pp frente ao modelo float.
   \item \textbf{Benchmark em 3 \textit{datasets} de campo:} documentação do gap
         lab-campo (98,43\%~$\to$~18--30\%) e sua natureza geográfica.
   \item \textbf{Resultado negativo reprodutível:} \textit{augmentation} sintética

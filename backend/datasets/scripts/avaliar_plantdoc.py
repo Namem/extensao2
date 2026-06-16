@@ -3,7 +3,9 @@ Avalia o modelo ceres_mobilenetv2_int8.tflite no dataset PlantDoc.
 Valida a generalização do modelo para imagens de campo real.
 
 Uso:
-    python avaliar_plantdoc.py                   # sem remoção de fundo
+    python avaliar_plantdoc.py                   # train + test (acurácia geral)
+    python avaliar_plantdoc.py --test-only       # apenas test split (métrica justa pós Exp D)
+    python avaliar_plantdoc.py --report          # + F1, precision, recall por classe
     python avaliar_plantdoc.py --remover-fundo   # Opção A: rembg antes de inferir
 
 Saída:
@@ -16,6 +18,11 @@ import tensorflow as tf
 from pathlib import Path
 from datetime import datetime
 from PIL import Image
+try:
+    from sklearn.metrics import classification_report, f1_score
+    SKLEARN_OK = True
+except ImportError:
+    SKLEARN_OK = False
 
 # ---------------------------------------------------------------------------
 # Argumentos
@@ -26,9 +33,15 @@ _parser.add_argument("--remover-fundo", action="store_true",
     help="Aplica rembg para remover fundo antes de inferir (Opção A diagnóstico).")
 _parser.add_argument("--modelo", type=str, default=None,
     help="Caminho alternativo para o .tflite. Ex: --modelo ceres_expe_int8.tflite")
+_parser.add_argument("--test-only", action="store_true",
+    help="Avalia apenas o split test/ (métrica justa após fine-tuning com train/).")
+_parser.add_argument("--report", action="store_true",
+    help="Exibe e salva F1, precision e recall por classe (sklearn).")
 _args, _ = _parser.parse_known_args()
 
 REMOVER_FUNDO = _args.remover_fundo
+TEST_ONLY     = _args.test_only
+REPORT        = _args.report
 
 if REMOVER_FUNDO:
     try:
@@ -45,9 +58,9 @@ BASE_DIR    = Path(__file__).resolve().parents[2]
 _modelo_nome = _args.modelo if _args.modelo else "ceres_mobilenetv2_int8.tflite"
 MODELO_PATH = BASE_DIR / "datasets" / "modelo" / _modelo_nome
 PLANTDOC    = BASE_DIR / "datasets" / "raw" / "plantdoc"
-# Avalia train + test para comparação justa com avaliação original (1353 imgs)
-PLANTDOC_SPLITS = ["train", "test"]
-# Nota: para Exp D (treinou com PlantDoc/train), use ["test"] para métrica justa (69 imgs)
+# --test-only: apenas test split (métrica justa pós fine-tuning Exp D/E)
+# default: train + test (reproduz avaliação original Exp B — 1353 imgs)
+PLANTDOC_SPLITS = ["test"] if TEST_ONLY else ["train", "test"]
 # Arquivo de saída separado por modo para preservar ambos os resultados
 _sufixo     = "_opcao_a" if REMOVER_FUNDO else ""
 RESULTADO   = BASE_DIR.parent / "docs" / "resultados" / f"plantdoc_results{_sufixo}.md"
@@ -137,6 +150,7 @@ print(f"\nAvaliando imagens em: {PLANTDOC} (splits: {PLANTDOC_SPLITS})")
 
 resultados = {}   # classe_ceres → {"corretas": int, "total": int}
 erros_global = 0
+y_true, y_pred = [], []   # para classification_report
 
 for pasta_plantdoc, classe_ceres in MAPA_CLASSES.items():
     imagens = []
@@ -153,6 +167,8 @@ for pasta_plantdoc, classe_ceres in MAPA_CLASSES.items():
     for img_path in imagens:
         try:
             pred = inferir(img_path)
+            y_true.append(classe_ceres)
+            y_pred.append(pred)
             if pred == classe_ceres:
                 corretas += 1
         except Exception as e:
@@ -201,3 +217,33 @@ with open(RESULTADO, "w", encoding="utf-8") as f:
     f.write("`[Preencher apos ver os resultados]`\n")
 
 print(f"\nResultado salvo em: {RESULTADO}")
+
+# ---------------------------------------------------------------------------
+# classification_report (--report)
+# ---------------------------------------------------------------------------
+
+if REPORT:
+    if not SKLEARN_OK:
+        print("\n[AVISO] sklearn não instalado. Execute: pip install scikit-learn")
+    elif y_true:
+        classes_presentes = sorted(set(y_true))
+        report = classification_report(
+            y_true, y_pred,
+            labels=classes_presentes,
+            target_names=classes_presentes,
+            digits=3,
+            zero_division=0,
+        )
+        print("\n" + "="*60)
+        print("CLASSIFICATION REPORT (F1 por classe)")
+        print("="*60)
+        print(report)
+
+        # Salvar também em arquivo
+        report_path = RESULTADO.parent / "plantdoc_f1_report.txt"
+        with open(report_path, "w", encoding="utf-8") as f:
+            f.write(f"Modelo: {_modelo_nome}\n")
+            f.write(f"Splits: {PLANTDOC_SPLITS}\n")
+            f.write(f"Data: {datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n")
+            f.write(report)
+        print(f"F1 report salvo em: {report_path}")

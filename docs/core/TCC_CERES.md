@@ -90,13 +90,31 @@ Django REST, Flutter, precision agriculture.
 
 ## LISTA DE FIGURAS
 
-`[PENDENTE: gerada ao final do projeto]`
+| Nº | Descrição | Seção |
+|----|-----------|-------|
+| Figura 3.1 | Arquitetura geral do sistema Ceres Diagnóstico (ESP32-S3 → MQTT → Django REST → Flutter) | 3.1 |
+| Figura 5.1 | Curvas de treinamento MobileNetV2 96×96 INT8 — Experimento B (50 épocas) | 5.2 |
 
 ---
 
 ## LISTA DE TABELAS
 
-`[PENDENTE: gerada ao final do projeto]`
+| Nº | Descrição | Seção |
+|----|-----------|-------|
+| Tabela 3.1 | Composição do dataset PlantVillage após pré-processamento e augmentation offline | 3.2 |
+| Tabela 3.2 | Mapeamento de classes PlantVillage → Ceres (10 classes) | 3.2 |
+| Tabela 5.1 | Configuração dos experimentos — Edge Impulse (Exp A) vs TensorFlow Local (Exp B) | 5.1 |
+| Tabela 5.2 | Resultados comparativos Exp A FP32 / Exp A INT8 / Exp B INT8 | 5.1 |
+| Tabela 5.3 | Acurácia por classe — Experimento B (PlantVillage test set, 2.734 imagens) | 5.2 |
+| Tabela 5.4 | Latência de inferência no ESP32-S3 N16R8 (240 MHz) — Experimento E | 5.3 |
+| Tabela 5.5 | Comparativo de latência com trabalhos relacionados | 5.3 |
+| Tabela 5.6 | Validação PlantDoc por classe — Experimento B (linha de base) | 5.4 |
+| Tabela 5.7 | Comparativo dos Experimentos C, D e E (augmentation e Focal Loss) | 5.4 |
+| Tabela 5.8 | Validação Tomato-Village — Experimento E (217 imagens, Rajastão, Índia) | 5.4 |
+| Tabela 5.9 | Validação Daffodil BD — Experimento E (1.616 imagens, Bangladesh) | 5.4 |
+| Tabela 5.10 | Edge vs Cloud — comparativo de latência e características | 5.5 |
+| Tabela 6.1 | Resultados finais do modelo Exp E vs metas da hipótese | 6.1 |
+| Tabela 6.2 | Validação de campo em 3 datasets independentes (PlantDoc, Tomato-Village, Daffodil BD) | 6.1 |
 
 ---
 
@@ -895,7 +913,7 @@ para produtores rurais sem internet estável em Sorriso-MT.
 | Recall ponderado | 0,92 | 0,62 | — |
 | Tamanho .tflite | 1.637 KB | 547 KB | **639 KB** |
 | RAM pico inferencia | 441,8 KB | 232,9 KB | — |
-| Latencia ESP32-S3 (estimada) | 4.322 ms | 1.365 ms | [Sprint 2] |
+| Latencia ESP32-S3 (estimada) | 4.322 ms | 1.365 ms | **692 ms** |
 
 #### Analise e Discussao
 
