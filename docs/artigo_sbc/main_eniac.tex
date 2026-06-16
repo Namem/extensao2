@@ -13,7 +13,7 @@
 
 \sloppy
 
-\title{Ceres Diagnóstico: Sistema TinyML Embarcado para Detecção de\\
+\title{Ceres Diagnóstico: Sistema TinyML Embarcado para Detecção de
 Doenças em Tomateiro com Validação Lab-Campo em Três Datasets}
 
 %% VERSÃO BLIND — descomentar para submissão com revisão cega
@@ -43,10 +43,10 @@ model; 2.37~pp residual loss vs.\ float), synthetic background augmentation
 (ineffective), and real-data fine-tuning (+10~pp). The final model achieves 98.43\%
 (float) on PlantVillage and 18--30\% on three independent field datasets,
 quantifying the persistent lab-field gap.
-\end{abstract}
 
-\keywords{TinyML, MobileNetV2, ESP32-S3, Detecção de Doenças em Plantas,
-Aprendizado de Máquina Embarcado, Gap Laboratório-Campo}
+\vspace{0.5em}\noindent\textbf{Keywords:} TinyML, MobileNetV2, ESP32-S3, plant
+disease detection, embedded machine learning, lab--field gap.
+\end{abstract}
 
 \begin{resumo}
 Este artigo apresenta o Ceres Diagnóstico, sistema embarcado de baixo custo para
@@ -61,10 +61,11 @@ REST (306~ms, nuvem). Cinco experimentos documentam o impacto da calibração IN
 augmentation sintética (ineficaz) e fine-tuning real (+10~pp). O modelo final atinge
 98,43\% (float) no PlantVillage e 18--30\% em três datasets de campo,
 quantificando o gap laboratório-campo.
-\end{resumo}
 
-\palavraschave{TinyML, MobileNetV2, ESP32-S3, Detecção de Doenças em Plantas,
-Aprendizado de Máquina Embarcado, Gap Laboratório-Campo}
+\vspace{0.5em}\noindent\textbf{Palavras-chave:} TinyML, MobileNetV2, ESP32-S3,
+detecção de doenças em plantas, aprendizado de máquina embarcado, gap
+laboratório-campo.
+\end{resumo}
 
 
 %% ----------------------------------------------------------------
@@ -345,7 +346,7 @@ Resultado: 88.949~imagens de treino.
 
 \textbf{Datasets de campo real} (validação independente):
 PlantDoc \cite{singh2020} --- 1.353~imagens (EUA/Europa);
-Tomato-Village \cite{girase2024} --- 217~imagens (Rajastão, Índia);
+Tomato-Village \cite{gehlot2023} --- 217~imagens (Rajastão, Índia);
 Daffodil~BD~\cite{daffodilbd2024} --- 1.616~imagens (Bangladesh).
 
 \subsection{Experimentos}
@@ -405,7 +406,7 @@ O modelo efetivamente embarcado no ESP32-S3 é o INT8.}
 Acurácia val set  & 92,5\% & 62,0\% & 97,90\% & --- \\
 Acurácia test set & ---    & ---    & 98,13\% & \textbf{95,76\%} \\
 Macro F1          & 0,92   & 0,62   & 0,977   & --- \\
-Tamanho modelo    & 1.637~KB & 547~KB & ---    & \textbf{639~KB} \\
+Tamanho modelo    & 1.637~KB & 547~KB & ---    & \textbf{638~KB} \\
 \bottomrule
 \end{tabular}
 \end{table}
