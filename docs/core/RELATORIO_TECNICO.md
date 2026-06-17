@@ -2,7 +2,7 @@
 **TCC Engenharia da Computação — IFMT Cuiabá**
 **Autor:** Namem Rachid Jaudy Neto
 **Orientador:** (a preencher)
-**Última atualização:** 2026-06-06
+**Última atualização:** 2026-06-17
 
 > Este documento registra cronologicamente tudo que foi implementado,
 > as decisões tomadas, os resultados obtidos e os problemas resolvidos.
@@ -27,6 +27,58 @@ git push  →  GitHub  →  git pull
 ```
 O `CLAUDE.md` garante que o Claude Code recupere o contexto do projeto
 automaticamente em qualquer máquina ao abrir o projeto.
+
+---
+
+## PSI — Disciplina de Projeto de Sistemas de Informação ✅ CONCLUÍDA
+
+**Período:** 2026-06-17  
+**Descrição:** Entrega final da disciplina PSI — artigo científico, slides de defesa e roteiros.
+
+### Artigo
+
+| Item | Arquivo | Detalhe |
+|---|---|---|
+| Versão Markdown | `docs/artigo/artigo_ceres_psi.md` | Completa com nome e IFMT |
+| Versão LaTeX blind | `docs/artigo/main_blind.tex` | Para submissão em conferência |
+| Versão LaTeX PSI | `docs/PSI/artigo/main_psi.tex` | Desanonimizada para o professor |
+
+Mudanças de desanonimização: `[Autor Omitido]` → Namem Rachid Jaudy Neto; `[Instituição Omitida]` → IFMT Cuiabá; URL anonymous.4open.science → github.com/Namem/extensao2.
+
+### Slides (23 slides, 30 min)
+
+Apresentação final preenchida com preencher_slides.py:
+- Slide 7: 10 fotos de classes embutidas (cls_01…cls_10)
+- Slide 9: XML copiado do template original (quantização)
+- Slide 10: matriz_confusao_int8.png embutida
+- Slide 19: app_iot.jpg + hardware_setup.jpg
+- Slide 20: demo_ceres_1.5x.mp4 (11 MB) com click-to-play via zipfile+lxml
+
+Técnicas usadas para embutir vídeo: `<p:pic>` com extensões `a14:media`/`p14:media`, thumbnail PNG preto 640×360, `<p:timing>` com `<p:video>/<p:cMediaNode spid="201">`.
+
+### Roteiros
+
+| Arquivo | Conteúdo |
+|---|---|
+| `roteiro_apresentacao.pdf` | Compacto (23 blocos, tags fala/enfase/alerta/ok/transição) |
+| `roteiro_expandido.pdf` | Rico — caixas amarelas "Para estudar" por slide + FAQ com 12 perguntas |
+
+### Reorganização docs/
+
+Nova estrutura hierárquica:
+```
+docs/
+  PSI/        ← entregas PSI
+  artigo/     ← fonte do artigo (era artigo_sbc/)
+  TCC/        ← docx + gerador (era raiz docs/)
+  sprints/    ← sprint_2/ (era apresentacoes/)
+  core/       ← docs internas (inalterado)
+  resultados/ ← resultados (inalterado)
+  slides_psi/ ← scripts + assets (era slides/)
+  README.md   ← índice criado
+```
+
+`.gitignore` atualizado: `.claude/` ignorado completamente; `!docs/PSI/slides/*.pptx` permite commitar a apresentação final.
 
 ---
 

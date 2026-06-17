@@ -1,7 +1,7 @@
 # Backlog do Produto — Ceres Diagnóstico
 **TCC Engenharia da Computação — IFMT Cuiabá**
 **Autor:** Namem Rachid Jaudy Neto
-**Última atualização:** 2026-06-06
+**Última atualização:** 2026-06-17
 
 > Backlog exclusivo do produto (software + firmware + hardware).
 > Para escrita do TCC e artigo científico, veja [BACKLOG_ESCRITA.md](BACKLOG_ESCRITA.md).
@@ -430,6 +430,46 @@ sincronização offline para diagnósticos feitos sem internet.
 
 ---
 
+## PSI — Disciplina de Projeto de Sistemas de Informação ✅ CONCLUÍDA (2026-06-17)
+
+### Artigo Científico ✅
+- [x] `docs/artigo/artigo_ceres_psi.md` — versão Markdown completa com nome e instituição
+- [x] `docs/artigo/main_blind.tex` — versão LaTeX blind para submissão (anteriormente `main_eniac_anonimo.tex`)
+- [x] `docs/PSI/artigo/main_psi.tex` — versão LaTeX **desanonimizada** para entrega PSI
+  - Autor: Namem Rachid Jaudy Neto
+  - Instituição: IFMT, Cuiabá — MT
+  - URL GitHub real: github.com/Namem/extensao2 (era anonymous.4open.science)
+- [x] `docs/PSI/artigo/` — assets completos para Overleaf (referencias.bib, sbc-template.sty, sbc.bst, imagens)
+
+### Slides de Defesa ✅
+- [x] `docs/PSI/slides/Ceres_Diagnostico_Defesa_PSI.pptx` — apresentação final 23 slides
+  - Slide 7: 10 fotos de classes embutidas
+  - Slide 9: slide de quantização copiado do template original
+  - Slide 10: matriz de confusão INT8 embutida
+  - Slide 19: app_iot.jpg + hardware_setup.jpg
+  - Slide 20: demo_ceres_1.5x.mp4 embutido com click-to-play
+- [x] `docs/slides_psi/scripts/preencher_slides.py` — script de preenchimento do PPTX
+- [x] `docs/slides_psi/scripts/gerar_roteiro.py` — gera roteiro compacto PDF (23 slides)
+
+### Roteiros ✅
+- [x] `docs/PSI/roteiros/roteiro_apresentacao.pdf` — roteiro compacto (slide-a-slide, 30 min)
+- [x] `docs/PSI/roteiros/roteiro_expandido.pdf` — roteiro rico para estudo
+  - Caixas amarelas "Para estudar / caso perguntem" em cada slide
+  - Experimentos explicados em linguagem não-técnica
+  - FAQ expandido (12 perguntas antecipadas com respostas completas)
+- [x] `docs/slides_psi/scripts/gerar_roteiro_expandido.py` — gerador do roteiro expandido
+
+### Organização docs/ ✅
+- [x] `docs/README.md` criado — índice completo da pasta docs
+- [x] `docs/artigo/` — criada (era `artigo_sbc/`, renomeada)
+- [x] `docs/TCC/` — criada; `TCC_CERES.docx` e `gerar_tcc_docx.js` movidos para cá
+- [x] `docs/sprints/sprint_2/` — criada (era `apresentacoes/`, reorganizada com subpastas)
+- [x] `docs/slides_psi/` — criada (era `slides/`, reorganizada em scripts/ + assets/)
+- [x] `docs/assets/` — removida (arquivo duplicado)
+- [x] `.gitignore` — `.claude/` ignorado completamente; exceção `!docs/PSI/slides/*.pptx`
+
+---
+
 ## Sprint 6 — TCC Final + Defesa ⏳ PENDENTE
 
 - [ ] `docs/core/TCC_CERES.md` — preencher todas as seções [PENDENTE]
@@ -458,5 +498,6 @@ sincronização offline para diagnósticos feitos sem internet.
 | Sprint 5 | Perfil + Backend Usuário | ✅ Concluída | 8/8 |
 | Sprint 3.7 | Design Refresh + Novas Telas + MQTT Cloud | ✅ Concluída | 27/27 |
 | Sprint 5B | Robustez Backend + Sync Offline | ✅ Concluída | 18/18 |
+| PSI | Artigo + Slides + Roteiros + docs/ | ✅ Concluída | 15/15 |
 | Sprint 6 | TCC Final + Defesa | ⏳ Pendente | 0/7 |
 | Fase Futura | RPi3B+ + EfficientNet (Exp F) | 📋 Registrado | — |
