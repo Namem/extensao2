@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="utf-8"?>
+<p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
+  <p:cSld name="Slide Conclusao">
+    <p:bg>
+      <p:bgPr>
+        <a:solidFill>
+          <a:srgbClr val="1A3A1A"/>
+        </a:solidFill>
+      </p:bgPr>
+    </p:bg>
+    <p:spTree>
+      <p:nvGrpSpPr>
+        <p:cNvPr id="1" name=""/>
+        <p:cNvGrpSpPr/>
+        <p:nvPr/>
+      </p:nvGrpSpPr>
+      <p:grpSpPr>
+        <a:xfrm>
+          <a:off x="0" y="0"/>
+          <a:ext cx="0" cy="0"/>
+          <a:chOff x="0" y="0"/>
+          <a:chExt cx="0" cy="0"/>
+        </a:xfrm>
+      </p:grpSpPr>
+      <!-- Top gold bar -->
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="2" name="TopBar"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="0" y="0"/>
+            <a:ext cx="9144000" cy="73152"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
+          <a:solidFill><a:srgbClr val="C8860A"/></a:solidFill>
+          <a:ln w="12700"><a:solidFill><a:srgbClr val="C8860A"/></a:solidFill><a:prstDash val="solid"/></a:ln>
+        </p:spPr>
+      </p:sp>
+      <!-- Label -->
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="3" name="LabelText"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="365760" y="137160"/>
+            <a:ext cx="2286000" cy="320040"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
+          <a:noFill/><a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" rtlCol="0" anchor="ctr"/>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr indent="0" marL="0"><a:buNone/></a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="1000" b="1" dirty="0">
+                <a:solidFill><a:srgbClr val="C8860A"/></a:solidFill>
+              </a:rPr>
+              <a:t>13 | CONCLUSÃO</a:t>
+            </a:r>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <!-- Main title -->
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="4" name="MainTitle"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="365760" y="548640"/>
+            <a:ext cx="8412480" cy="685800"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
+          <a:noFill/><a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" rtlCol="0" anchor="ctr"/>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="ctr" indent="0" marL="0"><a:buNone/></a:pPr>
+            <a:r>
+              <a:rPr lang="pt-BR" sz="4400" b="1" dirty="0">
+                <a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill>
+              </a:rPr>
+              <a:t>TinyML agrícola funciona.</a:t>
+            </a:r>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <!-- Subtitle gold -->
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="5" name="Subtitle"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="365760" y="1234440"/>
+            <a:ext cx="8412480" cy="347472"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
+          <a:noFill/><a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" rtlCol="0" anchor="ctr"/>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="ctr" indent="0" marL="0"><a:buNone/></a:pPr>
+            <a:r>
+              <a:rPr lang="pt-BR" sz="2000" b="1" dirty="0">
+                <a:solidFill><a:srgbClr val="C8860A"/></a:solidFill>
+              </a:rPr>
+              <a:t>O gargalo é o dado, não o hardware.</a:t>
+            </a:r>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <!-- Card 1: Viabilidade -->
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="6" name="Card1Bg"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="365760" y="1737360"/>
+            <a:ext cx="3930240" cy="2800000"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
+          <a:solidFill><a:srgbClr val="2D5A2D"/></a:solidFill>
+          <a:ln w="19050"><a:solidFill><a:srgbClr val="C8860A"/></a:solidFill><a:prstDash val="solid"/></a:ln>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="7" name="Card1Text"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="420000" y="1800000"/>
+            <a:ext cx="3875640" cy="2700000"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
+          <a:noFill/><a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" rtlCol="0" anchor="t"/>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr indent="0" marL="0"><a:buNone/></a:pPr>
+            <a:r>
+              <a:rPr lang="pt-BR" sz="1200" b="1" dirty="0">
+                <a:solidFill><a:srgbClr val="C8860A"/></a:solidFill>
+              </a:rPr>
+              <a:t>VIABILIDADE</a:t>
+            </a:r>
+          </a:p>
+          <a:p>
+            <a:pPr indent="0" marL="0"><a:buNone/></a:pPr>
+            <a:endParaRPr lang="pt-BR" sz="950" dirty="0"/>
+          </a:p>
+          <a:p>
+            <a:pPr indent="0" marL="0"><a:buNone/></a:pPr>
+            <a:r>
+              <a:rPr lang="pt-BR" sz="950" dirty="0">
+                <a:solidFill><a:srgbClr val="CCCCCC"/></a:solidFill>
+              </a:rPr>
+              <a:t>MobileNetV2 INT8</a:t>
+            </a:r>
+          </a:p>
+          <a:p>
+            <a:pPr indent="0" marL="0"><a:buNone/></a:pPr>
+            <a:r>
+              <a:rPr lang="pt-BR" sz="950" dirty="0">
+                <a:solidFill><a:srgbClr val="CCCCCC"/></a:solidFill>
+              </a:rPr>
+              <a:t>638KB · 692ms · ~R$80</a:t>
+            </a:r>
+          </a:p>
+          <a:p>
+            <a:pPr indent="0" marL="0"><a:buNone/></a:pPr>
+            <a:r>
+              <a:rPr lang="pt-BR" sz="950" dirty="0">
+                <a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill>
+              </a:rPr>
+              <a:t>Roda no ESP32-S3.</a:t>
+            </a:r>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <!-- Card 2: Gap documentado -->
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="8" name="Card2Bg"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="4848000" y="1737360"/>
+            <a:ext cx="3930240" cy="2800000"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
+          <a:solidFill><a:srgbClr val="2D5A2D"/></a:solidFill>
+          <a:ln w="19050"><a:solidFill><a:srgbClr val="C8860A"/></a:solidFill><a:prstDash val="solid"/></a:ln>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="9" name="Card2Text"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="4902240" y="1800000"/>
+            <a:ext cx="3875640" cy="2700000"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
+          <a:noFill/><a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" rtlCol="0" anchor="t"/>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr indent="0" marL="0"><a:buNone/></a:pPr>
+            <a:r>
+              <a:rPr lang="pt-BR" sz="1200" b="1" dirty="0">
+                <a:solidFill><a:srgbClr val="C8860A"/></a:solidFill>
+              </a:rPr>
+              <a:t>GAP ESTRUTURAL</a:t>
+            </a:r>
+          </a:p>
+          <a:p>
+            <a:pPr indent="0" marL="0"><a:buNone/></a:pPr>
+            <a:endParaRPr lang="pt-BR" sz="950" dirty="0"/>
+          </a:p>
+          <a:p>
+            <a:pPr indent="0" marL="0"><a:buNone/></a:pPr>
+            <a:r>
+              <a:rPr lang="pt-BR" sz="950" dirty="0">
+                <a:solidFill><a:srgbClr val="CCCCCC"/></a:solidFill>
+              </a:rPr>
+              <a:t>20–30% em campo</a:t>
+            </a:r>
+          </a:p>
+          <a:p>
+            <a:pPr indent="0" marL="0"><a:buNone/></a:pPr>
+            <a:r>
+              <a:rPr lang="pt-BR" sz="950" dirty="0">
+                <a:solidFill><a:srgbClr val="CCCCCC"/></a:solidFill>
+              </a:rPr>
+              <a:t>não é fracasso —</a:t>
+            </a:r>
+          </a:p>
+          <a:p>
+            <a:pPr indent="0" marL="0"><a:buNone/></a:pPr>
+            <a:r>
+              <a:rPr lang="pt-BR" sz="950" dirty="0">
+                <a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill>
+              </a:rPr>
+              <a:t>é fenômeno documentado.</a:t>
+            </a:r>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+      <!-- Footer with contact -->
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="12" name="FooterBg"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="0" y="4800600"/>
+            <a:ext cx="9144000" cy="342900"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
+          <a:solidFill><a:srgbClr val="0D1E0D"/></a:solidFill>
+          <a:ln w="12700"><a:solidFill><a:srgbClr val="C8860A"/></a:solidFill><a:prstDash val="solid"/></a:ln>
+        </p:spPr>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr>
+          <p:cNvPr id="13" name="FooterText"/>
+          <p:cNvSpPr/>
+          <p:nvPr/>
+        </p:nvSpPr>
+        <p:spPr>
+          <a:xfrm>
+            <a:off x="274320" y="4800600"/>
+            <a:ext cx="8595360" cy="342900"/>
+          </a:xfrm>
+          <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
+          <a:noFill/><a:ln/>
+        </p:spPr>
+        <p:txBody>
+          <a:bodyPr wrap="square" rtlCol="0" anchor="ctr"/>
+          <a:lstStyle/>
+          <a:p>
+            <a:pPr algn="ctr" indent="0" marL="0"><a:buNone/></a:pPr>
+            <a:r>
+              <a:rPr lang="en-US" sz="800" dirty="0">
+                <a:solidFill><a:srgbClr val="C8860A"/></a:solidFill>
+              </a:rPr>
+              <a:t>github.com/Namem/extensao2  ·  ceres.up.railway.app  ·  namem.rachid.jaudy@gmail.com  ·  Junho 2026</a:t>
+            </a:r>
+          </a:p>
+        </p:txBody>
+      </p:sp>
+    </p:spTree>
+  </p:cSld>
+  <p:clrMapOvr>
+    <a:masterClrMapping/>
+  </p:clrMapOvr>
+</p:sld>

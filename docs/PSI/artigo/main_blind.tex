@@ -20,11 +20,13 @@
 \title{TinyML para Detecção de Doenças em Tomateiro: Três Arquiteturas de
 Inferência e Gap Laboratório-Campo}
 
-\author{Namem Rachid Jaudy Neto\inst{1}}
+%% VERSÃO BLIND — descomentar para submissão com revisão cega
+% \author{Omitido para revisão cega\inst{1}}
+% \address{Instituição omitida \email{omitido@omitido.com}}
 
-\address{Instituto Federal de Educação, Ciência e Tecnologia de Mato Grosso -- IFMT\\
-  Cuiabá -- MT -- Brasil
-  \email{namem.rachid.jaudy@gmail.com}}
+\author{[Autor Omitido para Revisão Cega]\inst{1}}
+
+\address{[Instituição Omitida para Revisão Cega]}
 
 \begin{document}
 \maketitle
@@ -99,7 +101,7 @@ on-device e API cloud) sobre o mesmo modelo; (4)~valida quantitativamente o gap 
 3~\textit{datasets} independentes; (5)~documenta cinco experimentos com resultados
 negativos reprodutíveis (\textit{augmentation} sintética ineficaz) e positivos
 (\textit{fine-tuning} real $+$10~pp). Código e modelos disponíveis em
-\url{https://github.com/Namem/extensao2}.
+\url{https://anonymous.4open.science/r/extensao2-B79B}.
 
 O desenvolvimento seguiu ciclos iterativos em contexto de projeto acadêmico de
 graduação sem financiamento externo dedicado. Restrições de prazo e a não-aquisição do módulo de câmera
@@ -227,10 +229,8 @@ API cloud) em diferentes estágios de maturidade; (c)~documentação de
 %% ----------------------------------------------------------------
 
 Trata-se de uma pesquisa aplicada de natureza experimental, organizada em ciclos
-iterativos de desenvolvimento e validação. O trabalho foi desenvolvido no Instituto
-Federal de Mato Grosso (IFMT), Cuiabá, sem financiamento externo dedicado.
-A Tabela~\ref{tab:recursos} sumariza os recursos de \textit{hardware} e
-\textit{software} empregados.
+iterativos de desenvolvimento e validação. O trabalho foi desenvolvido em uma instituição federal de ensino brasileira, sem financiamento externo dedicado. A Tabela~\ref{tab:recursos}
+sumariza os recursos de \textit{hardware} e \textit{software} empregados.
 
 \begin{table}[ht]
 \centering
@@ -271,7 +271,7 @@ como arrays~C (692~ms~$\pm$1~ms); o \textit{pipeline} de captura completo
 (câmera~→~inferência~→~MQTT) não foi concluído neste ciclo por restrição de
 prazo e pela não-aquisição do módulo OV5640.
 
-\textbf{(2) Caminho Mobile on-device (Flutter + \texttt{tflite\_flutter}) —
+\textbf{(2) Caminho Mobile on-device (Flutter + \texttt{tflite\_flutter}) ---
 \textit{principal veículo validado}:} o mesmo modelo é carregado como
 \textit{asset} no APK e executado localmente no Android via
 \texttt{tflite\_flutter~0.12.1}, sem servidor. Latência estimada de 200--400~ms,
@@ -280,7 +280,7 @@ na tela de câmera. \textbf{Status:} \textit{pipeline} funcional câmera~→~app
 validado \textit{end-to-end}; tornou-se o caminho primário de validação do produto
 diante das restrições que impediram a conclusão do caminho Edge.
 
-\textbf{(3) Caminho Cloud (Flutter + Django) — \textit{validado end-to-end}:} o
+\textbf{(3) Caminho Cloud (Flutter + Django) --- \textit{validado end-to-end}:} o
 aplicativo Flutter captura a imagem, envia via HTTPS à API Django (Railway), que
 executa o mesmo modelo TFLite via Python \textit{subprocess} e retorna o
 diagnóstico em JSON. \textit{Pipeline} completo câmera~→~app~→~API~→~modelo~→~resultado
@@ -588,8 +588,8 @@ As principais contribuições são:
 \begin{enumerate}
   \item \textbf{Pipeline reproduzível:} PlantVillage $\to$ 88.949~imgs $\to$
         MobileNetV2 INT8 $\to$ ESP32-S3, código aberto
-        (\url{https://github.com/Namem/extensao2}).
-  \item \textbf{Quantificação da calibração INT8:} $+$33,8~pp com
+        (\url{https://anonymous.4open.science/r/extensao2-B79B}).
+  \item \textbf{Quantificação da calibração INT8:} $+$34~pp com
         \textit{representative\_dataset} (62,0\%~$\to$~95,76\%) vs.\ quantização
         automática, com perda residual de apenas 2,37~pp frente ao modelo float.
   \item \textbf{Benchmark em 3 \textit{datasets} de campo:} documentação do gap
@@ -651,11 +651,10 @@ Mato Grosso.
 %% ----------------------------------------------------------------
 
 Declara-se que ferramentas de inteligência artificial generativa
-(Claude, Anthropic) foram utilizadas como auxílio na revisão gramatical,
-reorganização de parágrafos e sugestão de formatação LaTeX. Nenhum conteúdo
-técnico --- experimentos, dados, análises, interpretações ou conclusões ---
-foi gerado por IA; todo o desenvolvimento, execução e análise são de autoria
-e responsabilidade exclusivas do autor.
+foram utilizadas como auxílio na revisão gramatical, reorganização de parágrafos
+e sugestão de formatação LaTeX. Nenhum conteúdo técnico --- experimentos, dados,
+análises, interpretações ou conclusões --- foi gerado por IA; todo o
+desenvolvimento, execução e análise são de autoria e responsabilidade exclusivas.
 
 %% ----------------------------------------------------------------
 \bibliographystyle{sbc}
