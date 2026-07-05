@@ -253,3 +253,8 @@ docs/extensao/slides/unpacked*/
 docs/extensao/slides/preview/
 docs/extensao/slides/qa/
 docs/extensao/**/__pycache__/
+
+# Documentos de TCC — manter apenas localmente (nao publicar)
+docs/core/TCC/
+docs/core/TCC_CERES.md
+docs/core/BACKLOG_ESCRITA.md
