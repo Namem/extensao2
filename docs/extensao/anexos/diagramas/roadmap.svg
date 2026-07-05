@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1520 740" width="1520" height="740" font-family="Segoe UI, Arial, sans-serif">
+<defs>
+  <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+    <path d="M0,0 L8,3 L0,6 Z" fill="#1A3A1A"/>
+  </marker>
+  <marker id="arrowOpen" markerWidth="12" markerHeight="12" refX="9" refY="4" orient="auto" markerUnits="strokeWidth">
+    <path d="M0,0 L9,4 L0,8" fill="none" stroke="#1A3A1A" stroke-width="1.4"/>
+  </marker>
+  <marker id="tri" markerWidth="16" markerHeight="14" refX="14" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L14,6 L1,11 Z" fill="#F5F0E8" stroke="#1A3A1A" stroke-width="1.4"/>
+  </marker>
+</defs>
+<rect x="0" y="0" width="1520" height="740" fill="#F5F0E8"/>
+<text x="760.0" y="42" font-size="24" font-weight="700" fill="#1A3A1A" text-anchor="middle">Roadmap do Produto — Linha do Tempo</text>
+<text x="760.0" y="64" font-size="12.5" fill="#6B6256" text-anchor="middle">Ceres Diagnostico — Atividade de Extensao II — IFMT Cuiaba</text>
+
+<line x1="70" y1="150" x2="1013.0" y2="150" stroke="#5D6B52" stroke-width="3"/>
+<line x1="1013.0" y1="150" x2="1375" y2="150" stroke="#C8860A" stroke-width="3" stroke-dasharray="9,6" marker-end="url(#arrow)"/>
+<circle cx="245.0" cy="150" r="13" fill="#2D5A2D" stroke="#F5F0E8" stroke-width="3"/>
+<text x="245.0" y="155" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif">1</text>
+<text x="245.0" y="124" font-size="12" font-weight="700" fill="#C8860A" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif">≈ 1 mês</text>
+<line x1="245.0" y1="163" x2="245.0" y2="195" stroke="#5D6B52" stroke-width="1.5"/>
+<rect x="70" y="195" width="350" height="428" rx="12" fill="#FBF7F0" stroke="#2D5A2D" stroke-width="2"/>
+<rect x="70" y="195" width="350" height="54" rx="12" fill="#2D5A2D"/>
+<rect x="70" y="237" width="350" height="12" fill="#2D5A2D"/>
+<text x="88" y="218" font-size="12" font-weight="700" fill="#D8E8D0" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">SPRINT 1</text>
+<text x="88" y="239" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">Núcleo Inteligente</text>
+<text x="88" y="275" font-size="11" font-weight="700" fill="#2D5A2D" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">Backend + IA</text>
+<text x="402" y="275" font-size="11" font-weight="700" fill="#C8860A" text-anchor="end" font-family="Segoe UI, Arial, sans-serif">18 tarefas</text>
+<line x1="88" y1="287" x2="402" y2="287" stroke="#D8D0C0" stroke-width="1"/>
+<circle cx="96" cy="315" r="3.5" fill="#2D5A2D"/>
+<text x="110" y="319" font-size="11.5" font-weight="400" fill="#261E19" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">Motor de diagnóstico + API</text>
+<circle cx="96" cy="367" r="3.5" fill="#2D5A2D"/>
+<text x="110" y="371" font-size="11.5" font-weight="400" fill="#261E19" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">JWT · Multi-tenant · PostgreSQL</text>
+<circle cx="96" cy="419" r="3.5" fill="#2D5A2D"/>
+<text x="110" y="423" font-size="11.5" font-weight="400" fill="#261E19" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">Dataset PlantVillage (88.949)</text>
+<circle cx="96" cy="471" r="3.5" fill="#2D5A2D"/>
+<text x="110" y="475" font-size="11.5" font-weight="400" fill="#261E19" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">Modelo IA — Exp A→E (638 KB)</text>
+<circle cx="96" cy="523" r="3.5" fill="#2D5A2D"/>
+<text x="110" y="527" font-size="11.5" font-weight="400" fill="#261E19" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">Backend MQTT + validação campo</text>
+<rect x="70" y="593" width="350" height="30" fill="#1A3A1A"/>
+<rect x="70" y="593" width="350" height="12" fill="#1A3A1A"/>
+<text x="245.0" y="613" font-size="11" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif">✔ CONCLUÍDA</text>
+<circle cx="629.0" cy="150" r="13" fill="#3B6B3B" stroke="#F5F0E8" stroke-width="3"/>
+<text x="629.0" y="155" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif">2</text>
+<text x="629.0" y="124" font-size="12" font-weight="700" fill="#C8860A" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif">≈ 1 mês</text>
+<line x1="629.0" y1="163" x2="629.0" y2="195" stroke="#5D6B52" stroke-width="1.5"/>
+<rect x="454" y="195" width="350" height="428" rx="12" fill="#FBF7F0" stroke="#3B6B3B" stroke-width="2"/>
+<rect x="454" y="195" width="350" height="54" rx="12" fill="#3B6B3B"/>
+<rect x="454" y="237" width="350" height="12" fill="#3B6B3B"/>
+<text x="472" y="218" font-size="12" font-weight="700" fill="#D8E8D0" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">SPRINT 2</text>
+<text x="472" y="239" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">Borda Embarcada</text>
+<text x="472" y="275" font-size="11" font-weight="700" fill="#3B6B3B" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">Firmware + IoT</text>
+<text x="786" y="275" font-size="11" font-weight="700" fill="#C8860A" text-anchor="end" font-family="Segoe UI, Arial, sans-serif">8 tarefas</text>
+<line x1="472" y1="287" x2="786" y2="287" stroke="#D8D0C0" stroke-width="1"/>
+<circle cx="480" cy="315" r="3.5" fill="#3B6B3B"/>
+<text x="494" y="319" font-size="11.5" font-weight="400" fill="#261E19" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">Firmware ESP32-S3 (PlatformIO)</text>
+<circle cx="480" cy="367" r="3.5" fill="#3B6B3B"/>
+<text x="494" y="371" font-size="11.5" font-weight="400" fill="#261E19" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">WiFi + MQTT + DHT22 / solo</text>
+<circle cx="480" cy="419" r="3.5" fill="#3B6B3B"/>
+<text x="494" y="423" font-size="11.5" font-weight="400" fill="#261E19" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">TFLite Micro embarcado</text>
+<circle cx="480" cy="471" r="3.5" fill="#3B6B3B"/>
+<text x="494" y="475" font-size="11.5" font-weight="400" fill="#261E19" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">Benchmark 692 ms · 10/10</text>
+<circle cx="480" cy="523" r="3.5" fill="#3B6B3B"/>
+<text x="494" y="527" font-size="11.5" font-weight="400" fill="#261E19" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">Pilha IoT ponta a ponta</text>
+<rect x="454" y="593" width="350" height="30" fill="#1A3A1A"/>
+<rect x="454" y="593" width="350" height="12" fill="#1A3A1A"/>
+<text x="629.0" y="613" font-size="11" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif">✔ CONCLUÍDA</text>
+<circle cx="1013.0" cy="150" r="13" fill="#4A7A4A" stroke="#F5F0E8" stroke-width="3"/>
+<text x="1013.0" y="155" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif">3</text>
+<text x="1013.0" y="124" font-size="12" font-weight="700" fill="#C8860A" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif">≈ 1 mês</text>
+<line x1="1013.0" y1="163" x2="1013.0" y2="195" stroke="#5D6B52" stroke-width="1.5"/>
+<rect x="838" y="195" width="350" height="428" rx="12" fill="#FBF7F0" stroke="#4A7A4A" stroke-width="2"/>
+<rect x="838" y="195" width="350" height="54" rx="12" fill="#4A7A4A"/>
+<rect x="838" y="237" width="350" height="12" fill="#4A7A4A"/>
+<text x="856" y="218" font-size="12" font-weight="700" fill="#D8E8D0" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">SPRINT 3</text>
+<text x="856" y="239" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">Aplicativo e Integração</text>
+<text x="856" y="275" font-size="11" font-weight="700" fill="#4A7A4A" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">App + UX + Deploy</text>
+<text x="1170" y="275" font-size="11" font-weight="700" fill="#C8860A" text-anchor="end" font-family="Segoe UI, Arial, sans-serif">29 tarefas</text>
+<line x1="856" y1="287" x2="1170" y2="287" stroke="#D8D0C0" stroke-width="1"/>
+<circle cx="864" cy="315" r="3.5" fill="#4A7A4A"/>
+<text x="878" y="319" font-size="11.5" font-weight="400" fill="#261E19" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">App Flutter — 5 telas</text>
+<circle cx="864" cy="367" r="3.5" fill="#4A7A4A"/>
+<text x="878" y="371" font-size="11.5" font-weight="400" fill="#261E19" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">Design System + on-device 60ms</text>
+<circle cx="864" cy="419" r="3.5" fill="#4A7A4A"/>
+<text x="878" y="423" font-size="11.5" font-weight="400" fill="#261E19" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">Deploy Railway + MQTT Cloud</text>
+<circle cx="864" cy="471" r="3.5" fill="#4A7A4A"/>
+<text x="878" y="475" font-size="11.5" font-weight="400" fill="#261E19" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">Mapa GPS · Perfil · Guia</text>
+<circle cx="864" cy="523" r="3.5" fill="#4A7A4A"/>
+<text x="878" y="527" font-size="11.5" font-weight="400" fill="#261E19" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">Sync offline + robustez</text>
+<rect x="838" y="593" width="350" height="30" fill="#1A3A1A"/>
+<rect x="838" y="593" width="350" height="12" fill="#1A3A1A"/>
+<text x="1013.0" y="613" font-size="11" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif">✔ CONCLUÍDA</text>
+<text x="1360" y="124" font-size="11.5" font-weight="700" fill="#C8860A" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-style="italic">Fase Futura</text>
+<circle cx="1360" cy="150" r="11" fill="#F5F0E8" stroke="#C8860A" stroke-width="3"/>
+<line x1="1360" y1="161" x2="1360" y2="195" stroke="#C8860A" stroke-width="1.5" stroke-dasharray="4,3"/>
+<rect x="1230.0" y="195" width="260" height="210" rx="12" fill="#FBF3E2" stroke="#C8860A" stroke-width="1.8"/>
+<text x="1360" y="225" font-size="11" font-weight="700" fill="#C8860A" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif">PRÓXIMOS PASSOS</text>
+<line x1="1248.0" y1="239" x2="1472.0" y2="239" stroke="#E0CFA8" stroke-width="1"/>
+<text x="1360" y="267" font-size="11" font-weight="400" fill="#261E19" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif">Câmera OV5640 no ESP32-S3</text>
+<text x="1360" y="291" font-size="11" font-weight="400" fill="#261E19" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif">(diagnóstico autônomo)</text>
+<text x="1360" y="315" font-size="11" font-weight="400" fill="#261E19" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif"></text>
+<text x="1360" y="339" font-size="11" font-weight="400" fill="#261E19" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif">EfficientNet-B0 no</text>
+<text x="1360" y="363" font-size="11" font-weight="400" fill="#261E19" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif">Raspberry Pi 3B+</text>
+<text x="760.0" y="718" font-size="11" font-weight="400" fill="#6B6256" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif">Metodologia: Scrum adaptado · 3 sprints de ~1 mês · versionamento no GitHub (github.com/Namem/extensao2)</text>
+</svg>

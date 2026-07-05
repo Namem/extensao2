@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1260 900" width="1260" height="900" font-family="Segoe UI, Arial, sans-serif">
+<defs>
+  <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+    <path d="M0,0 L8,3 L0,6 Z" fill="#1A3A1A"/>
+  </marker>
+  <marker id="arrowOpen" markerWidth="12" markerHeight="12" refX="9" refY="4" orient="auto" markerUnits="strokeWidth">
+    <path d="M0,0 L9,4 L0,8" fill="none" stroke="#1A3A1A" stroke-width="1.4"/>
+  </marker>
+  <marker id="tri" markerWidth="16" markerHeight="14" refX="14" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L14,6 L1,11 Z" fill="#F5F0E8" stroke="#1A3A1A" stroke-width="1.4"/>
+  </marker>
+</defs>
+<rect x="0" y="0" width="1260" height="900" fill="#F5F0E8"/>
+<text x="630.0" y="42" font-size="24" font-weight="700" fill="#1A3A1A" text-anchor="middle">Modelo Entidade-Relacionamento (MER)</text>
+<text x="630.0" y="64" font-size="12.5" fill="#6B6256" text-anchor="middle">Ceres Diagnostico — Atividade de Extensao II — IFMT Cuiaba</text>
+
+<rect x="70" y="110" width="260" height="90" rx="4" fill="#FBF7F0" stroke="#1A3A1A" stroke-width="1.8"/>
+<rect x="70" y="110" width="260" height="28" rx="4" fill="#1A3A1A"/>
+<rect x="70" y="134" width="260" height="4" fill="#1A3A1A"/>
+<text x="200.0" y="129" font-size="12.5" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="Consolas, monospace">accounts_tenant</text>
+<rect x="78" y="142" width="26" height="15" rx="3" fill="#C8860A"/>
+<text x="91" y="153" font-size="9" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="Consolas, monospace">PK</text>
+<text x="112" y="154" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">id  bigint</text>
+<text x="112" y="172" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">nome  varchar(255)</text>
+<text x="112" y="190" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">criado_em  timestamp</text>
+<rect x="70" y="340" width="280" height="126" rx="4" fill="#FBF7F0" stroke="#1A3A1A" stroke-width="1.8"/>
+<rect x="70" y="340" width="280" height="28" rx="4" fill="#1A3A1A"/>
+<rect x="70" y="364" width="280" height="4" fill="#1A3A1A"/>
+<text x="210.0" y="359" font-size="12.5" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="Consolas, monospace">accounts_customuser</text>
+<rect x="78" y="372" width="26" height="15" rx="3" fill="#C8860A"/>
+<text x="91" y="383" font-size="9" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="Consolas, monospace">PK</text>
+<text x="112" y="384" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">id  bigint</text>
+<text x="112" y="402" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">username  varchar</text>
+<text x="112" y="420" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">email  varchar</text>
+<text x="112" y="438" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">password  varchar</text>
+<rect x="78" y="444" width="26" height="15" rx="3" fill="#0C447C"/>
+<text x="91" y="455" font-size="9" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="Consolas, monospace">FK</text>
+<text x="112" y="456" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">tenant_id  bigint</text>
+<rect x="470" y="250" width="300" height="270" rx="4" fill="#FBF7F0" stroke="#1A3A1A" stroke-width="1.8"/>
+<rect x="470" y="250" width="300" height="28" rx="4" fill="#1A3A1A"/>
+<rect x="470" y="274" width="300" height="4" fill="#1A3A1A"/>
+<text x="620.0" y="269" font-size="12.5" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="Consolas, monospace">diagnostico_diagnosticoevento</text>
+<rect x="478" y="282" width="26" height="15" rx="3" fill="#C8860A"/>
+<text x="491" y="293" font-size="9" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="Consolas, monospace">PK</text>
+<text x="512" y="294" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">id  bigint</text>
+<text x="512" y="312" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">device_id  varchar(50)</text>
+<text x="512" y="330" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">classe_detectada  varchar</text>
+<text x="512" y="348" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">confianca  double</text>
+<text x="512" y="366" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">temperatura  double</text>
+<text x="512" y="384" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">umidade_ar  double</text>
+<text x="512" y="402" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">umidade_solo  double</text>
+<text x="512" y="420" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">latitude  double</text>
+<text x="512" y="438" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">longitude  double</text>
+<text x="512" y="456" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">timestamp  timestamp</text>
+<rect x="478" y="462" width="26" height="15" rx="3" fill="#0C447C"/>
+<text x="491" y="473" font-size="9" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="Consolas, monospace">FK</text>
+<text x="512" y="474" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">usuario_id  bigint</text>
+<rect x="478" y="480" width="26" height="15" rx="3" fill="#0C447C"/>
+<text x="491" y="491" font-size="9" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="Consolas, monospace">FK</text>
+<text x="512" y="492" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">diagnostico_id  bigint</text>
+<text x="512" y="510" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">criado_em  timestamp</text>
+<rect x="880" y="110" width="310" height="126" rx="4" fill="#FBF7F0" stroke="#1A3A1A" stroke-width="1.8"/>
+<rect x="880" y="110" width="310" height="28" rx="4" fill="#1A3A1A"/>
+<rect x="880" y="134" width="310" height="4" fill="#1A3A1A"/>
+<text x="1035.0" y="129" font-size="12.5" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="Consolas, monospace">diagnostico_diagnostico</text>
+<rect x="888" y="142" width="26" height="15" rx="3" fill="#C8860A"/>
+<text x="901" y="153" font-size="9" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="Consolas, monospace">PK</text>
+<text x="922" y="154" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">id  bigint</text>
+<text x="922" y="172" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">nome  varchar(200)</text>
+<text x="922" y="190" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">descricao  text</text>
+<text x="922" y="208" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">recomendacao_manejo  text</text>
+<text x="922" y="226" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">criado_em  timestamp</text>
+<rect x="890" y="450" width="290" height="72" rx="4" fill="#FBF7F0" stroke="#1A3A1A" stroke-width="1.8"/>
+<rect x="890" y="450" width="290" height="28" rx="4" fill="#1A3A1A"/>
+<rect x="890" y="474" width="290" height="4" fill="#1A3A1A"/>
+<text x="1035.0" y="469" font-size="12.5" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="Consolas, monospace">diagnostico_pergunta</text>
+<rect x="898" y="482" width="26" height="15" rx="3" fill="#C8860A"/>
+<text x="911" y="493" font-size="9" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="Consolas, monospace">PK</text>
+<text x="932" y="494" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">id  bigint</text>
+<text x="932" y="512" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">texto  varchar(255)</text>
+<rect x="865" y="640" width="320" height="126" rx="4" fill="#FBF7F0" stroke="#1A3A1A" stroke-width="1.8"/>
+<rect x="865" y="640" width="320" height="28" rx="4" fill="#1A3A1A"/>
+<rect x="865" y="664" width="320" height="4" fill="#1A3A1A"/>
+<text x="1025.0" y="659" font-size="12.5" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="Consolas, monospace">diagnostico_opcao</text>
+<rect x="873" y="672" width="26" height="15" rx="3" fill="#C8860A"/>
+<text x="886" y="683" font-size="9" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="Consolas, monospace">PK</text>
+<text x="907" y="684" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">id  bigint</text>
+<text x="907" y="702" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">texto  varchar(200)</text>
+<rect x="873" y="708" width="26" height="15" rx="3" fill="#0C447C"/>
+<text x="886" y="719" font-size="9" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="Consolas, monospace">FK</text>
+<text x="907" y="720" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">pergunta_origem_id</text>
+<rect x="873" y="726" width="26" height="15" rx="3" fill="#0C447C"/>
+<text x="886" y="737" font-size="9" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="Consolas, monospace">FK</text>
+<text x="907" y="738" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">proxima_pergunta_id</text>
+<rect x="873" y="744" width="26" height="15" rx="3" fill="#0C447C"/>
+<text x="886" y="755" font-size="9" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="Consolas, monospace">FK</text>
+<text x="907" y="756" font-size="11" font-weight="400" fill="#261E19" text-anchor="start" font-family="Consolas, monospace">diagnostico_final_id</text>
+<line x1="200.0" y1="200" x2="210.0" y2="340" stroke="#0C447C" stroke-width="1.6"/>
+<text x="190.0" y="194" font-size="12" font-weight="700" fill="#1A3A1A" text-anchor="end" font-family="Segoe UI, Arial, sans-serif">1</text>
+<text x="220.0" y="356" font-size="12" font-weight="700" fill="#1A3A1A" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">N</text>
+<line x1="350" y1="403.0" x2="470" y2="385.0" stroke="#0C447C" stroke-width="1.6"/>
+<text x="360" y="397.0" font-size="12" font-weight="700" fill="#1A3A1A" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">1</text>
+<text x="460" y="379.0" font-size="12" font-weight="700" fill="#1A3A1A" text-anchor="end" font-family="Segoe UI, Arial, sans-serif">N</text>
+<line x1="770" y1="385.0" x2="880" y2="173.0" stroke="#0C447C" stroke-width="1.6"/>
+<text x="780" y="379.0" font-size="12" font-weight="700" fill="#1A3A1A" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">1</text>
+<text x="870" y="167.0" font-size="12" font-weight="700" fill="#1A3A1A" text-anchor="end" font-family="Segoe UI, Arial, sans-serif">N</text>
+<line x1="1035.0" y1="522" x2="1025.0" y2="640" stroke="#0C447C" stroke-width="1.6"/>
+<text x="1025.0" y="516" font-size="12" font-weight="700" fill="#1A3A1A" text-anchor="end" font-family="Segoe UI, Arial, sans-serif">1</text>
+<text x="1035.0" y="656" font-size="12" font-weight="700" fill="#1A3A1A" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">N</text>
+<path d="M865,696 L833,696 L833,486.0 L890,486.0" fill="none" stroke="#0C447C" stroke-width="1.4" stroke-dasharray="5,4"/>
+<path d="M1185,714 L1232,714 L1232,173.0 L1190,173.0" fill="none" stroke="#0C447C" stroke-width="1.4" stroke-dasharray="5,4"/>
+<rect x="70" y="848" width="26" height="15" rx="3" fill="#C8860A"/>
+<text x="83" y="859" font-size="9" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="Consolas, monospace">PK</text>
+<text x="104" y="860" font-size="11" font-weight="400" fill="#6B6256" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">Chave primaria</text>
+<rect x="230" y="848" width="26" height="15" rx="3" fill="#0C447C"/>
+<text x="243" y="859" font-size="9" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="Consolas, monospace">FK</text>
+<text x="264" y="860" font-size="11" font-weight="400" fill="#6B6256" text-anchor="start" font-family="Segoe UI, Arial, sans-serif">Chave estrangeira      1 —— N : relacionamento um-para-muitos</text>
+</svg>
