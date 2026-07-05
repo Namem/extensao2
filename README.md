@@ -169,7 +169,7 @@ flutter run -d android
 ### 3 — Firmware ESP32-S3 (PlatformIO)
 ```bash
 cd firmware/esp32s3_ceres
-# Editar src/config.h com SSID, senha WiFi e broker MQTT
+# Copiar include/config.h.example -> include/config.h e ajustar SSID, senha WiFi e broker MQTT
 pio run --target upload
 pio device monitor --baud 115200
 ```
@@ -196,7 +196,6 @@ python verificar_ambiente.py --notebook  # Notebook (foco em WiFi + ESP32)
 | GET | `/api/diagnostico/sensor/` | Última leitura de sensor do ESP32 |
 
 **Deploy de produção:** `https://ceres.up.railway.app`
-Conta de teste: `test@test.com` / `test123`
 
 ---
 
