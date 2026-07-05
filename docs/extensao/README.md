@@ -4,25 +4,24 @@ Pacote de entrega da disciplina. **O relatório é autocontido** — toda a docu
 técnica (diagramas, API, manuais, backlog) está reproduzida dentro dele.
 
 ## Entregável principal
-- **[relatorio_final_extensao.pdf](relatorio_final_extensao.pdf)** — versão final para entrega
-- **[relatorio_final_extensao.docx](relatorio_final_extensao.docx)** — versão editável (Word)
-- [RELATORIO_FINAL_EXTENSAO.md](RELATORIO_FINAL_EXTENSAO.md) — resumo em Markdown
+- **[Namem_Rachid_relatorio_final_extensao.pdf](Namem_Rachid_relatorio_final_extensao.pdf)** — versão final para entrega
+- **[Namem_Rachid_relatorio_final_extensao.docx](Namem_Rachid_relatorio_final_extensao.docx)** — versão editável (Word)
 
 ## Estrutura da pasta
 ```
 extensao/
-├─ relatorio_final_extensao.pdf / .docx     ← ENTREGÁVEL (autocontido)
-├─ RELATORIO_FINAL_EXTENSAO.md
+├─ Namem_Rachid_relatorio_final_extensao.pdf / .docx   ← ENTREGÁVEL (autocontido)
+├─ README.md
 ├─ anexos/                                   ← material de apoio
 │  ├─ diagramas/    casos_de_uso · arquitetura · diagrama_classes · mer · roadmap (png/svg)
-│  ├─ backlog_produto_ceres.xlsx
-│  ├─ BACKLOG_PRODUTO.md
-│  ├─ API_CERES.md · MANUAL_INSTALACAO.md · MANUAL_USUARIO.md
+│  ├─ backlog_produto_ceres.xlsx · BACKLOG_PRODUTO.md
+│  ├─ API_CERES.md · MANUAL_INSTALACAO.md · MANUAL_USUARIO.md · CHECKLIST.md
 ├─ assets/
-│  ├─ screenshots/  12 telas do app (renderizadas do protótipo)
+│  ├─ screenshots/     12 telas do app (renderizadas do protótipo)
 │  └─ fotos_hardware/  fotos do ESP32-S3, sensores e testes
-├─ slides/          apresentação Sprint MVP + roteiro
+├─ slides/          apresentação Sprint MVP_ATT + roteiro + vídeo demo
 └─ fontes/          scripts geradores (Python + Node)
+   └─ slides/       scripts legados de geração de slides
 ```
 
 ## Como regenerar

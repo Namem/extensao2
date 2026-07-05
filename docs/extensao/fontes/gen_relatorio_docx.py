@@ -10,7 +10,7 @@ from docx.oxml import OxmlElement
 from PIL import Image as PILImage
 import relatorio_conteudo as C
 
-OUT = "C:/Users/Rachid/Desktop/NR/Semestre 2026_1/extensao/ceres-diagnostico/docs/extensao/relatorio_final_extensao.docx"
+OUT = "C:/Users/Rachid/Desktop/NR/Semestre 2026_1/extensao/ceres-diagnostico/docs/extensao/Namem_Rachid_relatorio_final_extensao.docx"
 
 VERDE = RGBColor(0x1A, 0x3A, 0x1A)
 DOUR  = RGBColor(0xA9, 0x6E, 0x08)
