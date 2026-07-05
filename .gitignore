@@ -11,7 +11,6 @@ node_modules/
 *.apk
 
 # ExceÃ§Ã£o: apresentaÃ§Ã£o final PSI (commitar para o professor)
-!docs/PSI/slides/*.pptx
 
 # Assets de QA e node_modules internos (nÃ£o commitar)
 docs/slides_psi/node_modules/
@@ -258,3 +257,6 @@ docs/extensao/**/__pycache__/
 docs/core/TCC/
 docs/core/TCC_CERES.md
 docs/core/BACKLOG_ESCRITA.md
+
+# Artigo/PSI — manter apenas localmente (nao publicar)
+docs/PSI/
